@@ -1,6 +1,6 @@
 # Claude Code Skills
 
-An opinionated set of **14 Claude Code skills** for collaborative software development. The goal is to produce straightforward, maintainable changes while keeping consequential product and architectural decisions under your control.
+An opinionated set of **13 Claude Code skills** for collaborative software development, built around a **project brain**: a `.brain/` folder that holds what the project is, how it is built, what you decided, what is open, and what is done. A new session reads the brain instead of re-reading the codebase. The goal is to produce straightforward, maintainable changes while keeping consequential product and architectural decisions under your control.
 
 The skills are **tools to use when needed**, not a mandatory pipeline. Small changes should stay small; complex or multi-session work can use more structure.
 
@@ -13,34 +13,71 @@ project/
 ├── CLAUDE.md
 └── .claude/
     └── skills/
-        ├── brainstorm/          # SKILL.md + lenses/
-        ├── diagnose/
-        ├── distill-content/
-        ├── domain-modeling/
-        ├── handoff/
-        ├── implement/           # SKILL.md + references/
-        ├── plan-feature/
-        ├── refine-backlog/      # SKILL.md + references/
-        ├── review-architecture/
-        ├── review-code/         # SKILL.md + references/findings.md
-        ├── review-merge-request/
-        ├── review-security/
-        ├── write-spec/
-        └── write-tickets/
+        ├── brain-brainstorm/            # SKILL.md + lenses/
+        ├── brain-diagnose/
+        ├── brain-distill-content/
+        ├── brain-implement/             # SKILL.md + references/
+        ├── brain-plan-feature/
+        ├── brain-refine-backlog/        # SKILL.md + references/
+        ├── brain-review-architecture/
+        ├── brain-review-code/           # SKILL.md + references/findings.md
+        ├── brain-review-merge-request/
+        ├── brain-review-security/
+        ├── brain-update/                # SKILL.md + references/templates.md
+        ├── brain-write-spec/
+        └── brain-write-tickets/
 ```
 
 Merge `CLAUDE.md` with any existing root instructions rather than replacing project-specific guidance.
 
-`review-architecture`, `review-security`, and `review-merge-request` read the shared finding format from `review-code/references/findings.md`, so install them together with `review-code`.
+`brain-review-architecture`, `brain-review-security`, and `brain-review-merge-request` read the shared finding format from `brain-review-code/references/findings.md`, so install them together with `brain-review-code`.
 
-Skills labeled **manual** use `disable-model-invocation: true` and must be explicitly invoked (for example, `/implement`). Other skills may be selected when relevant, and can also be invoked explicitly.
+Skills labeled **manual** use `disable-model-invocation: true` and must be explicitly invoked (for example, `/brain-implement`). Other skills may be selected when relevant, and can also be invoked explicitly.
+
+`tests/` is not installed. It holds the behavior scenarios used to verify the skills (see [Verification](#verification)).
+
+Then run `/brain-update` once in the project to create its brain.
+
+## The project brain
+
+```text
+.brain/
+├── 00_index.md          Index of every .brain document with status; last-synced commit; git setting
+├── 01_about.md          What the app is, who uses it, core concepts, how it works
+├── 02_features.md       Capabilities grouped by module / feature
+├── 03_architecture.md   Stack, framework, runtime, platforms, application design, domain boundaries
+├── 04_data_model.md     Entities, schema, relationships, derived data
+├── 05_settings.md       User-configurable surface
+├── 06_ux_interface.md   Visual language, layouts, interactions
+├── 07_integrations.md   External tools, file formats, OS APIs
+├── 08_error_logging.md  Operational concerns, observability, known failure modes
+├── 09_user_decisions.md Log of decisions you made
+├── glossary.md          Canonical terms (required)
+├── open_questions.md    Questions only you can answer
+├── spikes.md            Technical assumptions not yet verified
+├── state.md             Feature checklist: planned / in progress / done (required)
+├── adrs/                NNNN-<slug>.md
+├── specs/               NN-<slug>.md
+├── tickets/             <feature-slug>/NN-<slug>.md
+├── impl_plans/          <feature>.md
+├── planning/            <feature>/INDEX.md and NNN-<slug>.md
+├── diagnoses/           NN-<slug>.md
+├── reviews/             architecture/NN-<slug>.md, security/NN-<slug>.md
+└── NN_<topic>/          Detail split out of root file NN_<topic>.md
+```
+
+- **Reading:** every skill except `brain-distill-content` reads all root files once per session (again after context compaction), and reads subfolders only when linked or needed. Root files are kept under about 25,000 words in total; a root file over about 4,000 words moves its detail into a `NN_<topic>/` subfolder and keeps a summary.
+- **Writing:** `brain-update` owns the root files and `adrs/`. Other skills write only their own documents into the subfolders, then invoke `brain-update` to index them and propagate what changed. `brain-update` never runs your code, never commits, and never edits another skill's documents.
+- **Git:** `.brain` is untracked by default. The first run asks, and adds `.brain/` to the repository's local `info/exclude` unless you choose to track it. Inside a linked git worktree, an untracked brain is found in the main checkout.
+
+**Known limit:** an untracked brain is shared by every worktree and branch, but it records a single `Last synced` commit. After syncing from one branch, the brain can describe code that another branch does not have yet; `brain-update` reports this when it notices.
 
 ## Collaboration rules
 
 Root [`CLAUDE.md`](CLAUDE.md) contains the shared decision policy, which the skills reference instead of restating:
 
-- **Investigate facts independently.** Read code, tests, configuration, and documentation rather than asking questions the repository can answer.
-- **Respect established decisions.** Follow approved specifications, architectural decisions, and relevant ADRs.
+- **Investigate facts independently.** Read code, tests, configuration, documentation, and the brain rather than asking questions the repository can answer.
+- **Respect established decisions.** Follow approved specifications, architectural decisions, ADRs, and the decisions recorded in `.brain/09_user_decisions.md`.
 - **Make routine local choices.** Naming, private helpers, and ordinary test details do not need repeated approval.
 - **Consult on consequential choices.** Changes to product behavior, ownership, lifecycle, public contracts, persistence, or meaningful architecture require a recommendation and your decision *before* implementation.
 
@@ -50,114 +87,114 @@ For example, a request to extend communication in an existing `Session` does not
 
 | Skill | Purpose | Use when | Typical output |
 |---|---|---|---|
-| `brainstorm` | Resolves open requirements and design decisions through a visible decision table, lens-guided options, and dependency-ordered questions. | Behavior, constraints, or architectural direction is unclear. | A confirmed direction summary with its decision table. |
-| `diagnose` | Investigates failures using reproduction and discriminating hypotheses; applies a bounded fix only when authorized. | A failure, regression, or intermittent issue needs explanation. | Diagnosis in conversation and, if authorized, a verified repair. |
-| `distill-content` **(manual)** | Removes verbosity from technical documents while preserving all material information and structure. | AI-generated docs, MR descriptions, or RFCs are padded. | The distilled document. |
-| `domain-modeling` | Maintains approved domain vocabulary, context boundaries, and durable architectural decisions. | Design work establishes or changes domain meaning or context ownership. | `CONTEXT.md`, `CONTEXT-MAP.md`, or ADR updates when justified. |
-| `handoff` **(manual)** | Captures the minimum a fresh session needs, linking existing records rather than copying them. | You want a cross-session continuation document. | `handoff-<slug>.md` in the OS temporary directory. |
-| `implement` **(manual)** | Implements approved work in test-first increments, starting from specification examples, and maintains resumable progress. | You are ready to change code, with or without a formal spec. | Code, checks, and for tracked features `docs/implementation/<feature>/todo.md`. |
-| `plan-feature` | Tracks multi-session planning with dependency-aware research, consult, prototype, and task tickets. | An initiative has many interdependent decisions and spans days or sessions. | `docs/planning/<feature>/INDEX.md` and planning tickets. |
-| `refine-backlog` | Reviews Jira stories for refinement readiness without changing them. | Preparing for backlog refinement. | Suggested gaps, draft acceptance criteria, and questions. |
-| `review-architecture` | Discovers architectural friction **or** assesses a selected boundary, using concrete evidence. | You want improvement candidates or a focused design evaluation. | Findings in conversation. |
-| `review-code` | Assesses a bounded change set for correctness, requirement fit, and repository fit, delegating to subagents for larger changes. | A substantive change needs review, or you request one. | Three-section findings report. |
-| `review-merge-request` **(manual)** | Reviews an MR/PR against Jira acceptance criteria using `review-code`, adding coverage, tests, performance, and a merge recommendation. Read-only. | You want an advisory merge assessment. | Consolidated findings and Approve / Request changes. |
-| `review-security` | Examines realistic threats, trust boundaries, access control, credentials, and sensitive-data flows. | Work changes a security boundary or you request an audit. | Risk-based findings in conversation. |
-| `write-spec` **(manual)** | Records established requirements, invariants, concrete examples, and decisions without inventing missing choices. | A substantial feature needs a stable implementation contract. | `docs/specs/<NN>-<slug>.md`. |
-| `write-tickets` | Decomposes approved work into verifiable increments whose acceptance criteria reference spec examples, with your approval of the set. | Work benefits from independent tickets or staged delivery. | `docs/tickets/<feature>/issues/<NN>-<slug>.md`. |
-
-Reviews and diagnoses are delivered in the conversation. They are saved under `docs/` only when you request a record or a workflow needs one for continuation.
+| `brain-update` | Creates and maintains the project brain: investigates and interviews you on the first run, then syncs the root files with commits, decisions, and new documents. | A project has no brain yet, another skill finished work, or you want the brain synced. | `.brain/` root files and ADRs. |
+| `brain-brainstorm` | Resolves open requirements and design decisions through a visible decision table, lens-guided options, and dependency-ordered questions. | Behavior, constraints, or architectural direction is unclear. | A confirmed direction summary; decisions recorded through `brain-update`. |
+| `brain-diagnose` | Investigates failures using reproduction and discriminating hypotheses; applies a bounded fix only when authorized. | A failure, regression, or intermittent issue needs explanation. | Diagnosis in conversation; `.brain/diagnoses/` only on request. |
+| `brain-distill-content` **(manual)** | Removes verbosity from technical documents while preserving all material information and structure. | AI-generated docs, MR descriptions, or RFCs are padded. | The distilled document. |
+| `brain-implement` **(manual)** | Implements approved work in test-first increments, starting from specification examples, and maintains resumable progress. | You are ready to change code, with or without a formal spec. | Code, checks, and for tracked features `.brain/impl_plans/<feature>.md`. |
+| `brain-plan-feature` | Tracks multi-session planning with dependency-aware research, consult, prototype, and task tickets. | An initiative has many interdependent decisions and spans days or sessions. | `.brain/planning/<feature>/INDEX.md` and planning tickets. |
+| `brain-refine-backlog` | Reviews Jira stories for refinement readiness without changing them. | Preparing for backlog refinement. | Suggested gaps, draft acceptance criteria, and questions. |
+| `brain-review-architecture` | Discovers architectural friction **or** assesses a selected boundary, using concrete evidence. | You want improvement candidates or a focused design evaluation. | Findings in conversation; `.brain/reviews/architecture/` only on request. |
+| `brain-review-code` | Assesses a bounded change set for correctness, requirement fit, and repository fit, delegating to subagents for larger changes. | A substantive change needs review, or you request one. | Three-section findings report. |
+| `brain-review-merge-request` **(manual)** | Reviews an MR/PR against Jira acceptance criteria using `brain-review-code`, adding coverage, tests, performance, and a merge recommendation. Read-only. | You want an advisory merge assessment. | Consolidated findings and Approve / Request changes. |
+| `brain-review-security` | Examines realistic threats, trust boundaries, access control, credentials, and sensitive-data flows. | Work changes a security boundary or you request an audit. | Findings in conversation; `.brain/reviews/security/` only on request. |
+| `brain-write-spec` **(manual)** | Records established requirements, invariants, concrete examples, and decisions without inventing missing choices. | A substantial feature needs a stable implementation contract. | `.brain/specs/<NN>-<slug>.md`. |
+| `brain-write-tickets` | Decomposes approved work into verifiable increments whose acceptance criteria reference spec examples, with your approval of the set. | Work benefits from independent tickets or staged delivery. | `.brain/tickets/<feature>/<NN>-<slug>.md`. |
 
 ## Example workflows
 
 These are **examples, not checklists**. Skip any step that does not provide value.
 
+### First session in a project
+
+1. Run `/brain-update`. It reads the code, asks whether `.brain` should be tracked in git (default: no), proposes moving existing specs, ADRs, and `CONTEXT.md` into `.brain`, and then interviews you one question at a time about what the code cannot show.
+2. Answer what you can; "I don't know yet" is recorded in `open_questions.md`.
+
 ### Small, well-defined change
 
 Example: Add a `--json` option to an existing export command.
 
-1. Run `/implement` directly from the request; a specification and ticket set are not required.
+1. Run `/brain-implement` directly from the request; a specification and ticket set are not required.
 2. Make the smallest coherent change and validate it with targeted tests or other checks.
-3. Inspect the diff. Invoke `review-code` only if the change is consequential, substantial, or you request it.
-4. Update relevant existing documentation if the user-facing command changed.
+3. Inspect the diff. Invoke `brain-review-code` only if the change is consequential, substantial, or you request it.
+4. Update relevant existing documentation if the user-facing command changed. `brain-update` records the new option in the brain.
 
 ### Substantial feature
 
 Example: Add a share-link capability for notes.
 
-1. Use `brainstorm` to resolve permission rules, revocation, expiration, and other consequential questions. Claude investigates existing behavior itself and tracks decisions in a table.
-2. Use `review-architecture` if ownership or another expensive-to-reverse decision needs focused evaluation. Record approved durable decisions through `domain-modeling` when appropriate.
-3. Use `/write-spec` to capture the established behavior, invariants, and concrete examples.
-4. Use `write-tickets` **only if** the work benefits from multiple independently verifiable increments or separate sessions.
-5. Use `/implement` to execute the spec or tickets, starting from the spec's examples as tests. Run `review-code` for a substantial change; add `review-security` if the design introduces authorization, trust, or sensitive-data boundaries.
+1. Use `brain-brainstorm` to resolve permission rules, revocation, expiration, and other consequential questions. Claude investigates existing behavior itself and tracks decisions in a table; the confirmed decisions go into the brain.
+2. Use `brain-review-architecture` if ownership or another expensive-to-reverse decision needs focused evaluation. Approved hard-to-reverse decisions become ADRs through `brain-update`.
+3. Use `/brain-write-spec` to capture the established behavior, invariants, and concrete examples.
+4. Use `brain-write-tickets` **only if** the work benefits from multiple independently verifiable increments or separate sessions.
+5. Use `/brain-implement` to execute the spec or tickets, starting from the spec's examples as tests. Run `brain-review-code` for a substantial change; add `brain-review-security` if the design introduces authorization, trust, or sensitive-data boundaries.
 
 ### Large, multi-session planning effort
 
-1. Use `plan-feature` to establish the objective, open areas, planning tickets, and dependencies under `docs/planning/<feature>/`.
-2. Resolve research and consult tickets one session at a time; `brainstorm` handles the interactive decisions.
-3. Once consequential choices are settled, use `/write-spec` and optionally `write-tickets`.
-4. Use `/implement` to execute the work with its own feature-level progress records.
+1. Use `brain-plan-feature` to establish the objective, open areas, planning tickets, and dependencies under `.brain/planning/<feature>/`.
+2. Resolve research and consult tickets one session at a time; `brain-brainstorm` handles the interactive decisions.
+3. Once consequential choices are settled, use `/brain-write-spec` and optionally `brain-write-tickets`.
+4. Use `/brain-implement` to execute the work with its own impl plan.
 
-`plan-feature` tracks **planning state**; it does not substitute for the implementation tracker.
+`brain-plan-feature` tracks **planning state**; it does not substitute for the impl plan.
 
 ### Diagnose and fix a failure
 
 Example: Edits from two browser tabs occasionally overwrite one another.
 
-1. Use `diagnose` to establish what happened and test plausible causes. State whether repair is authorized or you want diagnosis only.
+1. Use `brain-diagnose` to establish what happened and test plausible causes. State whether repair is authorized or you want diagnosis only.
 2. If the cause supports a small bounded correction, apply and verify it when authorized.
-3. If the fix requires new conflict-resolution semantics or an ownership redesign, resolve it through `brainstorm` first.
-4. Add `review-security` when the problem crosses an authorization or other security boundary.
+3. If the fix requires new conflict-resolution semantics or an ownership redesign, resolve it through `brain-brainstorm` first.
+4. Add `brain-review-security` when the problem crosses an authorization or other security boundary.
 
 ### Improve or review architecture
 
 Example: Changes to note permissions regularly require updates across several modules.
 
-1. Use `review-architecture` in **discovery mode** to identify evidence-backed friction.
+1. Use `brain-review-architecture` in **discovery mode** to identify evidence-backed friction.
 2. Select a candidate for **focused review**; compare preserving the existing design and the smallest correction with larger alternatives only when justified.
-3. Approve any consequential change before recording it through `domain-modeling` or implementing it.
+3. Approve any consequential change before it is recorded through `brain-update` or implemented.
 4. Write a spec and tickets only if the change is substantial or needs staged migration.
 
 ### Merge request review
 
-1. Run `/review-merge-request` with the MR/PR link and the Jira story's acceptance criteria.
-2. It resolves the exact change set, runs `review-code`'s three assessments, adds `review-security` or `review-architecture` when warranted, and reports acceptance-criteria coverage with an advisory recommendation. Nothing is posted to the hosting platform.
+1. Run `/brain-review-merge-request` with the MR/PR link and the Jira story's acceptance criteria.
+2. It resolves the exact change set, runs `brain-review-code`'s three assessments, adds `brain-review-security` or `brain-review-architecture` when warranted, and reports acceptance-criteria coverage with an advisory recommendation. Nothing is posted to the hosting platform.
 
 ## Resuming implementation across sessions
 
-For implementation based on a persisted specification or ticket set, `/implement` creates **one feature workspace**, not one per session or ticket:
+For implementation based on a persisted specification or ticket set, `/brain-implement` keeps **one impl plan per feature**, not one per session or ticket:
 
 ```text
-docs/
+.brain/
+├── state.md                          # links each feature to its spec and impl plan
 ├── specs/
 │   └── 014-external-communication.md
-├── implementation/
-│   └── 014-external-communication/
-│       ├── todo.md
-│       └── guidance.md       # Optional
+├── impl_plans/
+│   └── 014-external-communication.md
 └── tickets/
-    └── external-communication/
-        └── issues/           # Optional
+    └── external-communication/       # Optional
 ```
 
-- **`todo.md`** tracks work items, current focus, blockers, verified test results, and the original Git review base.
-- **`guidance.md`** preserves useful implementation discoveries, code locations, caveats, and *references* to approved decisions. Created only when useful.
+The impl plan tracks work items, current focus, blockers, verified test results, and the original Git review base. It is a living document, not an append-only log, and it never authorizes a product or architectural decision; the specification and ADRs remain authoritative. Discoveries a later session would otherwise rediscover go into the brain's root files through `brain-update`. The template is in `brain-implement/references/`.
 
-**Both files are living documents, not append-only logs.** A fresh session reads them and verifies progress against the repository, Git state, and tests before continuing. Neither file authorizes a product or architectural decision; the specification and ADRs remain authoritative. Templates are in `implement/references/`.
-
-The `handoff` skill is optional for implementation continuation: use it when important context is not already captured by the spec, progress records, and repository.
+A fresh session reads the brain's root files, then the impl plan, and verifies progress against the repository, Git state, and tests before continuing.
 
 ## Verification
 
-Implementation uses focused test-first increments, starting from the specification's examples and covering stated invariants and failure paths beyond them. At completion, validation is proportional to scope and risk. `review-code` runs for substantial or consequential changes, **not every trivial edit**; `review-security` is similarly risk-based.
+Implementation uses focused test-first increments, starting from the specification's examples and covering stated invariants and failure paths beyond them. At completion, validation is proportional to scope and risk. `brain-review-code` runs for substantial or consequential changes, **not every trivial edit**; `brain-review-security` is similarly risk-based.
 
-All review skills share one severity scale (Critical / High / Medium / Low), a separate confidence rating, and common finding fields, defined in `review-code/references/findings.md`.
+All review skills share one severity scale (Critical / High / Medium / Low), a separate confidence rating, and common finding fields, defined in `brain-review-code/references/findings.md`.
 
-## Changes from experimental_v2
+The skills themselves are verified with the scenarios in `tests/scenarios.md`: each runs a fresh agent against a throwaway sample project (`tests/fixture/`), first without the skill (baseline) and then with it, and checks the agent's replies and the resulting files and git state.
 
-- `review-code` adds a **Correctness** assessment, a stricter base-resolution order (never the upstream tracking branch), proportional subagent delegation, and a consolidate-and-validate step.
-- `write-spec` adds **Behavior and Invariants** and numbered **Examples**; `implement` starts tests from them and `write-tickets` references them in acceptance criteria.
-- `brainstorm` adds a published decision table, an option-generation step, explicit evaluation of the current design, on-demand lenses (`architecture`, `data`, `contracts`, `failure`), and a fixed final summary that `write-spec` consumes.
-- `review-merge-request` delegates analysis to `review-code` and keeps only merge-specific inputs, checks, and the recommendation.
-- Review and diagnosis reports are conversation-first; all reviews use the shared finding format.
-- Model-invoked skills have "Use when…" descriptions; restated policy and repeated examples were removed.
-- `refine-backlog` no longer references the nonexistent bundled Jira script.
+## Changes from experimental_v3
+
+- Every skill is renamed with a `brain-` prefix (`brainstorm` → `brain-brainstorm`, and so on).
+- New `brain-update` skill and `.brain/` project store. Every skill except `brain-distill-content` reads the brain's root files once per session.
+- All generated documents move into `.brain/`: `docs/specs/` → `.brain/specs/`, `docs/adr/` → `.brain/adrs/`, `docs/tickets/<f>/issues/` → `.brain/tickets/<f>/`, `docs/implementation/<f>/todo.md` → `.brain/impl_plans/<f>.md`, `docs/planning/` → `.brain/planning/`, `docs/diagnoses/` → `.brain/diagnoses/`, `docs/reviews/architecture/` and `docs/security/` → `.brain/reviews/`.
+- `domain-modeling` is removed: `CONTEXT.md` becomes `.brain/glossary.md`, `CONTEXT-MAP.md` becomes the domain-boundaries section of `.brain/03_architecture.md`, and ADR writing moves into `brain-update`.
+- `handoff` is removed: `state.md`, `open_questions.md`, and impl plans cover continuation.
+- `implement`'s `guidance.md` is removed; discoveries go into the brain's root files.
+- Skills that write documents invoke `brain-update` afterward: `brain-brainstorm` (confirmed direction), `brain-write-spec`, `brain-write-tickets`, `brain-plan-feature` (resolved ticket), `brain-implement` (session end and completion), `brain-diagnose` (verified fix), and the review skills when a record is saved.
+- `tests/` adds behavior scenarios and a sample project for verifying the skills.

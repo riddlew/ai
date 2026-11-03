@@ -1,6 +1,6 @@
 # Engineering Collaboration Policy
 
-This file defines decision authority across planning, implementation, debugging, testing, and reviews. Apply it alongside repository-specific guidance, specifications, and ADRs. Keep established project decisions in their existing authoritative records rather than duplicating them here.
+This file defines decision authority across planning, implementation, debugging, testing, and reviews. Apply it alongside repository-specific guidance and the project brain (`.brain/`: specifications, ADRs, and project knowledge). Keep established project decisions in their existing authoritative records rather than duplicating them here.
 
 ## Decision authority
 
@@ -46,8 +46,9 @@ If the current architecture genuinely cannot support a requirement safely or cor
 - Implement incrementally, verify observable behavior, and keep changes within scope. Do not introduce a new architecture merely to make a test convenient.
 - Treat reviews and research as evidence and proposals, not as authority to expand scope or change approved decisions.
 - Keep process proportional: routine changes may be implemented and verified directly; substantial features may need specs; long-running work may need planning and tickets.
-- Create durable docs only when requested or required by a governing workflow (specifications, tickets, planning state, implementation progress, approved ADRs). Deliver review and diagnosis results in the conversation unless the user requests a record or a workflow needs one for continuation.
+- `.brain/` is the project's single document store. `brain-update` owns its root files and `adrs/`; other skills write only their own documents into its subfolders, then invoke `brain-update`.
+- Deliver review and diagnosis results in the conversation unless the user requests a saved record.
 - Record **approved** durable decisions through the project's existing documentation conventions when justified; do not turn unapproved recommendations into ADRs.
-- In multi-session implementation, `docs/implementation/<feature>/todo.md` and optional `guidance.md` are **mutable continuity aids**, not authorities for requirements or architecture. Verify progress against current code and tests; keep notes current rather than append-only; record approved consequential changes in the governing specification/ADR first.
+- Impl plans in `.brain/impl_plans/` and the `.brain` root files are **continuity aids** that summarize other sources. They are never authorities over specifications, ADRs, or user decisions. Verify them against current code and tests, and record approved consequential changes in the governing specification or ADR first.
 
 If blocked by a consequential open question, finish safe independent work, clearly identify the decision and affected scope, and do not proceed through the blocked choice.
