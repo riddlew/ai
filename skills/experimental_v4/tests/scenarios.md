@@ -67,7 +67,7 @@ End every reply with a section "Files read and commands run:" listing each one.
 - `<CONTEXT>`: the scenario's context line, or empty.
 - `<TRIGGER>`: `The user says: "<request>"` or `Another skill invokes you: "<message>"`.
 
-Follow-up turns go to the same subagent through SendMessage, containing only the user's answer.
+Follow-up turns go to the same subagent through SendMessage, prefixed `The user replies:` and followed by the answer. (Baseline S1 treated an unprefixed follow-up as a coordinator relay rather than user approval, so the prefix was added after the baseline.)
 
 ---
 
@@ -176,4 +176,38 @@ _Added in Task 7._
 
 ## Results
 
-_Baseline and skill results, with failures quoted verbatim._
+### Baseline (brief only), 2026-11-03
+
+**S1: fail** (criteria 3, 5, 7, 8, plus default-tracking)
+- Turn 1 asked whether to track `.brain` but recommended the opposite of the default: "I recommend committing it."
+- Every turn batched four or five numbered questions, including process questions the skill should settle itself ("Separate `spikes.md`, or one combined file?", "`.git/info/exclude` or `.gitignore`?").
+- Turn 2 warned that moving tracked docs takes them out of git (pass), but recommended copying instead.
+- After "Move them." it never interviewed the user about purpose, users, non-goals, or roadmap: "Where I used my earlier recommendations because nobody answered". It then wrote all root files from defaults.
+- It copied the docs instead of moving them and asked again: "A message passed on by the coordinator isn't your own approval". This is partly a harness artifact; see the wrapper ruling.
+- Final state:
+  - `00_index.md`: "Last synced: 2026-11-03 against commit `943a948`" (short sha, no `Git:` line).
+  - `.git/info/exclude`: untouched.
+  - `CONTEXT.md` and `docs/`: still present.
+  - `spikes.md`: has no Rekordbox entry, because the roadmap was never asked.
+- It ran the project's code (CLI smoke tests against temp DBs) and tried to run pytest.
+
+**S2: fail** (criterion 8)
+- Criteria 1–7 passed: cue add, cue_points, Cue point glossary entry, seconds-as-floats only, open question on the E2 contradiction, spec byte-identical, stats in progress, and `Last synced` = B.
+- `git status` shows `?? crate/__pycache__/`. It ran `python3 -c` against `filter_by_bpm` and tried pytest.
+- It rewrote `.brain/impl_plans/01-bpm-filter.md` ("marked E2 as regressed, added a step"), which `brain-implement` owns.
+
+**S3: fail** (criteria 1, 2)
+- Invoked by another skill with no brain, it ran a full first run unprompted and wrote 13 root files: "The handoff turned out to also be the first-time setup."
+- It never pointed the user at `/brain-update`.
+- It recommended committing `.brain`: "it has to be committed".
+- It ran the CLI against a temp DB.
+
+**Counters the skill needs** (from the failures above):
+1. Default to untracked, and present it as the default.
+2. Ask exactly one question per message, and never ask process questions the skill already answers (spikes vs. open questions, exclude vs. `.gitignore`).
+3. The interview is mandatory. Do not fill purpose, users, non-goals, or roadmap from defaults. Ask until the answer is "I don't know", then record it as open.
+4. Use the exact header lines `Last synced: <40-char sha> (<date>)` and `Git: ignored|tracked`. When untracked, write `info/exclude`.
+5. A move the user approved is a move: no copies, and don't ask twice.
+6. When invoked by another skill and no brain exists, do nothing and point to `/brain-update`.
+7. Read-only outside `.brain/`. Don't run the project's code or tests; record facts that need an experiment in `spikes.md`.
+8. Don't edit documents other skills own (impl plans, specs, tickets). Report needed changes instead.
