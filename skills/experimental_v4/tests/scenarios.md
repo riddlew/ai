@@ -202,7 +202,32 @@ _Added in Task 7._
 - It recommended committing `.brain`: "it has to be committed".
 - It ran the CLI against a temp DB.
 
-**Counters the skill needs** (from the failures above):
+### Skill (brain-update), 2026-11-03
+
+**S1: pass** (criteria 1–10)
+- **Turn 1:** a single question about git tracking, with "not tracked" as the stated default.
+- **Turn 2:** a destinations table, the out-of-git warning, the leave-in-place offer, and then it waited.
+- **After "Move them.":** it used plain `mv`, did not copy or ask again, and removed `CONTEXT.md`.
+- **Interview:** one question per turn: purpose, then non-goals, planned features, the cue-point definition, and existing decisions.
+- **Final state:**
+  - `00_index.md`: `Last synced: <full sha>`, `Git: ignored`;
+  - `.brain/` is in `info/exclude`;
+  - the glossary maps Crate ↔ `playlists`;
+  - `spikes.md` has the Rekordbox XML assumptions;
+  - `open_questions.md` has five entries;
+  - HEAD is unchanged, and no subagents were used.
+- **Minor:** it inferred the Users section ("Individual gigging DJs") from the purpose answer instead of asking. The user's words support it, so no counter was added.
+
+**S2: pass** (criteria 1–8)
+- It made no edit to `impl_plans/` and reported the plan as stale instead. It left no `__pycache__`.
+- It wrote ADR `0002-cue-points-in-float-seconds.md`, which meets the three ADR criteria. The ADR lists milliseconds only as an unapproved alternative.
+
+**S3: pass** (criteria 1–3)
+- It changed nothing and pointed the user to `/brain-update`.
+
+### Counters added to the skill
+
+These come from the baseline failures:
 1. Default to untracked, and present it as the default.
 2. Ask exactly one question per message, and never ask process questions the skill already answers (spikes vs. open questions, exclude vs. `.gitignore`).
 3. The interview is mandatory. Do not fill purpose, users, non-goals, or roadmap from defaults. Ask until the answer is "I don't know", then record it as open.
