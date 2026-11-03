@@ -5,13 +5,15 @@ description: Decompose an approved specification, plan, or discussion into small
 
 # Write Tickets
 
+**Project brain:** If `.brain/00_index.md` exists (at this worktree's root, or in the main checkout when working in a linked git worktree) and you have not read its root files in this session (or they were lost to context compaction), read every root `.md` file in that `.brain/` now. Read subfolders only when a root file links to them or the task needs them. Do not load `.brain` into subagents wholesale; pass only what their task needs. If no brain exists, proceed without one and mention once that `/brain-update` can create it.
+
 Convert established requirements into the **smallest practical set of independently verifiable delivery increments**. Follow root `CLAUDE.md`: tickets describe authorized outcomes and cannot settle unresolved behavior or approve a redesign.
 
 Use this skill only when the user requests tickets or a long-running workflow delegates ticket generation. If one ticket would merely restate the specification, recommend implementing from the specification directly.
 
 ## 1. Gather the evidence
 
-Read the relevant conversation, approved planning material, specifications (including their Examples), and referenced sources fully enough to preserve their intent. Read applicable `CONTEXT-MAP.md` / `CONTEXT.md`, relevant ADRs, existing tests, verification patterns, and public boundaries.
+Read the relevant conversation, approved planning material, specifications (including their Examples), and referenced sources fully enough to preserve their intent. Read `.brain/glossary.md`, `.brain/03_architecture.md`, relevant ADRs in `.brain/adrs/`, existing tests, verification patterns, and public boundaries.
 
 Keep separate:
 
@@ -68,7 +70,7 @@ Revise until the user approves. If the user already supplied and approved the ex
 
 ## 6. Write approved tickets
 
-Create one file per ticket at `docs/tickets/<feature-slug>/issues/<NN>-<slug>.md`, numbering from `01`. When continuing an existing set, follow its numbering and do not overwrite unrelated files.
+Create one file per ticket at `.brain/tickets/<feature-slug>/<NN>-<slug>.md`, numbering from `01`. When continuing an existing set, follow its numbering and do not overwrite unrelated files.
 
 ```markdown
 # <NN>: <Ticket Title>
@@ -83,7 +85,7 @@ Create one file per ticket at `docs/tickets/<feature-slug>/issues/<NN>-<slug>.md
 
 ## Acceptance Criteria
 
-- [ ] Satisfies specification examples E1–E3 (`docs/specs/<NN>-<slug>.md`, Examples).
+- [ ] Satisfies specification examples E1–E3 (`.brain/specs/<NN>-<slug>.md`, Examples).
 - [ ] <Observable result not covered by a specification example.>
 
 ## Governing Decisions
@@ -97,5 +99,7 @@ Include only essential boundaries not recoverable from those sources.>
 Omit Governing Decisions when the sources are unmistakable from context. Do not embed volatile source paths or implementation snippets unless an approved prototype fragment preserves a design contract. If a consequential decision is unresolved, do not write a ticket that assumes an answer; record the block and consult.
 
 Tickets are stable definitions; `brain-implement` tracks execution progress separately once work starts.
+
+Write only the ticket files into `.brain/`; leave the index, `state.md`, and other root files to `brain-update`. Then invoke `brain-update` with a one-line summary of what changed.
 
 Report the created ticket paths, actionable tickets, and remaining dependencies or blockers. Do not begin implementation unless separately authorized.

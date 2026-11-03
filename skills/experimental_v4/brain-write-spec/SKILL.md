@@ -6,6 +6,8 @@ disable-model-invocation: true
 
 # Write Spec
 
+**Project brain:** If `.brain/00_index.md` exists (at this worktree's root, or in the main checkout when working in a linked git worktree) and you have not read its root files in this session (or they were lost to context compaction), read every root `.md` file in that `.brain/` now. Read subfolders only when a root file links to them or the task needs them. Do not load `.brain` into subagents wholesale; pass only what their task needs. If no brain exists, proceed without one and mention once that `/brain-update` can create it.
+
 Record established requirements and approved decisions as a stable implementation contract. Small, well-understood changes can proceed without a spec. Follow root `CLAUDE.md` for decision authority.
 
 Do not conduct a new requirements interview or reopen settled choices. If a consequential gap remains, record it under Open Decisions; do not decide it to make the spec look complete.
@@ -16,8 +18,8 @@ Use, as relevant:
 
 - the current conversation and referenced material, including a `brain-brainstorm` final summary;
 - existing implementation, callers, and tests;
-- root `CONTEXT-MAP.md` and the relevant `CONTEXT.md` (otherwise root `CONTEXT.md`);
-- applicable root and context-local ADRs under `docs/adr/`;
+- `.brain/glossary.md` and `.brain/03_architecture.md`;
+- applicable ADRs under `.brain/adrs/`;
 - established public system boundaries.
 
 Classify everything as:
@@ -29,7 +31,7 @@ Classify everything as:
 
 A `brain-brainstorm` decision table maps directly: **Established** rows are approved decisions, **User decision** rows are open decisions, **Deferred** rows are implementation discretion, and **Investigate** rows must be investigated before writing or listed as open.
 
-Do not introduce a new manager, service, ownership boundary, or lifecycle model unless it is already approved. If the current design appears insufficient, record that as an open decision. Use the project's domain vocabulary.
+Do not introduce a new manager, service, ownership boundary, or lifecycle model unless it is already approved. If the current design appears insufficient, record that as an open decision. Use the canonical terms in `.brain/glossary.md`.
 
 ## 2. Write behavior, invariants, and examples
 
@@ -48,7 +50,7 @@ Prefer existing high-level test boundaries and patterns. Add a new boundary only
 
 ## 4. Write the file
 
-Store specifications in `docs/specs/<NN>-<short-slug>.md`:
+Store specifications in `.brain/specs/<NN>-<short-slug>.md`:
 
 1. Inspect existing numbered specs and increment the highest valid prefix.
 2. Match existing zero-padding, or use two digits.
@@ -116,7 +118,9 @@ For each gap state what is unknown, why implementation depends on it, the plausi
 
 ## Boundaries
 
-- This skill writes the specification only. `brain-implement` creates its progress workspace when work begins.
-- When the user approves a consequential change to a feature under implementation, update this specification, not the implementation notes.
+- This skill writes the specification only. `brain-implement` creates its impl plan in `.brain/impl_plans/` when work begins.
+- When the user approves a consequential change to a feature under implementation, update this specification, not the impl plan.
+
+Write only the spec file into `.brain/`; leave the index, `state.md`, and other root files to `brain-update`. Then invoke `brain-update` with a one-line summary of what changed.
 
 Report the created or updated path, and whether open decisions block implementation.

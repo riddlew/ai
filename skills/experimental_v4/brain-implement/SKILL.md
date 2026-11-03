@@ -6,6 +6,8 @@ disable-model-invocation: true
 
 # Implement
 
+**Project brain:** If `.brain/00_index.md` exists (at this worktree's root, or in the main checkout when working in a linked git worktree) and you have not read its root files in this session (or they were lost to context compaction), read every root `.md` file in that `.brain/` now. Read subfolders only when a root file links to them or the task needs them. Do not load `.brain` into subagents wholesale; pass only what their task needs. If no brain exists, proceed without one and mention once that `/brain-update` can create it.
+
 Implement an approved specification, ticket set, or well-established request. Small, clear changes need no specification. Follow root `CLAUDE.md` for decision authority and consultation.
 
 ## 1. Establish the boundary
@@ -13,10 +15,10 @@ Implement an approved specification, ticket set, or well-established request. Sm
 Before editing production code:
 
 1. Identify the governing specification, tickets, or request; approved decisions; exclusions; and open consequential questions.
-2. Read repository guidance, `CONTEXT-MAP.md` and the relevant `CONTEXT.md` (otherwise root `CONTEXT.md`), and applicable ADRs.
+2. Read repository guidance and applicable ADRs in `.brain/adrs/`.
 3. Inspect the relevant code, callers, tests, state owners, and lifecycle. Identify the smallest coherent implementation within existing responsibilities.
 4. Check `git status` and branch conventions. Do not overwrite unrelated changes or switch branches if that could endanger user work.
-5. Record the review base: a verified commit taken **before the first change**. When resuming, use the base recorded in `todo.md`, never the latest `HEAD`. If the recorded base is invalid or the branch or scope has materially changed, investigate and clarify instead of guessing.
+5. Record the review base: a verified commit taken **before the first change**. When resuming, use the base recorded in the impl plan, never the latest `HEAD`. If the recorded base is invalid or the branch or scope has materially changed, investigate and clarify instead of guessing.
 
 If a consequential choice is unresolved, consult before acting on it and continue independent authorized work meanwhile.
 
@@ -24,24 +26,21 @@ If a consequential choice is unresolved, consult before acting on it and continu
 
 Track progress when a persisted specification or ticket set governs the work, or when the user asks for multi-session continuity. Otherwise create no tracking files.
 
-Use one workspace per feature, never one per session or ticket:
+Use one impl plan per feature, never one per session or ticket:
 
-- **With a specification:** `docs/implementation/<spec-file-stem>/` (for example, `014-external-communication`).
-- **With tickets only:** `docs/implementation/<ticket-feature-slug>/`, linking the ticket source in `todo.md`.
-- **With neither:** `docs/implementation/<task-stub>/`, only when continuity is requested; record the governing request.
+- **With a specification:** `.brain/impl_plans/<spec-file-stem>.md` (for example, `014-external-communication.md`).
+- **With tickets only:** `.brain/impl_plans/<ticket-feature-slug>.md`, linking the ticket source.
+- **With neither:** `.brain/impl_plans/<task-stub>.md`, only when continuity is requested; record the governing request.
 
-If the workspace exists, resume it. Never reset it, overwrite it with a template, or create a second tracker.
+If the impl plan exists, resume it. Never reset it, overwrite it with a template, or create a second tracker. Create it when tracked work begins, following `${CLAUDE_SKILL_DIR}/references/todo-template.md`.
 
-- `todo.md` — the execution-status record. Create it when tracked work begins, following `${CLAUDE_SKILL_DIR}/references/todo-template.md`.
-- `guidance.md` — optional; only for discoveries a future session would otherwise rediscover. Follow `${CLAUDE_SKILL_DIR}/references/guidance-template.md`.
-
-Both are living documents, not logs, and neither is an authority: the specification governs behavior, tickets govern decomposition and acceptance criteria, ADRs govern architecture.
+The impl plan is the execution-status record: a living document, not a log, and not an authority. The specification governs behavior, tickets govern decomposition and acceptance criteria, and ADRs govern architecture. Discoveries a future session would otherwise rediscover go into the `.brain` root files through `brain-update`, not into the impl plan.
 
 ## 3. Resume from evidence, not notes
 
 At the start of every resumed session:
 
-1. Read the specification or tickets, `todo.md`, `guidance.md` if present, and applicable ADRs.
+1. Read the specification or tickets, the impl plan, and applicable ADRs.
 2. Inspect the branch, Git history and status, relevant source, and tests. Check completed items against actual code and validation evidence; a checked box is not proof.
 3. Reconcile: correct stale status, branch information, blockers, and verification notes, and note discrepancies concisely. Defer to verified repository state and approved requirements; consult only if a discrepancy raises a consequential decision.
 4. Select the next unblocked, authorized behavioral increment, respecting genuine ticket dependencies.
@@ -73,13 +72,15 @@ For each increment:
 3. If it already passes, investigate whether the behavior already exists or the test is inadequate. Do not force a failing test or manufacture changes.
 4. Make the smallest coherent production change across the layers needed.
 5. Rerun the test and confirm it passes. Simplify the affected code where useful and rerun relevant checks.
-6. For tracked work, update `todo.md` with trustworthy verification results.
+6. For tracked work, update the impl plan with trustworthy verification results.
 
 Work in behavioral slices, not layer batches. Where no practical automated test exists (configuration, documentation, some UI, production-only faults), use characterization tests, static checks, manual reproduction, or diff inspection, and disclose coverage limits. Never fabricate red-green history.
 
 ## 6. Keep state accurate
 
-Update `todo.md` after verified progress, when blockers change, and before ending a session, not after every edit. Update `guidance.md` only when a discovery changes how later work should proceed, and remove statements that become stale. Keep unresolved user choices visible and do not proceed through blocked work.
+Update the impl plan after verified progress, when blockers change, and before ending a session, not after every edit. Keep unresolved user choices visible and do not proceed through blocked work.
+
+Before ending a session, record its state in the impl plan. Then invoke `brain-update` with a one-line summary of what changed.
 
 ## 7. Finish
 
@@ -91,6 +92,8 @@ When all required behavior is implemented:
 2. Inspect the complete diff for missed requirements, scope creep, unnecessary abstraction, duplicated ownership, and regressions. Simplify within scope.
 3. Run `brain-review-code` for substantial or consequential changes (ownership, public contracts, persistence, security, broad cross-component behavior) or when requested. Pass the recorded review base, the governing specification or tickets, and the full scope including in-scope uncommitted files. For small, low-risk changes, your own diff inspection and checks are enough, but a small diff with material consequences still gets a review.
 4. Address supported in-scope findings, rerun affected checks, and consult before any new consequential decision.
-5. Report, and record in `todo.md`, only checks actually performed and whether `brain-review-code` ran or was skipped as disproportionate. Do not claim completion with unexplained failures.
+5. Report, and record in the impl plan, only checks actually performed and whether `brain-review-code` ran or was skipped as disproportionate. Do not claim completion with unexplained failures.
 
-At session end, give a concise status: completed increments, checks run and their results, the `todo.md` and `guidance.md` paths if present, blockers, and the next authorized step.
+When the work is complete, record it in the impl plan. Then invoke `brain-update` with a one-line summary of what changed.
+
+At session end, give a concise status: completed increments, checks run and their results, the impl plan path if present, blockers, and the next authorized step.

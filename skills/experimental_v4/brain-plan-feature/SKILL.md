@@ -1,16 +1,18 @@
 ---
 name: brain-plan-feature
-description: Manage large, multi-session feature planning with durable, dependency-aware planning tickets under docs/planning/. Use when an initiative has many interdependent decisions, research questions, or prototypes and will span several sessions or days; not for work that can be planned in one session.
+description: Manage large, multi-session feature planning with durable, dependency-aware planning tickets under .brain/planning/. Use when an initiative has many interdependent decisions, research questions, or prototypes and will span several sessions or days; not for work that can be planned in one session.
 ---
 
 # Plan Feature
+
+**Project brain:** If `.brain/00_index.md` exists (at this worktree's root, or in the main checkout when working in a linked git worktree) and you have not read its root files in this session (or they were lost to context compaction), read every root `.md` file in that `.brain/` now. Read subfolders only when a root file links to them or the task needs them. Do not load `.brain` into subagents wholesale; pass only what their task needs. If no brain exists, proceed without one and mention once that `/brain-update` can create it.
 
 Track planning state for substantial or uncertain efforts across sessions. This skill owns planning scope, planning tickets and their dependencies, and cross-session continuation. It delegates interactive decisions to `brain-brainstorm` and implementation decomposition to `brain-write-tickets`. Follow root `CLAUDE.md` for decision authority.
 
 ## Boundaries
 
 - **Plan, do not implement.** Bounded investigations, prerequisite tasks, and minimal prototypes are permitted planning work. None of them, nor completed planning, authorizes implementing the final objective.
-- **Planning state is not implementation state.** Do not create `docs/implementation/` or keep implementation checklists here. `brain-implement` tracks execution once authorized; the planning directory remains the record of planning decisions.
+- **Planning state is not implementation state.** Do not create `.brain/impl_plans/` entries or keep implementation checklists here. `brain-implement` tracks execution once authorized; the planning directory remains the record of planning decisions.
 
 ## Start
 
@@ -18,10 +20,10 @@ Track planning state for substantial or uncertain efforts across sessions. This 
 2. Inspect project context as needed to separate known facts from open decisions.
 3. Decide whether the effort warrants multi-session planning. If it can be resolved in one session, do not create a planning directory; use `brain-brainstorm` or `brain-write-spec` instead, without interrupting a straightforward authorized task to ask.
 
-Otherwise create `docs/planning/<feature-stub>/` with a concise, stable stub:
+Otherwise create `.brain/planning/<feature-stub>/` with a concise, stable stub:
 
 ```text
-docs/planning/<feature-stub>/
+.brain/planning/<feature-stub>/
 ├── INDEX.md
 └── <NNN>-<ticket-slug>.md
 ```
@@ -97,6 +99,8 @@ After resolving a ticket:
 2. Mark it `resolved`.
 3. Add a short linked summary under **Resolved Tickets** in `INDEX.md`.
 4. Reevaluate downstream dependencies and open areas.
+
+Then invoke `brain-update` with a one-line summary of what changed.
 
 ## Continue an existing plan
 

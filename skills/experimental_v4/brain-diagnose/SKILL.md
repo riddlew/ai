@@ -5,13 +5,15 @@ description: Investigate software failures through observable evidence and discr
 
 # Diagnose
 
+**Project brain:** If `.brain/00_index.md` exists (at this worktree's root, or in the main checkout when working in a linked git worktree) and you have not read its root files in this session (or they were lost to context compaction), read every root `.md` file in that `.brain/` now. Read subfolders only when a root file links to them or the task needs them. Do not load `.brain` into subagents wholesale; pass only what their task needs. If no brain exists, proceed without one and mention once that `/brain-update` can create it.
+
 Find the cause of a failure before choosing a correction. Follow root `CLAUDE.md` for decisions requiring consultation.
 
 Diagnosis is not authorization to repair. When the user asks for diagnosis only, do not change source code. When the user authorizes a fix, routine bounded repair is authorized; consequential scope, behavior, or architectural changes still need a decision.
 
 ## 1. Establish the symptom
 
-Describe expected versus observed behavior, relevant inputs, environment and configuration, triggering conditions, and investigation scope. Check relevant code, tests, specifications, `CONTEXT.md`, and ADRs. Do not infer the root cause from the error message or treat an old diagnosis as current evidence.
+Describe expected versus observed behavior, relevant inputs, environment and configuration, triggering conditions, and investigation scope. Check relevant code, tests, specifications, the `.brain` root files, and ADRs. Do not infer the root cause from the error message or treat an old diagnosis as current evidence.
 
 Establish the smallest repeatable reproduction available. For intermittent or production-only symptoms, use an observable baseline (trace, log signal, state transition) and note its limits. Do not run unsafe or destructive tests in shared environments without authorization.
 
@@ -41,11 +43,13 @@ If the repair would change product or error semantics, state or connection owner
 
 Report what passed, failed, or could not be reproduced, distinguishing pre-existing failures where evidence permits.
 
+After a verified fix, record the cause and fix in the conversation report (§5). Then invoke `brain-update` with a one-line summary of what changed.
+
 ## 5. Report
 
 Report in the conversation: symptom, cause and confidence, the fix if any, and verification. Write a durable diagnosis only when the user requests one or a workflow needs it for continuation.
 
-A durable diagnosis is a new file at `docs/diagnoses/<NN>-<short-slug>.md`: increment the highest existing number, matching its padding (two digits by default). Never overwrite a prior diagnosis. Include the sections that apply:
+A durable diagnosis is a new file at `.brain/diagnoses/<NN>-<short-slug>.md`: increment the highest existing number, matching its padding (two digits by default). Never overwrite a prior diagnosis. Include the sections that apply:
 
 ```markdown
 # <Failure>

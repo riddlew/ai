@@ -1,6 +1,6 @@
-# `todo.md` Template
+# Impl Plan Template
 
-`todo.md` is the mutable execution-status record for one feature. Adjust sections to the work.
+The impl plan (`.brain/impl_plans/<feature>.md`) is the mutable execution-status record for one feature. Adjust sections to the work.
 
 - **Ticketed feature:** one checklist item per ticket, with links; add smaller steps only when needed for multi-session continuity. Do not copy ticket acceptance criteria.
 - **Without tickets:** track meaningful end-to-end behavioral increments, not individual method edits.
@@ -8,8 +8,8 @@
 ```markdown
 # External Communication — Implementation Progress
 
-Specification: `docs/specs/014-external-communication.md`
-Tickets: `docs/tickets/external-communication/issues/` (if applicable)
+Specification: `.brain/specs/014-external-communication.md`
+Tickets: `.brain/tickets/external-communication/` (if applicable)
 Review base: `a1b2c3d` (verified original HEAD, not the latest session HEAD)
 Branch: `feature/external-communication` (last verified)
 

@@ -330,6 +330,18 @@ Follow-up turns go to the same subagent through SendMessage, prefixed `The user 
 **S7: pass**
 - Turn 1 treated the folder as a first run, asked the git-tracking question, left the spec unchanged, and created no root files.
 
+**S8: pass** (brain-write-spec)
+- **Spec:** `.brain/specs/02-cue-points.md` has E1–E7; E4 rejects the 9th cue.
+- **Other writes:** it created no `docs/`.
+- **brain-update invoked:** the index lists the spec (draft, OD1/OD2 open), and `state.md` links it.
+- **Note:** brain-write-spec ran the CLI against a temp DB while investigating, which its own skill permits, and it cleaned up `__pycache__`. Only brain-update is read-only.
+
+**S9: pass** (brain-implement)
+- It read all 13 root files, the impl plan, the spec, and ADR 0001.
+- It did not read `reviews/`.
+- It reported review base = A and named E2 as the next item.
+- It also caught the plan's false "E1 test passed" claim.
+
 ### Counters added to the skill
 
 These come from the baseline failures:
