@@ -6,6 +6,8 @@ disable-model-invocation: true
 
 # Review Merge Request
 
+**Project brain:** If `.brain/00_index.md` exists (at this worktree's root, or in the main checkout when working in a linked git worktree) and you have not read its root files in this session (or they were lost to context compaction), read every root `.md` file in that `.brain/` now. Read subfolders only when a root file links to them or the task needs them. Do not load `.brain` into subagents wholesale; pass only what their task needs. If no brain exists, proceed without one and mention once that `/brain-update` can create it.
+
 Produce one advisory assessment of the **current proposed change**. The analysis comes from `brain-review-code`; this skill owns the inputs, acceptance-criteria coverage, merge-specific checks, and the recommendation. Follow root `CLAUDE.md`.
 
 ## Read-only
@@ -28,7 +30,7 @@ Requirement sources, highest first:
 
 1. Jira story and acceptance criteria supplied by the user.
 2. MR/PR description and linked issues.
-3. Referenced specifications, approved ADRs, domain records, and repository rules.
+3. Referenced specifications, approved ADRs, `.brain` root files, and repository rules.
 4. Existing observable behavior, tests, interfaces, and documented contracts.
 
 Lower sources add context but do not override higher ones. If sources conflict materially, describe the conflict and ask the user which requirement is intended; continue independent review work meanwhile. Meeting the listed criteria does not prove the change correct.

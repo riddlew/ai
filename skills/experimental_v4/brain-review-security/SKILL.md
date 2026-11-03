@@ -5,6 +5,8 @@ description: Examine a specific security-sensitive change, data flow, or trust b
 
 # Security Review
 
+**Project brain:** If `.brain/00_index.md` exists (at this worktree's root, or in the main checkout when working in a linked git worktree) and you have not read its root files in this session (or they were lost to context compaction), read every root `.md` file in that `.brain/` now. Read subfolders only when a root file links to them or the task needs them. Do not load `.brain` into subagents wholesale; pass only what their task needs. If no brain exists, proceed without one and mention once that `/brain-update` can create it.
+
 Evaluate credible threats to a **bounded, real system**. Follow root `CLAUDE.md`. This is a focused security assessment, not a general code review (`brain-review-code` owns that) and not permission to modify code, permissions, credentials, configuration, or deployed systems.
 
 Use it when security is an explicit concern or a change materially affects authentication, authorization, tenant isolation, secret handling, untrusted input, or sensitive-data flow, not as a mandatory stage for low-risk edits.
@@ -18,7 +20,7 @@ From the request and current repository evidence, identify:
 - actors and their actual privileges, including unauthenticated actors;
 - entry points, trust boundaries, and enforcement points;
 - deployment assumptions, configuration, and existing controls;
-- applicable requirements, domain records, and ADRs.
+- applicable requirements, `.brain` root files, and ADRs.
 
 Inspect only enough adjacent code and infrastructure to follow the **complete relevant trust boundary**. If the requested scope ends before an important enforcement point or sink, explain the needed extension rather than auditing the whole repository.
 
@@ -82,6 +84,8 @@ List assumptions and missing evidence separately, not as findings. Also include 
 
 Deliver the review in the conversation. Write a durable report only when the user requests one or a workflow needs it for continuation.
 
-A durable report goes in `docs/security/<NN>-<short-slug>-review.md`: increment the highest existing number, matching its padding (two digits by default), and create the directory only when needed. Never overwrite a previous review. Redact sensitive values; include sources, scope limits, and the assessment date when claims are version-dependent. The report records evidence at the time of inspection; later fixes belong in the implementation record or a new review.
+A durable report goes in `.brain/reviews/security/<NN>-<short-slug>.md`: increment the highest existing number, matching its padding (two digits by default), and create the directory only when needed. Never overwrite a previous review. Redact sensitive values; include sources, scope limits, and the assessment date when claims are version-dependent. The report records evidence at the time of inspection; later fixes belong in the implementation record or a new review.
+
+When you save a durable report, it is the only file you write. Then invoke `brain-update` with a one-line summary of what changed.
 
 Report the saved path when a file is created.

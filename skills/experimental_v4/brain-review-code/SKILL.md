@@ -5,6 +5,8 @@ description: Review a bounded Git change set for correctness, requirement fit, a
 
 # Code Review
 
+**Project brain:** If `.brain/00_index.md` exists (at this worktree's root, or in the main checkout when working in a linked git worktree) and you have not read its root files in this session (or they were lost to context compaction), read every root `.md` file in that `.brain/` now. Read subfolders only when a root file links to them or the task needs them. Do not load `.brain` into subagents wholesale; pass only what their task needs. If no brain exists, proceed without one and mention once that `/brain-update` can create it.
+
 Review a bounded change set in three assessments: **Correctness**, **Requirement fit**, and **Repository fit**. Follow root `CLAUDE.md` for decision authority; a finding may recommend a change but does not authorize a redesign.
 
 Format every finding as defined in `${CLAUDE_SKILL_DIR}/references/findings.md`.
@@ -14,7 +16,7 @@ Format every finding as defined in `${CLAUDE_SKILL_DIR}/references/findings.md`.
 Choose the base in this order:
 
 1. base explicitly given by the user;
-2. base recorded by the invoking workflow before changes began (for example, `Review base` in a `todo.md`), if it resolves and is an ancestor of `HEAD`;
+2. base recorded by the invoking workflow before changes began (for example, `Review base` in the impl plan in `.brain/impl_plans/`), if it resolves and is an ancestor of `HEAD`;
 3. target branch of a verified PR/MR for the current branch (for example, from `gh pr view` or `glab mr view`);
 4. unambiguous repository evidence, such as documented branch conventions naming a single integration branch, or a repository with only one long-lived branch;
 5. otherwise ask the user for the base and stop.
@@ -36,12 +38,12 @@ Use the first that applies:
 
 1. specification or approved ticket supplied by the user;
 2. governing specification or ticket recorded by the invoking workflow;
-3. an unambiguous relevant specification under `docs/` or `specs/`;
+3. an unambiguous relevant specification under `.brain/specs/`;
 4. requirements explicitly established in the current task or approved discussion.
 
 Do not invent a specification or choose among conflicting ones. Ask only when ambiguity prevents a faithful review. If no reliable basis exists, skip Requirement fit and say why.
 
-Also read applicable repository guidance, tooling configuration, `CONTEXT-MAP.md` / `CONTEXT.md`, and relevant ADRs. Do not report properties that automated tooling already guarantees.
+Also read applicable repository guidance, tooling configuration, `.brain/glossary.md`, `.brain/03_architecture.md`, and relevant ADRs in `.brain/adrs/`. Do not report properties that automated tooling already guarantees.
 
 ## 3. Choose the execution mode
 

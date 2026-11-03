@@ -5,6 +5,8 @@ description: Discover architectural friction across a codebase, or assess a sele
 
 # Architecture Review
 
+**Project brain:** If `.brain/00_index.md` exists (at this worktree's root, or in the main checkout when working in a linked git worktree) and you have not read its root files in this session (or they were lost to context compaction), read every root `.md` file in that `.brain/` now. Read subfolders only when a root file links to them or the task needs them. Do not load `.brain` into subagents wholesale; pass only what their task needs. If no brain exists, proceed without one and mention once that `/brain-update` can create it.
+
 Find or assess architectural improvements using concrete evidence. Follow root `CLAUDE.md`: a recommendation or selected review topic is not approval to redesign. Do not modify production code.
 
 Choose the mode by **whether the user has selected an area**, not by whether they already know what is wrong:
@@ -16,7 +18,7 @@ If the request names specific code, use focused review. Do not run both modes au
 
 ## Shared evidence rules
 
-Establish the user's goal, known use cases, relevant owners and interfaces, constraints, and non-goals. Read applicable `CONTEXT-MAP.md`, the relevant `CONTEXT.md` (or root `CONTEXT.md`), and relevant ADRs; treat an existing ADR as intentional unless current evidence supports reconsidering it.
+Establish the user's goal, known use cases, relevant owners and interfaces, constraints, and non-goals. Read `.brain/glossary.md`, `.brain/03_architecture.md`, and relevant ADRs in `.brain/adrs/`; treat an existing ADR as intentional unless current evidence supports reconsidering it.
 
 Inspect code, tests, callers, dependencies, configuration, and change history only to the depth required. Separate verified facts, established choices, hypotheses, and unresolved decisions. Do not infer domain contexts from the number of modules or services.
 
@@ -64,6 +66,8 @@ Do not implement, adopt, or document a proposed architecture as settled until th
 
 Deliver the review in the conversation. Write a durable report only when the user requests one or a workflow needs it for continuation (for example, a `brain-plan-feature` research ticket).
 
-A durable report goes in `docs/reviews/architecture/<NN>-<short-slug>-review.md`: increment the highest existing number, matching its padding (two digits by default). Never overwrite an earlier review. Include the scope, cited evidence, findings, the three concluding sections, and unresolved questions. A later approval leads to an ADR, not to a rewrite of the old review.
+A durable report goes in `.brain/reviews/architecture/<NN>-<short-slug>.md`: increment the highest existing number, matching its padding (two digits by default). Never overwrite an earlier review. Include the scope, cited evidence, findings, the three concluding sections, and unresolved questions. A later approval leads to an ADR, not to a rewrite of the old review.
+
+When you save a durable report, it is the only file you write. Then invoke `brain-update` with a one-line summary of what changed.
 
 Report the conclusion and any file path created.

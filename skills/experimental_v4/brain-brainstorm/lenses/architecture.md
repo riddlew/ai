@@ -15,7 +15,7 @@ Use when a decision affects who owns a responsibility, state, or resource; compo
 
 - The current owner of the relevant state or resource: where it is created, mutated, and released.
 - Lifecycle: construction, shutdown order, and who holds references.
-- Callers and imports around the affected modules; dependency rules in lint configuration, layering docs, or ADRs.
+- Callers and imports around the affected modules; dependency rules in lint configuration, layering docs, `.brain/03_architecture.md`, or ADRs in `.brain/adrs/`.
 - Change coupling: files that repeatedly change together (`git log --name-only` over relevant history).
 - Tests: which boundary they exercise today and how much unrelated setup they need.
 

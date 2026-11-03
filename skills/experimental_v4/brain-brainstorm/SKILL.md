@@ -5,11 +5,13 @@ description: Resolve consequential product and architecture decisions with the u
 
 # Brainstorm
 
+**Project brain:** If `.brain/00_index.md` exists (at this worktree's root, or in the main checkout when working in a linked git worktree) and you have not read its root files in this session (or they were lost to context compaction), read every root `.md` file in that `.brain/` now. Read subfolders only when a root file links to them or the task needs them. Do not load `.brain` into subagents wholesale; pass only what their task needs. If no brain exists, proceed without one and mention once that `/brain-update` can create it.
+
 Help the user settle a sound direction. Investigate facts yourself, recommend, and let the user decide consequential choices (root `CLAUDE.md`). Do not implement or change production code while brainstorming.
 
 ## 1. Map the decision space
 
-Establish the objective, the relevant existing behavior, and decisions the user has already made. Use code, tests, documentation, `CONTEXT.md`, and ADRs to answer factual questions.
+Establish the objective, the relevant existing behavior, and decisions the user has already made. Use code, tests, documentation, the `.brain` root files, and ADRs in `.brain/adrs/` to answer factual questions.
 
 Track every question in a decision table:
 
@@ -115,3 +117,5 @@ Present the final summary in this format, which `brain-write-spec` consumes:
 ```
 
 Ask the user to confirm the direction before treating it as established. If it was already confirmed in the discussion, do not ask again. Do not begin implementation without authorization.
+
+Once the user confirms the direction, it is established. Then invoke `brain-update` with a one-line summary of what changed.
