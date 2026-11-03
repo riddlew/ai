@@ -150,27 +150,117 @@ Follow-up turns go to the same subagent through SendMessage, prefixed `The user 
 
 ## S4: Worktree
 
-_Added in Task 5._
+- **Fixture:** synced, plus a linked worktree:
+
+  ```bash
+  cd <RUN> && git worktree add -q <RUN>-wt -b wt
+  # in <RUN>-wt/crate/cli.py, after parser = ...: parser.add_argument("--version", action="version", version="crate 0.1.0")
+  cd <RUN>-wt && git commit -qam "Add --version flag"   # with the fixture identity
+  ```
+
+  `<FIXTURE>` in the wrapper is `<RUN>-wt`.
+- **Context:** none
+- **Trigger:** The user says: "/brain-update"
+
+**Pass criteria**
+
+1. No `.brain/` exists in `<RUN>-wt`.
+2. `<RUN>/.brain/02_features.md` mentions `--version`.
+3. HEAD of both checkouts is unchanged.
 
 ## S5: Missing sync commit
 
-_Added in Task 5._
+- **Fixture:** synced, then replace the `Last synced` sha in `.brain/00_index.md` with `deadbeefdeadbeefdeadbeefdeadbeefdeadbeef`.
+- **Context:** none
+- **Trigger:** The user says: "/brain-update"
+
+**Pass criteria**
+
+1. The reply says the recorded commit is missing and that it re-verified the root files.
+2. S2's criteria 1 and 2 pass (`cue add` and `cue_points`).
+3. `00_index.md` has `Last synced: <B>`.
 
 ## S6: Oversized root file
 
-_Added in Task 5._
+- **Fixture:** synced, then append about 5,600 words of command examples to `.brain/02_features.md`, plus the unique line `SENTINEL-FEATURE-DETAIL`:
+
+  ```bash
+  printf '\n## Command examples\n\n' >> <RUN>/.brain/02_features.md
+  seq 1 160 | sed -E 's/^(.*)$/- Example \1: `crate add-track warmup "Track \1" "Artist \1" 120` appends Track \1 by Artist \1 at position \1 of the warmup crate, so `list-crate warmup` prints it directly after the track added before it, and a 118–122 filter includes it./' >> <RUN>/.brain/02_features.md
+  printf '\nSENTINEL-FEATURE-DETAIL\n' >> <RUN>/.brain/02_features.md
+  ```
+
+- **Context:** none
+- **Trigger:** The user says: "/brain-update"
+
+**Pass criteria**
+
+1. `wc -w .brain/02_features.md` is 4,000 or less, and the file links into `.brain/02_features/`.
+2. `grep -r SENTINEL-FEATURE-DETAIL .brain/02_features/` matches.
+3. `grep -r "Example 160" .brain/02_features/` matches: no content was dropped.
 
 ## S7: Partial folder, first run
 
-_Added in Task 5._
+- **Fixture:** partial
+- **Context:** none
+- **Trigger:** The user says: "/brain-update"
+
+**Pass criteria** (turn 1)
+
+1. It treats this as a first run and asks the git-tracking question.
+2. `.brain/specs/01-bpm-filter.md` is unchanged.
+3. No root `.md` files exist in `.brain/`.
 
 ## S8: brain-write-spec
 
-_Added in Task 6._
+- **Fixture:** synced
+- **Skill:** `brain-write-spec`
+- **Context:** the confirmed direction below, from a `brain-brainstorm` session earlier in this conversation:
+
+  ```markdown
+  ## Direction: Cue points
+
+  **Behavior and scope:** Users add cue points to a track from the CLI and see them when listing a crate.
+  **Non-goals:** Hot vs. memory cue distinction; cue labels; Rekordbox export.
+
+  ### Decisions
+
+  | ID | Decision | Status | Depends on | Resolution |
+  |---|---|---|---|---|
+  | D1 | Unit for cue positions | Established | — | Seconds from track start, stored as floats (user) |
+  | D2 | Command shape | Established | — | `cue add <track> <seconds>` (user) |
+  | D3 | Maximum cues per track | Established | — | 8; adding a 9th is rejected with a non-zero exit and nothing stored (user) |
+  | D4 | Track lookup when titles repeat | Deferred | — | Left to implementation |
+
+  **Relevant facts:** tracks in the `tracks` table, crates in `playlists` (`crate/store.py`); errors print `crate: <message>` and exit 1 (`crate/cli.py`).
+  **Blocking open decisions:** None
+  **Deferred to implementation:** D4
+  ```
+
+- **Trigger:** The user says: "/brain-write-spec"
+
+**Pass criteria**
+
+1. `.brain/specs/02-cue-points.md` exists, and its Examples include rejection of a 9th cue.
+2. No `docs/` directory is created.
+3. `.brain/00_index.md` lists `specs/02-cue-points.md`. (`brain-update` was invoked.)
+4. `.brain/state.md` lists cue points with a link to spec 02.
 
 ## S9: brain-implement resume
 
-_Added in Task 7._
+- **Fixture:** synced
+- **Skill:** `brain-implement`
+- **Context:** none
+- **Trigger:** The user says: "/brain-implement resume the BPM filter work. Stop after you report the next work item and the files you read."
+
+**Pass criteria**
+
+1. Every root `.md` file in `.brain/` is read.
+2. `.brain/impl_plans/01-bpm-filter.md` and `.brain/specs/01-bpm-filter.md` are read.
+3. Nothing under `.brain/reviews/` is read.
+4. The reported review base equals `<A>`.
+5. The next work item is the E2 upper bound.
+6. It attempts no reads of `CONTEXT.md` or `docs/`.
 
 ---
 
@@ -224,6 +314,21 @@ _Added in Task 7._
 
 **S3: pass** (criteria 1–3)
 - It changed nothing and pointed the user to `/brain-update`.
+
+**S4: pass**
+- It found the main checkout's brain from `-wt`, created no `.brain` in `-wt`, and `02_features.md` mentions `--version`.
+- **Limitation it reported:** one shared brain across branches. `Last synced` now names a commit that exists only on `wt`. This is a known limit of an untracked shared brain; see the README.
+
+**S5: pass**
+- It detected that `deadbeef…` doesn't exist and re-checked every root file against `HEAD`.
+- `cue add` and `cue_points` are recorded, and `Last synced` = HEAD.
+
+**S6: pass**
+- `02_features.md` went from 6,783 words to 284 and links to `02_features/command_examples.md`.
+- All 160 examples and `SENTINEL-FEATURE-DETAIL` were moved verbatim.
+
+**S7: pass**
+- Turn 1 treated the folder as a first run, asked the git-tracking question, left the spec unchanged, and created no root files.
 
 ### Counters added to the skill
 
