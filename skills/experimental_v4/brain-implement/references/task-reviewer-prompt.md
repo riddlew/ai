@@ -32,14 +32,24 @@ Base: `{base}`
 
    `| ID | met / unmet / unclear | evidence (file:line, test name) |`
 
-2. **Findings** in the format of `brain-review-code/references/findings.md` (path relative to the skills directory), using the Critical, High, Medium and Low scale.
+2. **Findings** in the format of `{findings_path}`, using the Critical, High, Medium and Low scale.
 3. **Verdict:** `Approved` or `Needs fixes`. Use `Needs fixes` when any row is unmet or any finding is Critical, High or Medium.
 
 ## Re-review variant
 
-Used after a fix round. Input: the fix diff and the open findings. Do no fresh broad review.
+Used after a fix round. Nothing is committed between rounds, so review the cumulative `git diff {base}` plus untracked files.
 
-- For each finding, mark addressed or not addressed, with `file:line`.
+Open findings:
+
+{open_findings}
+
+Implementer's fix report:
+
+{fix_report}
+
+Do no fresh broad review.
+
+- For each open finding, mark addressed or not addressed, with `file:line`.
 - Judge any pushback: stands or rejected, with the reason.
-- List new issues the fix introduced, in the findings format.
+- Look for new issues only in the files the fix report names, in the findings format.
 - End with the verdict.

@@ -48,6 +48,14 @@ The first line is exactly one of `DONE`, `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT`, 
 
 Used when the coordinator resumes you, or dispatches you fresh, with findings.
 
-- Apply `${CLAUDE_SKILL_DIR}/references/review-feedback.md`.
+- Open findings:
+
+{open_findings}
+
+- Prior report (filled only for a fresh implementer):
+
+{prior_report}
+
+- Apply `{review_feedback_path}`.
 - Report each finding as fixed (with the test), pushed back (with evidence: `file:line` and test output), or unclear (with the question).
 - Fix only the listed findings.
