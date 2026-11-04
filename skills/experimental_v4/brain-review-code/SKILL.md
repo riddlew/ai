@@ -47,7 +47,7 @@ Also read applicable repository guidance, tooling configuration, `.brain/glossar
 
 ## 3. Choose the execution mode
 
-- **Delegated:** when the change spans more than one component (top-level module, package, or service) or about 300 or more changed lines, excluding generated files and lockfiles. Dispatch one subagent per assessment in parallel. Give each only its own packet (below) and the path to `references/findings.md`; none receives another's conclusions.
+- **Delegated:** when the change spans more than one component (top-level module, package, or service) or about 300 or more changed lines, excluding generated files and lockfiles. Dispatch one standard-tier subagent per assessment in parallel. Give each only its own packet (below) and the path to `references/findings.md`; none receives another's conclusions.
 - **Inline:** otherwise, or when subagents are unavailable. Complete each assessment in turn without revising earlier conclusions to match later ones. State in the report that the assessments did not run in separate contexts.
 
 Every packet contains the resolved base, the commit range and any working-tree files, and the changed files. Separate contexts reduce shared assumptions; they do not guarantee correctness. Step 5 applies in both modes.

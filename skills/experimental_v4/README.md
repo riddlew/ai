@@ -83,6 +83,10 @@ Root [`CLAUDE.md`](CLAUDE.md) contains the shared decision policy, which the ski
 
 For example, a request to extend communication in an existing `Session` does not authorize silently moving connection ownership into a new `ConnectionManager`. Claude should explain the concrete reason for such a change, compare it with extending `Session`, and ask you which design to adopt.
 
+## Model tiers
+
+Skills refer to a "standard tier" and a "strongest tier". Root [`CLAUDE.md`](CLAUDE.md) maps tiers to models in one table, which is the only place to change them. At skill start, Claude suggests a `/model` switch once, and only on a clear mismatch.
+
 ## Skills
 
 | Skill | Purpose | Use when | Typical output |
@@ -91,7 +95,7 @@ For example, a request to extend communication in an existing `Session` does not
 | `brain-brainstorm` | Resolves open requirements and design decisions through a visible decision table, lens-guided options, and dependency-ordered questions. | Behavior, constraints, or architectural direction is unclear. | A confirmed direction summary; decisions recorded through `brain-update`. |
 | `brain-diagnose` | Investigates failures using reproduction and discriminating hypotheses; applies a bounded fix only when authorized. | A failure, regression, or intermittent issue needs explanation. | Diagnosis in conversation; `.brain/diagnoses/` only on request. |
 | `brain-distill-content` **(manual)** | Removes verbosity from technical documents while preserving all material information and structure. | AI-generated docs, MR descriptions, or RFCs are padded. | The distilled document. |
-| `brain-implement` **(manual)** | Implements approved work in test-first increments, starting from specification examples, and maintains resumable progress. | You are ready to change code, with or without a formal spec. | Code, checks, and for tracked features `.brain/impl_plans/<feature>.md`. |
+| `brain-implement` **(manual)** | Implements approved work in test-first increments, starting from specification examples, and maintains resumable progress. Asks once per feature whether to use a git worktree and which execution mode to use (subagent-driven, with a per-task reviewer, or inline). Pauses after each task for you to commit, with a suggested Conventional Commits message, and ends with a review proportional to the change. | You are ready to change code, with or without a formal spec. | Code, checks, and for tracked features `.brain/impl_plans/<feature>.md`. |
 | `brain-plan-feature` | Tracks multi-session planning with dependency-aware research, consult, prototype, and task tickets. | An initiative has many interdependent decisions and spans days or sessions. | `.brain/planning/<feature>/INDEX.md` and planning tickets. |
 | `brain-refine-backlog` | Reviews Jira stories for refinement readiness without changing them. | Preparing for backlog refinement. | Suggested gaps, draft acceptance criteria, and questions. |
 | `brain-review-architecture` | Discovers architectural friction **or** assesses a selected boundary, using concrete evidence. | You want improvement candidates or a focused design evaluation. | Findings in conversation; `.brain/reviews/architecture/` only on request. |
@@ -116,7 +120,7 @@ Example: Add a `--json` option to an existing export command.
 
 1. Run `/brain-implement` directly from the request; a specification and ticket set are not required.
 2. Make the smallest coherent change and validate it with targeted tests or other checks.
-3. Inspect the diff. Invoke `brain-review-code` only if the change is consequential, substantial, or you request it.
+3. The final check is `brain-implement`'s own diff inspection. A full `brain-review-code` runs only if the change is consequential or you ask for one.
 4. Update relevant existing documentation if the user-facing command changed. `brain-update` records the new option in the brain.
 
 ### Substantial feature
@@ -127,7 +131,7 @@ Example: Add a share-link capability for notes.
 2. Use `brain-review-architecture` if ownership or another expensive-to-reverse decision needs focused evaluation. Approved hard-to-reverse decisions become ADRs through `brain-update`.
 3. Use `/brain-write-spec` to capture the established behavior, invariants, and concrete examples.
 4. Use `brain-write-tickets` **only if** the work benefits from multiple independently verifiable increments or separate sessions.
-5. Use `/brain-implement` to execute the spec or tickets, starting from the spec's examples as tests. Run `brain-review-code` for a substantial change; add `brain-review-security` if the design introduces authorization, trust, or sensitive-data boundaries.
+5. Use `/brain-implement` to execute the spec or tickets, starting from the spec's examples as tests. It asks for the execution mode at startup and pauses after each task for you to commit. Substantial or consequential changes get a final review by a fresh strongest-tier reviewer, which runs `brain-review-code`; add `brain-review-security` if the design introduces authorization, trust, or sensitive-data boundaries.
 
 ### Large, multi-session planning effort
 
@@ -180,9 +184,11 @@ The impl plan tracks work items, current focus, blockers, verified test results,
 
 A fresh session reads the brain's root files, then the impl plan, and verifies progress against the repository, Git state, and tests before continuing.
 
+The impl plan header records the worktree and execution-mode answers, so a resumed session does not ask again. It also records per-task base and commit shas, rulings, and deferred findings.
+
 ## Verification
 
-Implementation uses focused test-first increments, starting from the specification's examples and covering stated invariants and failure paths beyond them. At completion, validation is proportional to scope and risk. `brain-review-code` runs for substantial or consequential changes, **not every trivial edit**; `brain-review-security` is similarly risk-based.
+Implementation uses focused test-first increments, starting from the specification's examples and covering stated invariants and failure paths beyond them. At completion, validation is proportional to scope and risk. `brain-review-code` runs for substantial or consequential changes, **not every trivial edit**; in subagent-driven mode each task also gets a task review with up to five fix rounds. `brain-review-security` is similarly risk-based. Review findings are handled by `brain-implement/references/review-feedback.md`: verify before acting, and push back with evidence. No task is marked done without a test run read in that session.
 
 All review skills share one severity scale (Critical / High / Medium / Low), a separate confidence rating, and common finding fields, defined in `brain-review-code/references/findings.md`.
 
