@@ -39,6 +39,26 @@ When a consequential decision arises:
 
 If the current architecture genuinely cannot support a requirement safely or correctly, explain why and propose a change; do not quietly force a poor fit. If a user-approved direction presents a concrete safety or correctness problem, surface it instead of silently substituting another design.
 
+## Model tiers
+
+Skills refer to "standard tier" and "strongest tier"; this table is the only place that maps tiers to models.
+
+| Role | Tier | Model today |
+|---|---|---|
+| Task implementer, task reviewer, scoped re-review | standard | Sonnet |
+| Fix-round 4–5 implementer, final reviewer, final fix pass | strongest | Opus |
+| Main session: brainstorming, writing specs, architecture review | strongest | Opus |
+| Main session: coordinating subagent-driven mode | standard | Sonnet |
+| `brain-review-code` delegated assessment subagents | standard | Sonnet |
+
+Rules:
+- Every subagent dispatch names its model explicitly, using this table.
+- When a `brain-` skill starts, suggest switching only on a clear mismatch, say so once, and continue either way:
+  - Sonnet while brainstorming, writing a spec, or reviewing architecture → suggest `/model opus`.
+  - Opus while coordinating subagent-driven mode → suggest `/model sonnet`.
+- Inline implementation gets no suggestion (task difficulty varies); the inline final fix pass runs on the session model.
+- To change models later, edit only this table.
+
 ## Implementation and review discipline
 
 - Prefer the smallest coherent solution satisfying **current** requirements. Do not optimize for speculative flexibility or abstract design ideals.
