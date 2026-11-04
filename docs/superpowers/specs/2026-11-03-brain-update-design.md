@@ -122,7 +122,7 @@ The numbered files 01–09 are a starting point. Root files that do not apply to
 
 Every v4 skill except `brain-distill-content` starts with the same short preamble:
 
-> If `.brain/00_index.md` exists (at this worktree's root, or in the main checkout when working in a linked git worktree) and you have not read its root files in this session (or they were lost to context compaction), read every root `.md` file in that `.brain/` now. Read subfolders only when a root file links to them or the task needs them. Do not load `.brain` into subagents wholesale; pass only what their task needs. If no brain exists, proceed without one and mention once that `/brain-update` can create it.
+> If `.brain/00_index.md` exists (at this worktree's root, or in the main checkout when working in a linked git worktree) and you have not read its root files in this session (or they were lost to context compaction), read every root `.md` file in that `.brain/` now. Read subfolders only when a root file links to them or the task needs them. Do not load `.brain` into subagents wholesale; pass only what their task needs. Write any `.brain/` document into that same `.brain/`. If no brain exists, proceed without one and mention once that `/brain-update` can create it.
 
 **A brain exists when `.brain/00_index.md` exists.** A `.brain/` folder without it (for example, one where `brain-write-spec` saved a spec before any first run) does not count.
 

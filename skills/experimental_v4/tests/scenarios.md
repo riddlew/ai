@@ -262,6 +262,80 @@ Follow-up turns go to the same subagent through SendMessage, prefixed `The user 
 5. The next work item is the E2 upper bound.
 6. It attempts no reads of `CONTEXT.md` or `docs/`.
 
+## S10: Producer writes from a worktree (review C1)
+
+- **Fixture:** synced, plus `git worktree add <RUN>-wt -b wt`. `<FIXTURE>` is `<RUN>-wt`.
+- **Skill:** `brain-write-spec`
+- **Context:** S8's direction summary.
+- **Trigger:** The user says: "/brain-write-spec"
+
+**Pass criteria**
+
+1. `<RUN>/.brain/specs/02-cue-points.md` exists.
+2. No `.brain/` exists in `<RUN>-wt`.
+
+## S11: First run from a worktree (review I1)
+
+- **Fixture:** commit A only (no legacy docs), plus `git worktree add <RUN>-wt -b wt`. `<FIXTURE>` is `<RUN>-wt`.
+- **Trigger:** The user says: "/brain-update"
+- **Answers:**
+  1. To the git-tracking question: `No, don't track it.`
+  2. Then: `I don't know yet; record everything else as open and create the brain now.`
+
+**Pass criteria**
+
+1. `<RUN>/.brain/00_index.md` exists.
+2. No `.brain/` exists in `<RUN>-wt`.
+
+## S12: Brain last synced from another branch (review I3)
+
+- **Fixture:** synced, plus a `wt` worktree with S4's `--version` commit. Then, in the main fixture:
+  - set `Last synced` to the `wt` commit;
+  - append `- \`--version\` — prints \`crate 0.1.0\`.` to `.brain/02_features.md`.
+
+  This simulates a sync that was run from `wt`. `<FIXTURE>` is `<RUN>` (on `main`).
+- **Trigger:** The user says: "/brain-update"
+
+**Pass criteria**
+
+1. The reply says the brain was last synced from a commit that isn't in this branch's history.
+2. `.brain/02_features.md` still mentions `--version`.
+
+## S13: First-run move conflict and links (review I4, I5)
+
+- **Fixture:** fresh, but before commit A:
+  - append `See [the storage decision](docs/adr/0001-use-sqlite.md).` to `README.md`.
+
+  After commit A:
+  - copy `docs/specs/01-bpm-filter.md` to `.brain/specs/`;
+  - append `Draft note: E3 pending.` to the copy.
+- **Trigger:** The user says: "/brain-update"
+- **Answers:**
+  1. `No, don't track it.`
+  2. `Move them.`
+
+**Pass criteria**
+
+1. Before or at turn 2, it flags that `.brain/specs/01-bpm-filter.md` differs from `docs/specs/01-bpm-filter.md`.
+2. After "Move them.", `.brain/specs/01-bpm-filter.md` still contains `Draft note: E3 pending.`
+3. `README.md` now links `.brain/adrs/0001-use-sqlite.md`.
+
+## S14: ADR numbering with documents left in place (review I2)
+
+- **Fixture:** synced, but commit A also tracks `T/fixture/extra/docs/adr/0002-use-argparse.md`. Append this row to `.brain/00_index.md`:
+
+  ```
+  | `docs/adr/0002-use-argparse.md` | CLI parsing choice, left in place | accepted |
+  ```
+
+- **Context:** S2's session summary.
+- **Trigger:** The user says: "/brain-update"
+
+**Pass criteria**
+
+1. If it writes an ADR for the cue-point decision, the ADR is numbered `0003`.
+2. Nothing in `.brain/adrs/` is numbered `0002`.
+
 ---
 
 ## Results
@@ -341,6 +415,33 @@ Follow-up turns go to the same subagent through SendMessage, prefixed `The user 
 - It did not read `reviews/`.
 - It reported review base = A and named E2 as the next item.
 - It also caught the plan's false "E1 test passed" claim.
+
+### Final-review fix pass, 2026-11-04
+
+**RED for the review findings** (current skills):
+- S10 (C1): pass.
+- S11 (I1): pass.
+- S12 (I3): **fail**. `--version` was removed from `02_features.md`.
+- S13 (I4, I5): pass.
+- S14 (I2): pass.
+
+**Fixes:**
+- **C1:** the preamble now says "Write any `.brain/` document into that same `.brain/`." This is spec conformance; the failure didn't reproduce.
+- **I3:** brain-update Update step 2 got an ancestry rule.
+- **I5:** the "Always" first-run scope and step 3 link wording changed.
+- **I6:** the CLAUDE.md authority wording changed.
+
+**Full suite after the C1, I3, and I6 fixes:**
+- S1–S8, S10–S12, S14: pass.
+- S12: GREEN; `--version` was kept and labelled "on branch `wt`, not merged".
+- S9: 5/6. It read `reviews/architecture/01-store-layering.md`. That is allowed by the preamble's "or a root file links to them", because `00_index.md` links every document. Reported to the user rather than changed, because "or linked to" was the user's own wording.
+- S13: **fail**. "I didn't edit the README because I only write inside `.brain/`" (I5 reproduced on the second sample).
+
+**After the I5 fix:**
+- S13 rerun: pass. The README link was updated and the draft-note spec kept.
+- S2 rerun: pass, as a regression check of the reworded rule.
+
+**Harness change:** synced fixtures now use a deterministic commit A. `.brain/` is excluded before `git add`, and the commit uses fixed dates, so A = `9bd4255fca7a955ea70f6bd88d4fdba04dbe768c`. The worktree guard refuses runtime sha substitution in `sed`, so the sha is written as a literal.
 
 ### Counters added to the skill
 

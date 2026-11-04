@@ -5,11 +5,11 @@ description: Use when a project has no .brain/ folder and the user wants one set
 
 # Brain Update
 
-`.brain/` is the project's central memory: what the project is, how it is built, what the user decided, what is open, and what is done. A new session reads its root files instead of re-reading the codebase. This skill is the only writer of the root files and `adrs/`. Other skills write their own documents into `.brain/` subfolders, then invoke this skill. Follow root `CLAUDE.md` for decision authority.
+`.brain/` is the project's central memory: what the project is, how it is built, what the user decided, what is open, and what is done. This skill is the only writer of the root files and `adrs/`. Other skills write their own documents into `.brain/` subfolders, then invoke this skill. Follow root `CLAUDE.md` for decision authority.
 
 **Always:**
 
-- Write only inside `.brain/`, plus `info/exclude` during a first run. Learn facts by reading code and git history. Never run the project's code, tests, or build; a fact that needs an experiment goes in `spikes.md`.
+- Write only inside `.brain/`. During a first run you also write `info/exclude` and carry out approved moves (§2 step 3), including deleting originals and fixing links to them anywhere. Learn facts by reading code and git history. Never run the project's code, tests, or build; a fact that needs an experiment goes in `spikes.md`.
 - Never stage, commit, or push.
 - Never dispatch subagents unless the user asks.
 - Ask the user one question per message.
@@ -25,15 +25,15 @@ A brain exists only when `.brain/00_index.md` exists. Look at the current worktr
 | No brain, and another skill invoked you | Change nothing. Tell the user no brain exists yet and that `/brain-update` will set one up. |
 | Brain exists | Update (§3) |
 
-Another skill invoking you is never a request to set up a brain, however easy the code is to read. A `.brain/` folder without `00_index.md` (for example, one holding a spec another skill saved) is not a brain; keep its files and index them during the first run.
+Another skill invoking you is never a request to set up a brain. A `.brain/` folder without `00_index.md` (for example, one holding a spec another skill saved) is not a brain; keep its files and index them during the first run.
 
 ## 2. First run
 
 Take these steps in order.
 
 1. **Investigate.** Read the README and docs, manifests and dependencies, entry points, module layout, tests, configuration, and recent `git log`. Never ask the user what the repository answers: language, frameworks, commands, settings, schema.
-2. **Ask about git tracking. This is your first question.** Ask whether `.brain` should be tracked in git, saying the default is **not tracked**: local to this machine. Recommend the default unless the user has said otherwise. If the answer is no or no preference, append `.brain/` to `info/exclude` under `git rev-parse --git-common-dir`. If yes, leave `.brain` visible to git. Either way, you never commit.
-3. **Propose moving the documents `.brain` replaces.** List each one found, with its destination from the table below, and wait for approval. If `.brain` is untracked and any of them are tracked, say that moving them takes them out of git for everyone else, and offer to leave those in place, indexed by their current path. Once the user approves, move them. Do not copy, and do not ask again. Use `git mv` when `.brain` is tracked, or plain `mv` when it is not; git then shows the old paths as deleted, and you don't commit. Fix links the move breaks.
+2. **Ask about git tracking. This is your first question.** Ask whether `.brain` should be tracked in git, saying the default is **not tracked**: local to this machine. Recommend the default unless told otherwise. If the answer is no or no preference, append `.brain/` to `info/exclude` under `git rev-parse --git-common-dir`. If yes, leave `.brain` visible to git. Either way, you never commit.
+3. **Propose moving the documents `.brain` replaces.** List each one found, with its destination from the table below, and wait for approval. If `.brain` is untracked and any of them are tracked, say that moving them takes them out of git for everyone else, and offer to leave those in place, indexed by their current path. Once the user approves, move them. Do not copy, and do not ask again. Use `git mv` when `.brain` is tracked, or plain `mv` when it is not; git then shows the old paths as deleted, and you don't commit. Update links to moved files everywhere, including the README.
 
    | From | To |
    |---|---|
@@ -49,7 +49,7 @@ Take these steps in order.
    | `CONTEXT-MAP.md` | domain-boundaries section of `03_architecture.md`, then delete |
 
 4. **Interview the user. This step is required.** Never fill it from defaults, recommendations, or guesses. Ask one question per message about what the code cannot show:
-   - purpose and the problem it solves;
+   - purpose;
    - users;
    - goals, non-goals, and priorities;
    - planned features;
@@ -69,7 +69,9 @@ Take these steps in order.
    - decisions, answers, and discoveries in the current conversation;
    - new or changed documents in `.brain/` subfolders.
 
-   If `<sha>` no longer exists, for example after a rebase, re-verify every root file against the current code instead of diffing, and say so.
+   If `<sha>` no longer exists (after a rebase, say), re-verify every root file against the current code instead of diffing, and say so.
+
+   If `<sha>` exists but is not an ancestor of `HEAD` (`git merge-base --is-ancestor <sha> HEAD` fails), the brain was last synced from another branch. Say so, and re-verify every root file against this branch. Keep content about work that exists only on another branch, labelled with that branch (for example, "on branch `wt`, not merged"), rather than removing it.
 3. Apply each change to every root file it affects. Add what is new, correct what changed, and remove what is no longer true. Root files describe the present, not history.
 4. Record each user decision in `09_user_decisions.md`, and write an ADR when one qualifies (§5). Move answered questions out of `open_questions.md` into `09` and the relevant root file. Resolve spikes (§4).
 5. Add new terms to `glossary.md`, and use canonical terms in the root files you touch. Report term mismatches in subfolder documents rather than editing them.
@@ -113,7 +115,7 @@ A project-specific topic gets the next free number, for example `10_protocols.md
 - **Confirmed problem:** it becomes an open question, or a decision in `09`.
 - **Deferred:** keep the entry, with a note.
 
-**Glossary:** for each term, record what it means, what it includes and excludes, and how it differs from neighboring terms. Map UI labels to code and database names where they differ. Record aliases to avoid only when they prevent likely confusion. Prefer meaning over class names, and don't mirror the codebase. A new canonical term or a changed definition is a decision; confirm it with the user unless it is already established.
+**Glossary:** for each term, record what it means, what it includes and excludes, and how it differs from neighboring terms. Map UI labels to code and database names where they differ. Record aliases to avoid only when they prevent likely confusion. A new canonical term or a changed definition is a decision; confirm it with the user unless it is already established.
 
 ## 5. ADRs
 

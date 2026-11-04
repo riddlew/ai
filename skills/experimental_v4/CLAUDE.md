@@ -49,6 +49,6 @@ If the current architecture genuinely cannot support a requirement safely or cor
 - `.brain/` is the project's single document store. `brain-update` owns its root files and `adrs/`; other skills write only their own documents into its subfolders, then invoke `brain-update`.
 - Deliver review and diagnosis results in the conversation unless the user requests a saved record.
 - Record **approved** durable decisions through the project's existing documentation conventions when justified; do not turn unapproved recommendations into ADRs.
-- Impl plans in `.brain/impl_plans/` and the `.brain` root files are **continuity aids** that summarize other sources. They are never authorities over specifications, ADRs, or user decisions. Verify them against current code and tests, and record approved consequential changes in the governing specification or ADR first.
+- Impl plans in `.brain/impl_plans/` and the descriptive `.brain` root files (`01`–`08`, `state.md`) are **continuity aids** that summarize other sources. Verify them against current code and tests; they never override specifications, ADRs, or recorded decisions. `.brain/09_user_decisions.md` is itself an authority on intent, alongside specifications and ADRs, and `.brain/glossary.md` is the authority on terminology. Record approved consequential changes in the governing specification, ADR, or `09_user_decisions.md` first.
 
 If blocked by a consequential open question, finish safe independent work, clearly identify the decision and affected scope, and do not proceed through the blocked choice.
