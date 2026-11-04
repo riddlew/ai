@@ -83,7 +83,7 @@ Work in behavioral slices, not layer batches. Where no practical automated test 
 
 ### Commit pause
 
-After each task, and after the final fix pass if it changed anything: report the task and test result, propose a Conventional Commits message (e.g. `fix(filter): make the BPM upper bound inclusive`), ask the user to commit, and wait. Never run `git commit` yourself. Once the user confirms, check HEAD moved and record the sha in the impl plan. The next task starts only after the commit; if the user says to continue without committing, do so and note that the next task's review covers both tasks' changes.
+After each task, and after the final fix pass if it changed anything: report the task, the test command and its result, propose a Conventional Commits message (e.g. `fix(parser): reject empty input lines`), ask the user to commit, and wait. Never run `git commit` yourself. Once the user confirms, check HEAD moved and record the sha in the impl plan. The next task starts only after the commit; if the user says to continue without committing, do so and note that the next task's review covers both tasks' changes.
 
 ## 6. Keep state accurate
 
@@ -101,7 +101,7 @@ When all required behavior is implemented:
 
 1. Run relevant static checks and targeted tests. For substantial work, run the full suite once where feasible. For small, low-risk changes, use proportionate checks and say what was skipped.
 2. Inspect the complete diff for missed requirements, scope creep, unnecessary abstraction, duplicated ownership, and regressions. Simplify within scope.
-3. Small, low-risk changes need only your own diff inspection and checks; substantial or consequential changes (ownership, public contracts, persistence, security, broad cross-component behavior, or a small diff with material consequences) get a full review: dispatch a fresh strongest-tier subagent that runs `brain-review-code` inline, given the impl plan's `Review base`, the governing spec or tickets, and the impl plan's Rulings and Deferred lists. If no subagent tool is available, run `brain-review-code` yourself and report `Final review: self-review (no fresh reviewer) — weaker than an independent review`. Critical, High, and Medium findings enter one fix pass (each fix test-first, then the full suite, then the commit pause); list Low findings for the user. No second review pass.
+3. Small, low-risk changes need only your own diff inspection and checks; substantial or consequential changes (ownership, public contracts, persistence, security, broad cross-component behavior, or a small diff with material consequences), or any change when requested, get a full review covering the full scope including in-scope uncommitted files: dispatch a fresh strongest-tier subagent that runs `brain-review-code` inline, given the impl plan's `Review base`, the governing spec or tickets, and the impl plan's Rulings and Deferred lists. If no subagent tool is available, run `brain-review-code` yourself and report `Final review: self-review (no fresh reviewer) — weaker than an independent review`. Critical, High, and Medium findings enter one fix pass (each fix test-first, then the full suite, then the commit pause); list Low findings for the user. No second review pass.
 4. Address supported in-scope findings, rerun affected checks, and consult before any new consequential decision.
 5. Report, and record in the impl plan, only checks actually performed and whether `brain-review-code` ran or was skipped as disproportionate. Do not claim completion with unexplained failures.
 
