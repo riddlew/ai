@@ -83,6 +83,12 @@ Trace each applicable requirement and specification Example to the implementatio
 
 Undocumented local implementation details are not unsupported behavior. Category: `Requirement`. Give no maintainability advice here.
 
+Also build a coverage table: one row for each specification Example, and one for each acceptance criterion of the tickets in scope. Mark each row:
+
+- **met** — cite the test that verifies it, or the file:line that implements it and "no test" when no test does;
+- **unmet** — cite the finding that reports it (every unmet row has one);
+- **unverifiable** — say what evidence is missing.
+
 ### Repository fit
 
 **Packet:** the change set, applicable repository rules with their locations, and what tooling guarantees.
@@ -118,6 +124,12 @@ Edit for clarity, but do not otherwise change an assessment's substantive conclu
 
 ## Requirement Fit
 
+| Requirement | Status | Evidence |
+|---|---|---|
+| E1 | met | `tests/test_filter.py::test_e1_range` |
+| E2 | unmet | R1 |
+| Ticket 02 AC 2 | met | `crate/cli.py:41` (no test) |
+
 <findings, "No supported findings", or "Skipped — <reason>">
 
 ## Repository Fit
@@ -129,7 +141,7 @@ Finish with:
 
 ```text
 Correctness: <N> findings
-Requirement fit: <N> findings | skipped
+Requirement fit: <met>/<total> met, <N> findings | skipped
 Repository fit: <N> findings
 ```
 

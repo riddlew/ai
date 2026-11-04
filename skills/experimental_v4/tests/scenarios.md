@@ -339,6 +339,20 @@ Follow-up turns go to the same subagent through SendMessage, prefixed `The user 
 1. If it writes an ADR for the cue-point decision, the ADR is numbered `0003`.
 2. Nothing in `.brain/adrs/` is numbered `0002`.
 
+## S15: brain-review-code coverage table
+
+- **Fixture:** synced, with no WIP file.
+- **Skill:** `brain-review-code`, run inline.
+- **Context:** none
+- **Trigger:** The user says: "/brain-review-code review the BPM filter work since the impl plan's review base, against spec 01."
+
+**Pass criteria**
+
+1. The Requirement Fit section has a coverage table with one row each for E1 and E2.
+2. E2 is `unmet` and cites the finding that reports the exclusive upper bound.
+3. E1 is `met` with evidence, noting that no test covers it, or `unverifiable` with the missing evidence named.
+4. The summary line reads `Requirement fit: <met>/<total> met, <N> findings`.
+
 ---
 
 ## Results
@@ -455,6 +469,13 @@ Single-turn tests with no fixture. The agent is told that the work is complete, 
 **After the skip rule:**
 - **No-change case:** 3/3 skipped, each citing the new rule.
 - **Control** (code committed after the last `brain-update`): 2/2 invoked `brain-update`, so the rule doesn't over-apply.
+
+### S15 coverage table, 2026-11-04
+
+- **Before the change: fail.** Requirement Fit listed findings R1–R3 only. E1 appeared only in prose ("E1 still passes"), with no row per Example and no met count in the summary.
+- **After the change: pass (4/4).**
+  - The table had E1 marked `met` (`crate/cli.py:9`, no test, reproduced) and E2 marked `unmet` (R1).
+  - The summary read `Requirement fit: 1/2 met, 3 findings`.
 
 ### Counters added to the skill
 
