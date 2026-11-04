@@ -19,6 +19,11 @@ Before editing production code:
 3. Inspect the relevant code, callers, tests, state owners, and lifecycle. Identify the smallest coherent implementation within existing responsibilities.
 4. Check `git status` and branch conventions. Do not overwrite unrelated changes or switch branches if that could endanger user work.
 5. Record the review base: a verified commit taken **before the first change**. When resuming, use the base recorded in the impl plan, never the latest `HEAD`. If the recorded base is invalid or the branch or scope has materially changed, investigate and clarify instead of guessing.
+6. **Startup questions** (before the first change, every run). If the impl plan header records `Workspace:` and `Execution mode:`, use them without asking. Otherwise ask both in one message:
+   - **Worktree:** work in a git worktree for this feature? Default: no.
+   - **Execution mode:** subagent-driven or inline? Recommend subagent-driven for several tasks with few shared interfaces; inline for one or two tasks, tightly coupled tasks, or untracked work.
+
+   Record the answers in the impl plan header when one exists (untracked work asks every run). If worktree: create it from the current HEAD so unpushed work is included: `git worktree add <repo root>/.claude/worktrees/<feature-slug> -b <feature-slug> HEAD`. Ensure `.claude/worktrees/` is listed in `info/exclude` under `git rev-parse --git-common-dir`. Work inside it (in Claude Code, `EnterWorktree` with that path when available). An untracked `.brain` is still found in the main checkout. Never merge or remove the worktree; at the end, report its path and branch.
 
 If a consequential choice is unresolved, consult before acting on it and continue independent authorized work meanwhile.
 
