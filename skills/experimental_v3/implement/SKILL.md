@@ -1,0 +1,96 @@
+---
+name: implement
+description: Implement established requirements in verified, test-first increments, maintaining resumable per-feature progress when a specification or ticket set governs the work.
+disable-model-invocation: true
+---
+
+# Implement
+
+Implement an approved specification, ticket set, or well-established request. Small, clear changes need no specification. Follow root `CLAUDE.md` for decision authority and consultation.
+
+## 1. Establish the boundary
+
+Before editing production code:
+
+1. Identify the governing specification, tickets, or request; approved decisions; exclusions; and open consequential questions.
+2. Read repository guidance, `CONTEXT-MAP.md` and the relevant `CONTEXT.md` (otherwise root `CONTEXT.md`), and applicable ADRs.
+3. Inspect the relevant code, callers, tests, state owners, and lifecycle. Identify the smallest coherent implementation within existing responsibilities.
+4. Check `git status` and branch conventions. Do not overwrite unrelated changes or switch branches if that could endanger user work.
+5. Record the review base: a verified commit taken **before the first change**. When resuming, use the base recorded in `todo.md`, never the latest `HEAD`. If the recorded base is invalid or the branch or scope has materially changed, investigate and clarify instead of guessing.
+
+If a consequential choice is unresolved, consult before acting on it and continue independent authorized work meanwhile.
+
+## 2. Track progress for governed work
+
+Track progress when a persisted specification or ticket set governs the work, or when the user asks for multi-session continuity. Otherwise create no tracking files.
+
+Use one workspace per feature, never one per session or ticket:
+
+- **With a specification:** `docs/implementation/<spec-file-stem>/` (for example, `014-external-communication`).
+- **With tickets only:** `docs/implementation/<ticket-feature-slug>/`, linking the ticket source in `todo.md`.
+- **With neither:** `docs/implementation/<task-stub>/`, only when continuity is requested; record the governing request.
+
+If the workspace exists, resume it. Never reset it, overwrite it with a template, or create a second tracker.
+
+- `todo.md` — the execution-status record. Create it when tracked work begins, following `${CLAUDE_SKILL_DIR}/references/todo-template.md`.
+- `guidance.md` — optional; only for discoveries a future session would otherwise rediscover. Follow `${CLAUDE_SKILL_DIR}/references/guidance-template.md`.
+
+Both are living documents, not logs, and neither is an authority: the specification governs behavior, tickets govern decomposition and acceptance criteria, ADRs govern architecture.
+
+## 3. Resume from evidence, not notes
+
+At the start of every resumed session:
+
+1. Read the specification or tickets, `todo.md`, `guidance.md` if present, and applicable ADRs.
+2. Inspect the branch, Git history and status, relevant source, and tests. Check completed items against actual code and validation evidence; a checked box is not proof.
+3. Reconcile: correct stale status, branch information, blockers, and verification notes, and note discrepancies concisely. Defer to verified repository state and approved requirements; consult only if a discrepancy raises a consequential decision.
+4. Select the next unblocked, authorized behavioral increment, respecting genuine ticket dependencies.
+
+## 4. Implement within the agreed design
+
+Extend existing owners and code paths before introducing managers, services, interfaces, dependencies, layers, or migrations. Avoid pass-through indirection, speculative extensibility, extra configuration, and unrelated refactoring.
+
+If the agreed design cannot support a requirement, explain the concrete problem and compare the smallest correction within existing ownership with any broader alternative before making a consequential change. Testing inconvenience or familiarity with a pattern does not justify a new abstraction.
+
+## 5. Test-first increments
+
+Use red-green cycles for new or changed observable behavior when a reliable test surface exists. Do not request approval per test.
+
+**Start from the specification's Examples.** Each Example is a candidate first test. Then add tests for the stated invariants and failure paths the Examples do not cover; examples are not exhaustive.
+
+Choose test boundaries:
+
+- Prefer stable or public interfaces through which callers observe behavior.
+- Exercise real project-owned components together where practical; fake genuine external boundaries (network, time, randomness, expensive infrastructure).
+- Do not test private implementation or mock project-owned internals for convenience.
+- Derive expected results independently from the specification, its Examples, or manually worked cases, never from the implementation's current output.
+- If meaningful testing requires a consequential change to public contracts or ownership, consult first.
+
+For each increment:
+
+1. Write one targeted test for the observable behavior.
+2. Run it and confirm it fails for the intended reason. Fix invalid red states (environment, fixtures, syntax) before counting it.
+3. If it already passes, investigate whether the behavior already exists or the test is inadequate. Do not force a failing test or manufacture changes.
+4. Make the smallest coherent production change across the layers needed.
+5. Rerun the test and confirm it passes. Simplify the affected code where useful and rerun relevant checks.
+6. For tracked work, update `todo.md` with trustworthy verification results.
+
+Work in behavioral slices, not layer batches. Where no practical automated test exists (configuration, documentation, some UI, production-only faults), use characterization tests, static checks, manual reproduction, or diff inspection, and disclose coverage limits. Never fabricate red-green history.
+
+## 6. Keep state accurate
+
+Update `todo.md` after verified progress, when blockers change, and before ending a session, not after every edit. Update `guidance.md` only when a discovery changes how later work should proceed, and remove statements that become stale. Keep unresolved user choices visible and do not proceed through blocked work.
+
+## 7. Finish
+
+Do not run the full suite or `review-code` as an end-of-session ritual while work remains.
+
+When all required behavior is implemented:
+
+1. Run relevant static checks and targeted tests. For substantial work, run the full suite once where feasible. For small, low-risk changes, use proportionate checks and say what was skipped.
+2. Inspect the complete diff for missed requirements, scope creep, unnecessary abstraction, duplicated ownership, and regressions. Simplify within scope.
+3. Run `review-code` for substantial or consequential changes (ownership, public contracts, persistence, security, broad cross-component behavior) or when requested. Pass the recorded review base, the governing specification or tickets, and the full scope including in-scope uncommitted files. For small, low-risk changes, your own diff inspection and checks are enough, but a small diff with material consequences still gets a review.
+4. Address supported in-scope findings, rerun affected checks, and consult before any new consequential decision.
+5. Report, and record in `todo.md`, only checks actually performed and whether `review-code` ran or was skipped as disproportionate. Do not claim completion with unexplained failures.
+
+At session end, give a concise status: completed increments, checks run and their results, the `todo.md` and `guidance.md` paths if present, blockers, and the next authorized step.
