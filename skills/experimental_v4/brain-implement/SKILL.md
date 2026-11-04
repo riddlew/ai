@@ -82,6 +82,8 @@ Update the impl plan after verified progress, when blockers change, and before e
 
 Before ending a session, record its state in the impl plan. Then invoke `brain-update` with a one-line summary of what changed.
 
+If `brain-update` already ran in this session and nothing has changed since (no code, tests, impl plan, or user decisions), skip both steps: the impl plan and the brain are already current. The usual case is a session that ends right after the completion step in §7.
+
 ## 7. Finish
 
 Do not run the full suite or `brain-review-code` as an end-of-session ritual while work remains.

@@ -84,7 +84,7 @@ List assumptions and missing evidence separately, not as findings. Also include 
 
 Deliver the review in the conversation. Write a durable report only when the user requests one or a workflow needs it for continuation.
 
-A durable report goes in `.brain/reviews/security/<NN>-<short-slug>.md`: increment the highest existing number, matching its padding (two digits by default), and create the directory only when needed. Never overwrite a previous review. Redact sensitive values; include sources, scope limits, and the assessment date when claims are version-dependent. The report records evidence at the time of inspection; later fixes belong in the implementation record or a new review.
+A durable report goes in `.brain/reviews/security/<NN>-<short-slug>.md`: increment the highest existing number, matching its padding (two digits by default), and create the directory only when needed. Never overwrite a previous review. Redact sensitive values; include sources, scope limits, and the assessment date when claims are version-dependent. The report records evidence at the time of inspection; later fixes belong in the implementation plan (`.brain/impl_plans/`) or a new review.
 
 When you save a durable report, it is the only file you write. Then invoke `brain-update` with a one-line summary of what changed.
 

@@ -196,5 +196,5 @@ The skills themselves are verified with the scenarios in `tests/scenarios.md`: e
 - `domain-modeling` is removed: `CONTEXT.md` becomes `.brain/glossary.md`, `CONTEXT-MAP.md` becomes the domain-boundaries section of `.brain/03_architecture.md`, and ADR writing moves into `brain-update`.
 - `handoff` is removed: `state.md`, `open_questions.md`, and impl plans cover continuation.
 - `implement`'s `guidance.md` is removed; discoveries go into the brain's root files.
-- Skills that write documents invoke `brain-update` afterward: `brain-brainstorm` (confirmed direction), `brain-write-spec`, `brain-write-tickets`, `brain-plan-feature` (resolved ticket), `brain-implement` (session end and completion), `brain-diagnose` (verified fix), and the review skills when a record is saved.
+- Skills that write documents invoke `brain-update` afterward: `brain-brainstorm` (confirmed direction), `brain-write-spec`, `brain-write-tickets`, `brain-plan-feature` (resolved ticket), `brain-implement` (on completion, and at session end unless nothing has changed since its last `brain-update`), `brain-diagnose` (verified fix), and the review skills when a record is saved.
 - `tests/` adds behavior scenarios and a sample project for verifying the skills.

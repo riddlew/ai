@@ -8,6 +8,8 @@ Paths below are relative to the repository root. `T` = `skills/experimental_v4/t
 
 Fixtures are the sample app `crate` (a Python CLI for DJs). Build them with plain commands. The worktree guard refuses to run helper scripts, so there is no build script.
 
+The commands need a POSIX shell with git, `sed`, and the standard file utilities. They avoid GNU-only and BSD-only flags (for example, `sed -i` always takes a `.bak` suffix that is then removed), so they run unchanged on Linux, macOS, and Windows under Git Bash or WSL.
+
 **fresh** — commit A plus tracked legacy docs (`CONTEXT.md`, `docs/adr/`, `docs/specs/`), no `.brain`:
 
 ```bash
@@ -35,7 +37,8 @@ mkdir -p <RUN> && cp -R T/fixture/commit-a/. <RUN>/ \
 cp -R T/fixture/brain-synced <RUN>/.brain && mkdir -p <RUN>/.brain/adrs <RUN>/.brain/specs \
   && cp T/fixture/legacy-docs/docs/adr/0001-use-sqlite.md <RUN>/.brain/adrs/ \
   && cp T/fixture/legacy-docs/docs/specs/01-bpm-filter.md <RUN>/.brain/specs/ \
-  && sed -i '' 's/__A_SHA__/<A>/' <RUN>/.brain/00_index.md <RUN>/.brain/impl_plans/01-bpm-filter.md \
+  && sed -i.bak 's/__A_SHA__/<A>/' <RUN>/.brain/00_index.md <RUN>/.brain/impl_plans/01-bpm-filter.md \
+  && rm -f <RUN>/.brain/00_index.md.bak <RUN>/.brain/impl_plans/01-bpm-filter.md.bak \
   && printf '.brain/\n' >> <RUN>/.git/info/exclude
 # 3. commit B (cue points; filter upper bound becomes exclusive), then WIP; note the sha as <B>
 cp -R T/fixture/commit-b/. <RUN>/ && cd <RUN> && git add -A \
@@ -442,6 +445,16 @@ Follow-up turns go to the same subagent through SendMessage, prefixed `The user 
 - S2 rerun: pass, as a regression check of the reworded rule.
 
 **Harness change:** synced fixtures now use a deterministic commit A. `.brain/` is excluded before `git add`, and the commit uses fixed dates, so A = `9bd4255fca7a955ea70f6bd88d4fdba04dbe768c`. The worktree guard refuses runtime sha substitution in `sed`, so the sha is written as a literal.
+
+### Session-end sync micro-test (brain-implement §6), 2026-11-04
+
+Single-turn tests with no fixture. The agent is told that the work is complete, that §7 recorded completion and ran `brain-update`, and that the user then ends the session. It must state whether it invokes `brain-update` again.
+
+**Before the §6 skip rule:** no-change case, 3/3 skipped. The agents inferred it ("the §7 completion step already did both"), even though §6 said to invoke unconditionally.
+
+**After the skip rule:**
+- **No-change case:** 3/3 skipped, each citing the new rule.
+- **Control** (code committed after the last `brain-update`): 2/2 invoked `brain-update`, so the rule doesn't over-apply.
 
 ### Counters added to the skill
 
