@@ -77,9 +77,13 @@ For each increment:
 3. If it already passes, investigate whether the behavior already exists or the test is inadequate. Do not force a failing test or manufacture changes.
 4. Make the smallest coherent production change across the layers needed.
 5. Rerun the test and confirm it passes. Simplify the affected code where useful and rerun relevant checks.
-6. For tracked work, update the impl plan with trustworthy verification results.
+6. **Proof before done.** A task is done only when, in this session: (a) its tests ran and passed and you read the output; (b) each Example or acceptance criterion it covers was compared against real output; (c) a self-review of the task diff passed (in scope, no unrelated edits, no debug leftovers, consistent with the spec); (d) the impl plan (when tracked) records the test command and result. "Should pass" is not evidence. If tests cannot run, the task stays open with the reason recorded; never check it off.
 
 Work in behavioral slices, not layer batches. Where no practical automated test exists (configuration, documentation, some UI, production-only faults), use characterization tests, static checks, manual reproduction, or diff inspection, and disclose coverage limits. Never fabricate red-green history.
+
+### Commit pause
+
+After each task, and after the final fix pass if it changed anything: report the task and test result, propose a Conventional Commits message (e.g. `fix(filter): make the BPM upper bound inclusive`), ask the user to commit, and wait. Never run `git commit` yourself. Once the user confirms, check HEAD moved and record the sha in the impl plan. The next task starts only after the commit; if the user says to continue without committing, do so and note that the next task's review covers both tasks' changes.
 
 ## 6. Keep state accurate
 
@@ -91,16 +95,16 @@ If `brain-update` already ran in this session and nothing has changed since (no 
 
 ## 7. Finish
 
-Do not run the full suite or `brain-review-code` as an end-of-session ritual while work remains.
+Do not run the full suite or `brain-review-code` as a ritual while work remains.
 
 When all required behavior is implemented:
 
 1. Run relevant static checks and targeted tests. For substantial work, run the full suite once where feasible. For small, low-risk changes, use proportionate checks and say what was skipped.
 2. Inspect the complete diff for missed requirements, scope creep, unnecessary abstraction, duplicated ownership, and regressions. Simplify within scope.
-3. Run `brain-review-code` for substantial or consequential changes (ownership, public contracts, persistence, security, broad cross-component behavior) or when requested. Pass the recorded review base, the governing specification or tickets, and the full scope including in-scope uncommitted files. For small, low-risk changes, your own diff inspection and checks are enough, but a small diff with material consequences still gets a review.
+3. Small, low-risk changes need only your own diff inspection and checks; substantial or consequential changes (ownership, public contracts, persistence, security, broad cross-component behavior, or a small diff with material consequences) get a full review: dispatch a fresh strongest-tier subagent that runs `brain-review-code` inline, given the impl plan's `Review base`, the governing spec or tickets, and the impl plan's Rulings and Deferred lists. If no subagent tool is available, run `brain-review-code` yourself and report `Final review: self-review (no fresh reviewer) — weaker than an independent review`. Critical, High, and Medium findings enter one fix pass (each fix test-first, then the full suite, then the commit pause); list Low findings for the user. No second review pass.
 4. Address supported in-scope findings, rerun affected checks, and consult before any new consequential decision.
 5. Report, and record in the impl plan, only checks actually performed and whether `brain-review-code` ran or was skipped as disproportionate. Do not claim completion with unexplained failures.
 
 When the work is complete, record it in the impl plan. Then invoke `brain-update` with a one-line summary of what changed.
 
-At session end, give a concise status: completed increments, checks run and their results, the impl plan path if present, blockers, and the next authorized step.
+At session end, give a concise status: completed increments, checks run and their results, coverage summary, every `Ruling:` line, deferred findings, the impl plan path if present, the worktree path and branch if one was used, blockers, and the next authorized step.
