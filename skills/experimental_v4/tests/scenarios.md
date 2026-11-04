@@ -601,6 +601,25 @@ Single-turn tests with no fixture. The agent is told that the work is complete, 
 - **No-change case:** 3/3 skipped, each citing the new rule.
 - **Control** (code committed after the last `brain-update`): 2/2 invoked `brain-update`, so the rule doesn't over-apply.
 
+### Execution modes RED (current skills, standard-tier scenario agents), 2026-11-04
+
+- **S16 fail.**
+  - No startup questions. It went straight to the work and changed `tests/`, `crate/cli.py`, and the brain.
+- **S17 pass.** It asked neither question and named E2 as next. The current skill never asks, so this pass is trivial.
+- **S18 fail on criterion 5.**
+  - Criteria 1–4, 6, and 7 pass. The E2 test failed first, the fix was applied, the tests passed, the impl plan was updated, and the review was skipped as disproportionate.
+  - It proposed no commit message: "you decide whether to commit the fix and the test".
+  - Side effect: it created a venv in `/tmp`.
+- **S19 fail on criterion 4.**
+  - F1 was fixed test-first.
+  - F2 was pushed back with evidence (`ORDER BY t.position`, plus a new regression test) and no agreement phrases.
+  - There was no commit pause.
+  - Side effect: it left `uv.lock`, `.venv`, and `__pycache__` in the fixture.
+- **S20a fail.** No `/model opus` suggestion.
+- **S20b pass.** No suggestion.
+
+Feedback handling (S19, criteria 1–3) already holds without new rules. Task 6 still adds the rules, because the design requires them for fix rounds and rulings.
+
 ### S15 coverage table, 2026-11-04
 
 - **Before the change: fail.** Requirement Fit listed findings R1–R3 only. E1 appeared only in prose ("E1 still passes"), with no row per Example and no met count in the summary.
