@@ -33,6 +33,8 @@ Implement incoming-message handling using the established session lifecycle.
 
 ## Rulings
 
+Format: `Ruling: <decision> — <why> — <cost if wrong>`
+
 - Ruling: reuse the session connection for sends — avoids a second lifecycle owner — cost if wrong: rework E4
 
 ## Deferred

@@ -25,6 +25,11 @@ Before editing production code:
 
    Record the answers in the impl plan header when one exists (untracked work asks every run). If worktree: create it from the current HEAD so unpushed work is included: `git worktree add <repo root>/.claude/worktrees/<feature-slug> -b <feature-slug> HEAD`. Ensure `.claude/worktrees/` is listed in `info/exclude` under `git rev-parse --git-common-dir`. Work inside it (in Claude Code, `EnterWorktree` with that path when available). An untracked `.brain` is still found in the main checkout. Never merge or remove the worktree; at the end, report its path and branch.
 
+**Mode switch.**
+- **Subagent-driven:** follow `${CLAUDE_SKILL_DIR}/references/subagent-driven.md` for each task. The main session coordinates and does not edit code.
+- **Inline:** implement each task yourself per §4–§5. There is no task reviewer.
+- **Both modes:** proof before done, the commit pause, and §7.
+
 If a consequential choice is unresolved, consult before acting on it and continue independent authorized work meanwhile.
 
 ## 2. Track progress for governed work
