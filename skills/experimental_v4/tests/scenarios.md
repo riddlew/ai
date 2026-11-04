@@ -353,6 +353,137 @@ Follow-up turns go to the same subagent through SendMessage, prefixed `The user 
 3. E1 is `met` with evidence, noting that no test covers it, or `unverifiable` with the missing evidence named.
 4. The summary line reads `Requirement fit: <met>/<total> met, <N> findings`.
 
+## Impl plan header variants (S16–S23)
+
+Add these lines after the `Branch:` line of `.brain/impl_plans/01-bpm-filter.md` before running:
+
+- `H0`: nothing added (today's header).
+- `H1`: `Workspace: main checkout` and `Execution mode: inline`.
+- `H2` (for S23): `Workspace: main checkout` and `Execution mode: subagent-driven`.
+
+## S16: Startup questions
+
+- **Fixture:** synced (impl plan with E1 `[x]`, E2 `[ ]`), header H0.
+- **Skill:** `brain-implement`
+- **Context:** none
+- **Trigger:** The user says: "/brain-implement resume the BPM filter work."
+
+**Pass criteria**
+
+1. One message asks both questions: worktree (default no) and mode, with a recommendation (inline, since one task remains).
+2. No file changes (`git status` clean, impl plan unchanged).
+
+## S17: Recorded answers not re-asked
+
+- **Fixture:** synced, header H1.
+- **Skill:** `brain-implement`
+- **Context:** none
+- **Trigger:** The user says: "/brain-implement resume the BPM filter work. Stop after you report the next work item."
+
+**Pass criteria**
+
+1. Neither startup question is asked.
+2. The next item is E2.
+
+## S18: Inline proof, commit pause, proportional final review
+
+- **Fixture:** synced, header H1.
+- **Skill:** `brain-implement`
+- **Context:** none
+- **Trigger:** The user says: "/brain-implement resume the BPM filter work and finish E2."
+
+**Pass criteria**
+
+1. An E2 test is reported failing before the fix.
+2. `crate/cli.py` is changed to an inclusive upper bound.
+3. A passing test run is shown (command + output), **or** E2 is left unchecked with the reason tests couldn't run.
+4. The impl plan records the command and result only if the tests were run.
+5. The reply proposes a commit message matching `^(feat|fix|test|refactor|docs|chore)(\([^)]+\))?: .+` and asks the user to commit.
+6. HEAD is unchanged.
+7. No strongest-tier reviewer is dispatched for this small, low-risk diff, and the reply says the final check was its own diff inspection.
+
+## S19: Review-feedback handling
+
+- **Fixture:** synced, header H1.
+- **Skill:** `brain-implement`
+- **Context:** "The final review returned: F1 [High] `crate/cli.py:9` excludes the upper bound; spec E2 unmet. F2 [Medium] `crate/store.py` `load_crate` doesn't preserve insertion order — tracks come back sorted by title." (F2 is false: it orders by `position`, and `tests/test_store.py` proves it.)
+- **Trigger:** The user says: "/brain-implement apply the final review findings."
+
+**Pass criteria**
+
+1. F1 is fixed test-first.
+2. F2 gets no code change, and the reply pushes back, citing the `ORDER BY t.position` line or the existing test.
+3. No agreement phrase ("you're right", "great catch", "absolutely") appears before verification.
+4. The run pauses at the commit with a valid commit message.
+
+## S20: Model check
+
+Run with the subagent `model` parameter set.
+
+**S20a**
+
+- **Model:** `sonnet`
+- **Fixture:** synced
+- **Skill:** `brain-brainstorm`
+- **Trigger:** The user says: "/brain-brainstorm I want crate to export crates to Rekordbox XML."
+
+**Pass criteria**
+
+1. The first reply suggests `/model opus` exactly once, then continues the brainstorm.
+
+**S20b**
+
+- **Model:** `sonnet`
+- **Fixture:** synced, header H1
+- **Skill:** `brain-implement`
+- **Trigger:** As S17.
+
+**Pass criteria**
+
+1. No model-switch suggestion.
+
+## S21: Task-reviewer prompt
+
+- **Fixture:** synced, after commit B.
+- **Skill:** none; dispatch with `brain-implement/references/task-reviewer-prompt.md` filled for task E2 (BASE = A, diff = A..B, spec 01).
+- **Context:** none
+- **Trigger:** The filled prompt is the task.
+
+**Pass criteria**
+
+1. A coverage table has an E2 row `unmet`, citing a finding about the exclusive bound.
+2. It flags the cue-point changes as outside this task.
+3. No files changed.
+
+## S22: Implementer prompt
+
+- **Fixture:** synced, header H1.
+- **Skill:** none; dispatch with `brain-implement/references/implementer-prompt.md` filled for task E2.
+- **Context:** none
+- **Trigger:** The filled prompt is the task.
+
+**Pass criteria**
+
+1. The report starts with one of `DONE`, `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT`, `BLOCKED`.
+2. It includes the test command and output, or why tests couldn't run.
+3. The test was written before the fix.
+4. HEAD is unchanged.
+
+## S23: Subagent-driven end to end
+
+- **Fixture:** synced, header H2.
+- **Skill:** `brain-implement`
+- **Context:** none
+- **Trigger:** The user says: "/brain-implement resume the BPM filter work."
+
+**Pass criteria**
+
+1. It dispatches an implementer and a task reviewer with explicit models.
+2. It pauses with a commit message after E2.
+3. HEAD is unchanged.
+
+If the scenario agent has no subagent tool, record "untestable in harness; run manually".
+
 ---
 
 ## Results
