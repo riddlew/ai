@@ -56,17 +56,32 @@ Stage an **approved** cross-cutting migration so intermediate states stay valid:
 
 Number tickets in dependency-consistent order; numbering itself is not a dependency.
 
-## 5. Obtain approval for the set
+## 5. Check, review, and obtain approval
 
-Before creating files, present each proposed ticket with:
+Do these in order, before creating files.
 
-- **Title** — the behavioral increment.
-- **Depends on** — genuine prerequisites, or none.
-- **Outcome** — what becomes observable or verifiable.
-- **Examples covered** — specification example IDs, when a specification exists.
-- **Architectural implications** — consequential changes needing approval, or "existing boundaries preserved".
+1. **Draft the set.** Present each proposed ticket with:
+   - **Title** — the behavioral increment.
+   - **Depends on** — genuine prerequisites, or none.
+   - **Outcome** — what becomes observable or verifiable.
+   - **Examples covered** — specification example IDs, when a specification exists.
+   - **Architectural implications** — consequential changes needing approval, or "existing boundaries preserved".
+2. **Self-check.** Fix the drafts until:
+   - a coverage table maps each spec Example and each invariant to the ticket(s) that cover it, with none left without a ticket. Without a spec, number the approved requirements from the plan or discussion `R1`, `R2`, … and map those;
+   - every acceptance criterion references Examples or states an observable result;
+   - names and terms are consistent across tickets, and with the spec and `.brain/glossary.md`;
+   - dependencies are genuine and acyclic.
 
-Revise until the user approves. If the user already supplied and approved the exact decomposition, do not ask again. Approval of the set does not approve an architectural decision that was neither disclosed nor established.
+   Then list the failure cases that no Example or criterion covers. Each becomes an acceptance criterion when approved requirements determine its outcome. Otherwise it is a question for the user. The list is not saved after approval.
+3. **Builder review.** Follow `${CLAUDE_SKILL_DIR}/../brain-review-code/references/builder-review.md`, with `ticket set` as `{artifact_kind}`. `{sources}` is the spec, or the approved plan or discussion text when there is no spec. `{artifact}` is the draft text, since no files exist yet. `{glossary_path}` is the absolute path of `glossary.md` in the `.brain/` you are using.
+4. **One approval message.** It must contain all of:
+   - the set;
+   - the coverage table;
+   - the uncovered failure cases and what happened to each;
+   - the `Builder review:` line;
+   - any questions only the user can answer.
+
+Revise until the user approves. A revision that adds, splits, or merges tickets gets one more builder review before approval; answers to review questions do not. If the user already supplied and approved the exact decomposition, do not ask again; the self-check and review still apply. Approval of the set does not approve an architectural decision that was neither disclosed nor established.
 
 ## 6. Write approved tickets
 
