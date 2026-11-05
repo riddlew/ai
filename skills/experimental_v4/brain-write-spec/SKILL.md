@@ -126,9 +126,9 @@ Do these in order, after the file is written.
    - terms match `.brain/glossary.md`;
    - Example IDs are unique;
    - the Verification Strategy names a test boundary for every Example.
-2. **Builder review.** Follow `${CLAUDE_SKILL_DIR}/../brain-review-code/references/builder-review.md`, with `spec` as `{artifact_kind}`. `{sources}` is "none: the spec must stand alone". `{glossary_path}` is the absolute path of `glossary.md` in the `.brain/` you are using.
+2. **Builder review.** Follow `${CLAUDE_SKILL_DIR}/../brain-review-code/references/builder-review.md`, with `spec` as `{artifact_kind}`. `{sources}` is "none: the spec must stand alone".
 3. **Pile-3 questions.** Ask them now, after the file is written. Wait for the reply, then apply the answers to the file. Unanswered ones go under Open Decisions. These questions are bounded to the gaps a builder hit. They are not a new requirements interview.
-4. **Structural revision.** A spec that gains or loses behaviors gets one more review.
+4. **Structural revision.** A later user revision that makes the spec gain or lose behaviors gets one more review. Applying the step-3 answers never does, even when they add Examples.
 5. **Only then** go to §6. Do not invoke `brain-update` before the questions are answered and applied, or recorded as Open Decisions.
 
 ## 6. Finish

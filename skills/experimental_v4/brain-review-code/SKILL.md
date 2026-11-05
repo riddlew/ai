@@ -83,7 +83,7 @@ Trace each applicable requirement and specification Example to the implementatio
 
 Undocumented local implementation details are not unsupported behavior. Category: `Requirement`. Give no maintainability advice here.
 
-Also build a coverage table: one row for each specification Example, and one for each acceptance criterion of the tickets in scope, plus one per Review Focus item (`RF<n>`) when provided. An unmet RF row is a finding graded by its effect, and the summary counts include RF rows. Mark each row:
+Also build a coverage table: one row for each specification Example, and one for each acceptance criterion of the tickets in scope, plus one per Review Focus item (`RF<n>`) when provided. An unmet RF row is a finding graded by its effect, and the summary counts include RF rows. Mark a `blocked` RF item `unverifiable`, naming its pending decision. It is not a finding and never enters a fix pass. Mark each row:
 
 - **met** — cite the test that verifies it, or the file:line that implements it and "no test" when no test does;
 - **unmet** — cite the finding that reports it (every unmet row has one);

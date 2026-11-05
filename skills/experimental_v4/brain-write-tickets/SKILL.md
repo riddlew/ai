@@ -73,7 +73,7 @@ Do these in order, before creating files. Consult on §3 architecture questions 
    - dependencies are genuine and acyclic.
 
    Then list the failure cases that no Example or criterion covers. Each becomes an acceptance criterion when approved requirements determine its outcome. Otherwise it is a question for the user. The list is not saved after approval.
-3. **Builder review.** Follow `${CLAUDE_SKILL_DIR}/../brain-review-code/references/builder-review.md`, with `ticket set` as `{artifact_kind}`. `{sources}` is the spec, or the approved plan or discussion text when there is no spec. `{artifact}` is the draft text, since no files exist yet. `{glossary_path}` is the absolute path of `glossary.md` in the `.brain/` you are using.
+3. **Builder review.** Follow `${CLAUDE_SKILL_DIR}/../brain-review-code/references/builder-review.md`, with `ticket set` as `{artifact_kind}`. `{sources}` is the spec, or the approved plan or discussion text when there is no spec. `{artifact}` is the draft text, since no files exist yet.
 4. **One approval message.** It must contain all of:
    - the set;
    - the coverage table;

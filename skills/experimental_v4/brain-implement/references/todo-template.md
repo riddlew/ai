@@ -43,7 +43,7 @@ Format: `Ruling: <decision> — <why> — <cost if wrong>`
 
 ## Review Focus
 
-- RF1: crate missing → exit 1 with `no such crate` — tested in "Handle missing crate"
+- RF1: peer closes the connection mid-message → partial message is discarded and logged — tested in "Handle connection failures and shutdown"
 - RF2: <case> — blocked: <decision needed> (also under Blockers and Open Decisions)
 
 ## Verification

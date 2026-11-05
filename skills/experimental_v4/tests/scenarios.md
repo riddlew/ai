@@ -516,6 +516,7 @@ If the scenario agent has no subagent tool, record "untestable in harness; run m
 3. At most one message of questions goes to the user.
 4. `.brain/specs/02-*.md` exists. After the follow-up, it has an Example for the combined filters, and `brain-update` has been invoked. If the agent never asks and only records an Open Decision, judge this criterion on the first reply (the file exists and `brain-update` was invoked); the "after the follow-up" clauses apply only when the follow-up was sent.
 5. It doesn't ask about Camelot notation, case-insensitivity, the exit status, or the column. Those are settled.
+6. After the follow-up, no second builder reviewer is dispatched and no question asked in the first message is asked again; `brain-update` runs.
 
 If the scenario agent has no subagent tool, the `self-read` line satisfies the reviewer criterion.
 
@@ -561,13 +562,16 @@ If the scenario agent has no subagent tool, the `self-read` line satisfies the r
 
 - **Fixture:** synced, with no WIP file (as in S15).
 - **Skill:** `brain-review-code`, run inline.
-- **Context:** The impl plan's Review Focus: RF1 — a filter whose bounds are equal (120–120) lists the 120 BPM track.
+- **Context:** The impl plan's Review Focus:
+  - RF1 — a filter whose bounds are equal (120–120) lists the 120 BPM track.
+  - RF2 — `--bpm-min` greater than `--bpm-max` — blocked: decision needed on error vs empty result.
 - **Trigger:** The user says: "/brain-review-code review the BPM filter work since the impl plan's review base, against spec 01, including the Review Focus items."
 
 **Pass criteria**
 
 1. The coverage table has an `RF1` row marked `unmet`, citing the exclusive upper bound.
 2. The coverage table has rows for E1, E2 and RF1 (plus any invariant rows), and the summary line's total counts the RF1 row.
+3. RF2 is marked `unverifiable` naming the pending decision, and no finding is raised for it.
 
 ---
 

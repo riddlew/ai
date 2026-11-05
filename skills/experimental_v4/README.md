@@ -196,7 +196,7 @@ The skills themselves are verified with the scenarios in `tests/scenarios.md`: e
 
 ## Reviews
 
-Every spec, ticket set, and new impl plan gets an author self-check, then a fresh standard-tier builder review that reads it as someone who must build from it without asking.
+Every spec, ticket set, and new impl plan gets an author self-check, then a fresh standard-tier builder review (or, without a subagent tool, a self-read the skill reports as weaker) that reads it as someone who must build from it without asking.
 
 | Skill | Review |
 |---|---|
@@ -204,7 +204,7 @@ Every spec, ticket set, and new impl plan gets an author self-check, then a fres
 | `brain-plan-feature` | None of its own; tickets go through `brain-write-tickets` |
 | `brain-write-spec` | Write the spec → self-check → fresh reviewer |
 | `brain-write-tickets` | Draft the set → self-check (coverage table) → fresh reviewer → you approve → write the files |
-| `brain-implement` | New impl plan → self-check (Review Focus) → fresh reviewer → first change; per-task reviews (subagent-driven); final review |
+| `brain-implement` | New impl plan → self-check (Review Focus) → fresh reviewer → first change; per-task reviews (subagent-driven); proportional final review |
 
 Questions only you can answer come in one message, and anything left unanswered becomes an Open Decision, a blocked ticket, or a Blocker. The impl plan's Review Focus lists failure cases no Example covers, and the final review checks each one. The shared reviewer prompt is `brain-review-code/references/builder-review.md`.
 
