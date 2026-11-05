@@ -4,7 +4,7 @@ A fresh reviewer reads an artifact (spec, ticket set, or impl plan) as the perso
 
 ## For the author
 
-**Dispatch.** Send one fresh subagent on the standard tier, read-only. Fill every slot. `{glossary_path}` and `{repo_root}` are absolute paths. Never pass the conversation or the rest of `.brain`.
+**Dispatch.** Send one fresh subagent on the standard tier, read-only. Fill every slot. `{artifact}` is the artifact's absolute file path when the file exists; for a draft not yet written, the full draft text. `{glossary_path}` and `{repo_root}` are absolute paths. Never pass the conversation or the rest of `.brain`.
 
 **No subagent tool.** Read the artifact yourself as the builder would, then report the `self-read` line below.
 

@@ -10,7 +10,7 @@ disable-model-invocation: true
 
 Record established requirements and approved decisions as a stable implementation contract. Small, well-understood changes can proceed without a spec. Follow root `CLAUDE.md` for decision authority.
 
-Do not conduct a new requirements interview or reopen settled choices. If a consequential gap remains, record it under Open Decisions; do not decide it to make the spec look complete.
+Do not conduct a new requirements interview (the bounded builder-review questions in §5 are the only exception) or reopen settled choices. If a consequential gap remains, record it under Open Decisions; do not decide it to make the spec look complete.
 
 ## 1. Gather the evidence
 
@@ -126,18 +126,18 @@ Do these in order, after the file is written.
    - terms match `.brain/glossary.md`;
    - Example IDs are unique;
    - the Verification Strategy names a test boundary for every Example.
-2. **Builder review.** Follow `../brain-review-code/references/builder-review.md`, with `spec` as `{artifact_kind}`. `{sources}` is "none: the spec must stand alone".
+2. **Builder review.** Follow `${CLAUDE_SKILL_DIR}/../brain-review-code/references/builder-review.md`, with `spec` as `{artifact_kind}`. `{sources}` is "none: the spec must stand alone". `{glossary_path}` is the absolute path of `glossary.md` in the `.brain/` you are using.
 3. **Pile-3 questions.** Ask them now, after the file is written. Wait for the reply, then apply the answers to the file. Unanswered ones go under Open Decisions. These questions are bounded to the gaps a builder hit. They are not a new requirements interview.
 4. **Structural revision.** A spec that gains or loses behaviors gets one more review.
-5. **Only then** finish, below. Do not invoke `brain-update` before the questions are answered and applied.
+5. **Only then** go to §6. Do not invoke `brain-update` before the questions are answered and applied, or recorded as Open Decisions.
+
+## 6. Finish
+
+Write only the spec file into `.brain/`; leave the index, `state.md`, and other root files to `brain-update`. After §5 is complete, invoke `brain-update` with a one-line summary of what changed.
+
+Report the created or updated path, whether open decisions block implementation, and the `Builder review:` line.
 
 ## Boundaries
 
 - This skill writes the specification only. `brain-implement` creates its impl plan in `.brain/impl_plans/` when work begins.
 - When the user approves a consequential change to a feature under implementation, update this specification, not the impl plan.
-
-## Finish
-
-Write only the spec file into `.brain/`; leave the index, `state.md`, and other root files to `brain-update`. After §5 is complete, invoke `brain-update` with a one-line summary of what changed.
-
-Report the created or updated path, whether open decisions block implementation, and the `Builder review:` line.
