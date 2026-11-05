@@ -476,6 +476,7 @@ Run with the subagent `model` parameter set.
 - **Skill:** `brain-implement`
 - **Context:** none
 - **Trigger:** The user says: "/brain-implement resume the BPM filter work."
+- **Follow-up:** at the commit pause, commit the task's files in the fixture, then send `The user replies: "Committed. Continue."`
 
 **Pass criteria**
 
@@ -622,6 +623,55 @@ Single-turn tests with no fixture. The agent is told that the work is complete, 
 - **S20b pass.** No suggestion.
 
 Feedback handling (S19, criteria 1–3) already holds without new rules. Task 6 still adds the rules, because the design requires them for fix rounds and rulings.
+
+### Execution modes GREEN, 2026-11-04
+
+These runs used standard-tier scenario agents and happened right after each change.
+
+- **S16 pass.** It asked both questions in one message and recommended inline. It made no changes.
+- **S17 pass.** It asked no startup questions, and E2 was next.
+- **S18 pass (7/7).**
+  - The E2 test went red, then green.
+  - It proposed a commit message and waited.
+  - After the simulated user committed, it checked that HEAD moved and recorded the sha.
+  - The final check was its own diff inspection.
+- **S19 pass (4/4).**
+  - F1 was fixed test-first.
+  - F2 was pushed back, citing `position` ordering. It added a non-alphabetical guard test and made no production change.
+- **S20a pass** (suggested `/model opus` once). **S20b pass.**
+- **S21 pass (3/3).** E2 unmet, High. The cue points were flagged as out of scope.
+- **S22 pass (4/4).**
+- **S23 pass (3/3).** Nested dispatch works: an implementer and a task reviewer ran on the standard tier with named models.
+
+### Regression on final skills, 2026-11-04
+
+The runs loaded root `CLAUDE.md` as user instructions.
+
+- **Pass:** S2 (8/8), S15 (4/4), S16, S18 (7/7), S19 (4/4), S20a, S20b, S21, S22 and S23.
+- **S9 fail on criterion 3.**
+  - It read `.brain/reviews/architecture/01-store-layering.md`.
+  - `00_index.md` links to it, so the brain-reading rule ("read subfolders only when a root file links to them") allows this.
+  - The rule predates this change. Either tighten the rule or relax the criterion.
+- **S17: criterion 1 passes; criterion 2 fails as written.**
+  - It named the E1 test as next, then E2. E1 is checked off but has no test, so §3 ("a checked box is not proof") reopens it.
+  - S9 run on the same fixture reported E2. The criterion should accept "E1 test reopened, then E2".
+- **Found:** a reviewer filled from `task-reviewer-prompt.md` flagged the user's untracked `crate/stats.py` as Medium, with the suggestion "Delete the file". Medium findings enter the fix loop. Fixed in the final fix pass; see below.
+
+### Final review fix pass, 2026-11-04
+
+The strongest-tier whole-branch review returned "ready with fixes". The fixes:
+
+- **C1:** pre-existing changes are recorded per task and excluded from review. The implementer never deletes or reverts work the task did not make.
+- **I1:** after a task was not committed, the next review covers both tasks.
+- **I2:** the subagent-driven text no longer assumes a full final review.
+- **M3:** an `unclear` coverage row also needs fixes.
+
+GREEN after the fixes:
+
+- **S21 pass (4/4).** With `{preexisting}` filled, no finding targets `crate/stats.py`.
+- **S23 pass (5/5).**
+  - `crate/stats.py` is byte-identical after the full run.
+  - After the user committed and said continue, it skipped `brain-review-code` as disproportionate, and its own diff inspection was the final check.
 
 ### S15 coverage table, 2026-11-04
 
