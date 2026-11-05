@@ -782,6 +782,51 @@ These runs used the current skills and standard-tier scenario agents.
 
 The baseline already finds gaps without a reviewer: S24 and S25 raised the combining question, the migration, and add-track validation on their own. What the change adds is the record (the coverage table, the review line, Review Focus) and the order: questions before `brain-update`, and the impl plan before the startup questions.
 
+### Builder reviews GREEN, 2026-11-05
+
+These runs used standard-tier scenario agents. Each ran right after its task's change.
+
+- **S24 pass (5/5).**
+  - A Sonnet builder reviewer ran.
+  - The combining question stayed an Open Decision.
+  - One message went to the user.
+  - `brain-update` ran only after the answer.
+
+  It also ran a second review after applying the answer. The final review later flagged this (I1).
+- **S25 pass (3/3).**
+  - One message carried the set, a coverage table with every Example and invariant, the uncovered cases as criteria, and the `Builder review:` line.
+  - No ticket files were written before approval. After approval, E1–E3 were in the tickets.
+- **S26 pass (4/4).**
+  - The impl plan and Review Focus were created first. RF4, the missing crate, was marked `blocked` because the spec conflicts with the error-logging prefix rule.
+  - The reviewer ran before any change.
+  - One message held the startup questions and the decisions.
+- **S27 pass (2/2).**
+- **S16 pass (3/3).**
+- **S17:** criteria 1 and 3 pass, so a plain resume triggers no review. Criterion 2 fails literally because E1 was reopened, which predates this change.
+
+### Regression on final skills, 2026-11-05
+
+- **Pass:** S9 (6/6), S15, S17 (3/3), S18 (7/7), S19, S23 (5/5), S25 (3/3), S26 (4/4) and S27.
+- **S16 fails criterion 2.** It rewrote the impl plan during resume reconciliation, before the startup answers. Earlier S16 runs left it unchanged. §3 allows status edits on resume, so the criterion is stricter than the skill.
+- **S24 fails on the follow-up.** After the user answered one question, it re-asked the questions left unanswered in a second message and held back `brain-update`. Fixed below.
+
+### Final review fix pass, 2026-11-05
+
+The strongest-tier review returned "ready with fixes". The fix pass changed:
+- **I1 and the S24 regression:** answers never trigger a re-review, unanswered questions are recorded and never re-asked, and a re-review asks only new questions.
+- **I2:** a new impl plan moves into the worktree when `.brain` is tracked.
+- **I3:** a `blocked` RF item is `unverifiable` and not a finding. Answering it rewrites the line.
+- **Smaller fixes:**
+  - absolute paths in every slot, with the glossary defined once;
+  - the reviewer wording;
+  - the template example moved out of the fixture domain;
+  - the README now says "proportional final review" and mentions the self-read fallback.
+
+GREEN after the fixes:
+- **S24 pass (6/6).** The answer added E11. The unanswered questions became Open Decisions and were not re-asked. No second review ran, and `brain-update` ran.
+- **S27 pass (3/3).** RF2 (`blocked`) is marked `unverifiable` with its pending decision, and no finding is raised for it.
+- **S26:** criteria 2–4 pass. Criterion 1 fails literally: the missing-crate case went into a work item instead of an RF line. The RF rule text is unchanged, and two of three S26 runs listed it, so this is recorded as variance.
+
 ### Counters added to the skill
 
 These come from the baseline failures:
