@@ -46,6 +46,12 @@ cp -R T/fixture/commit-b/. <RUN>/ && cd <RUN> && git add -A \
   && cp <ABS T>/fixture/wip/crate/stats.py crate/ && git rev-parse HEAD
 ```
 
+**synced+02** — the synced fixture, plus spec 02 copied into the brain. No impl plan exists for spec 02:
+
+```bash
+cp T/fixture/spec-02/02-key-filter.md <RUN>/.brain/specs/02-key-filter.md
+```
+
 Facts the criteria depend on:
 - Crates are stored in table `playlists`.
 - Commands are `add-track`, `list-crate`, and `filter`, plus `cue add` after commit B.
@@ -372,6 +378,7 @@ Add these lines after the `Branch:` line of `.brain/impl_plans/01-bpm-filter.md`
 
 1. One message asks both questions: worktree (default no) and mode, with a recommendation (inline, since one task remains).
 2. No file changes (`git status` clean, impl plan unchanged).
+3. No builder reviewer is dispatched (plain resume).
 
 ## S17: Recorded answers not re-asked
 
@@ -384,6 +391,7 @@ Add these lines after the `Branch:` line of `.brain/impl_plans/01-bpm-filter.md`
 
 1. Neither startup question is asked.
 2. The next item is E2.
+3. No builder reviewer is dispatched (plain resume).
 
 ## S18: Inline proof, commit pause, proportional final review
 
@@ -487,6 +495,72 @@ Run with the subagent `model` parameter set.
 5. After the user commits and says continue, no strongest-tier final reviewer is dispatched, and the reply says its own diff inspection was the final check.
 
 If the scenario agent has no subagent tool, record "untestable in harness; run manually".
+
+## S24: Spec builder review
+
+- **Fixture:** synced
+- **Skill:** `brain-write-spec`
+- **Context:** Brainstorm summary, confirmed by the user:
+  - `crate filter <crate> --key <key>` lists the tracks with that key, in crate order.
+  - Keys are Camelot notation (1–12 plus A or B), matched exactly and case-insensitively.
+  - An invalid key exits with status 2 and prints `invalid key: <key>`.
+  - Add a nullable `key` column to `tracks`, and an optional `--key` to `add-track`.
+
+  The summary is silent on whether `--key` combines with `--bpm-min`/`--bpm-max`. That is the planted gap.
+- **Trigger:** The user says: "/brain-write-spec write the key filter spec from the brainstorm summary."
+- **Follow-up:** only if the agent asked about combining: `The user replies: "Combine them: a track must satisfy all given filters."`
+
+**Pass criteria**
+
+1. A builder reviewer is dispatched with an explicit standard-tier model, or the reply carries the `self-read` report line.
+2. No Example or rule decides whether `--key` combines with the BPM bounds. The question reaches the user or appears under Open Decisions.
+3. At most one message of questions goes to the user.
+4. `.brain/specs/02-*.md` exists. After the follow-up, it has an Example for the combined filters, and `brain-update` has been invoked.
+5. It doesn't ask about Camelot notation, case-insensitivity, the exit status, or the column. Those are settled.
+
+## S25: Ticket set review
+
+- **Fixture:** synced+02
+- **Skill:** `brain-write-tickets`
+- **Context:** none
+- **Trigger:** The user says: "/brain-write-tickets break spec 02 into tickets."
+- **Follow-up:** `The user replies: "Approved."`
+
+**Pass criteria**
+
+1. Before any ticket file is written, one message has all of:
+   - the proposed set;
+   - a coverage table with a row for each of E1, E2 and E3 and each invariant;
+   - the missing-crate case and the combined-filter case, either listed as uncovered or added as acceptance criteria;
+   - the builder review result: a reviewer dispatched with an explicit standard-tier model, or the `self-read` line.
+2. No file exists under `.brain/tickets/` before the follow-up.
+3. After the follow-up, the ticket files exist, and every Example ID appears in some ticket's acceptance criteria.
+
+## S26: Impl plan review and Review Focus
+
+- **Fixture:** synced+02
+- **Skill:** `brain-implement`
+- **Context:** none
+- **Trigger:** The user says: "/brain-implement implement spec 02."
+
+**Pass criteria**
+
+1. `.brain/impl_plans/02-key-filter.md` exists with a `## Review Focus` section. One `RF` line covers the missing-crate case and names an owning work item or `blocked`.
+2. A builder reviewer is dispatched with an explicit standard-tier model before any code change, or the `self-read` line is reported.
+3. One message carries the startup questions and any review questions.
+4. Nothing under `crate/` or `tests/` has changed.
+
+## S27: Review Focus rows in `brain-review-code`
+
+- **Fixture:** synced, with no WIP file (as in S15).
+- **Skill:** `brain-review-code`, run inline.
+- **Context:** The impl plan's Review Focus: RF1 — a filter whose bounds are equal (120–120) lists the 120 BPM track.
+- **Trigger:** The user says: "/brain-review-code review the BPM filter work since the impl plan's review base, against spec 01, including the Review Focus items."
+
+**Pass criteria**
+
+1. The coverage table has an `RF1` row marked `unmet`, citing the exclusive upper bound.
+2. The summary line's met/total counts include the RF row.
 
 ---
 
