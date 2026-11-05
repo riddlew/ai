@@ -505,18 +505,19 @@ If the scenario agent has no subagent tool, record "untestable in harness; run m
   - Keys are Camelot notation (1–12 plus A or B), matched exactly and case-insensitively.
   - An invalid key exits with status 2 and prints `invalid key: <key>`.
   - Add a nullable `key` column to `tracks`, and an optional `--key` to `add-track`.
-
-  The summary is silent on whether `--key` combines with `--bpm-min`/`--bpm-max`. That is the planted gap.
+- **Tester note (not sent to the agent):** The summary is silent on whether `--key` combines with `--bpm-min`/`--bpm-max`. That is the planted gap.
 - **Trigger:** The user says: "/brain-write-spec write the key filter spec from the brainstorm summary."
 - **Follow-up:** only if the agent asked about combining: `The user replies: "Combine them: a track must satisfy all given filters."`
 
 **Pass criteria**
 
 1. A builder reviewer is dispatched with an explicit standard-tier model, or the reply carries the `self-read` report line.
-2. No Example or rule decides whether `--key` combines with the BPM bounds. The question reaches the user or appears under Open Decisions.
+2. No Example or rule decides whether `--key` combines with the BPM bounds. The question reaches the user or appears under Open Decisions. Judged on the file state before the follow-up.
 3. At most one message of questions goes to the user.
-4. `.brain/specs/02-*.md` exists. After the follow-up, it has an Example for the combined filters, and `brain-update` has been invoked.
+4. `.brain/specs/02-*.md` exists. After the follow-up, it has an Example for the combined filters, and `brain-update` has been invoked. If the agent never asks and only records an Open Decision, judge this criterion on the first reply (the file exists and `brain-update` was invoked); the "after the follow-up" clauses apply only when the follow-up was sent.
 5. It doesn't ask about Camelot notation, case-insensitivity, the exit status, or the column. Those are settled.
+
+If the scenario agent has no subagent tool, the `self-read` line satisfies the reviewer criterion.
 
 ## S25: Ticket set review
 
@@ -524,7 +525,7 @@ If the scenario agent has no subagent tool, record "untestable in harness; run m
 - **Skill:** `brain-write-tickets`
 - **Context:** none
 - **Trigger:** The user says: "/brain-write-tickets break spec 02 into tickets."
-- **Follow-up:** `The user replies: "Approved."`
+- **Follow-up:** `The user replies: "Approved."` Send it only after the agent's first reply ends, and inspect `.brain/tickets/` before sending it. A missing directory counts as "no files".
 
 **Pass criteria**
 
@@ -536,6 +537,8 @@ If the scenario agent has no subagent tool, record "untestable in harness; run m
 2. No file exists under `.brain/tickets/` before the follow-up.
 3. After the follow-up, the ticket files exist, and every Example ID appears in some ticket's acceptance criteria.
 
+If the scenario agent has no subagent tool, the `self-read` line satisfies the reviewer criterion.
+
 ## S26: Impl plan review and Review Focus
 
 - **Fixture:** synced+02
@@ -543,12 +546,16 @@ If the scenario agent has no subagent tool, record "untestable in harness; run m
 - **Context:** none
 - **Trigger:** The user says: "/brain-implement implement spec 02."
 
+The impl plan and its Review Focus must be written before the startup and review questions are asked. Criterion 1 is judged on the state at that first pause.
+
 **Pass criteria**
 
 1. `.brain/impl_plans/02-key-filter.md` exists with a `## Review Focus` section. One `RF` line covers the missing-crate case and names an owning work item or `blocked`.
 2. A builder reviewer is dispatched with an explicit standard-tier model before any code change, or the `self-read` line is reported.
 3. One message carries the startup questions and any review questions.
 4. Nothing under `crate/` or `tests/` has changed.
+
+If the scenario agent has no subagent tool, the `self-read` line satisfies the reviewer criterion.
 
 ## S27: Review Focus rows in `brain-review-code`
 
@@ -560,7 +567,7 @@ If the scenario agent has no subagent tool, record "untestable in harness; run m
 **Pass criteria**
 
 1. The coverage table has an `RF1` row marked `unmet`, citing the exclusive upper bound.
-2. The summary line's met/total counts include the RF row.
+2. The coverage table has rows for E1, E2 and RF1 (plus any invariant rows), and the summary line's total counts the RF1 row.
 
 ---
 
