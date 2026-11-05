@@ -761,6 +761,23 @@ GREEN after the fixes:
   - The table had E1 marked `met` (`crate/cli.py:9`, no test, reproduced) and E2 marked `unmet` (R1).
   - The summary read `Requirement fit: 1/2 met, 3 findings`.
 
+### Builder reviews RED, 2026-11-05
+
+These runs used the current skills and standard-tier scenario agents.
+
+- **S24 fails criterion 1.** No builder reviewer ran, and there is no `self-read` line.
+  - Criteria 2, 3 and 5 pass: the combining question became Open Decision 1, all three open decisions went in one message, and nothing settled was asked again.
+  - It invoked `brain-update` before asking the user.
+- **S25 fails criterion 1.** There is no coverage table and no builder-review record.
+  - The set, the missing-crate case and the combined-filter case all appeared, as prose and questions.
+  - Criterion 2 passes: no ticket files were written.
+- **S26 fails criteria 1 and 2.**
+  - It asked the startup questions before it created any impl plan, so there is no Review Focus. No reviewer ran.
+  - Criteria 3 and 4 pass. One message carried the startup questions and a migration decision, and nothing changed.
+- **S27 passes (2/2).** With the Review Focus item named in the request, the current `brain-review-code` already adds an `RF1` row marked `unmet` and counts it (`2/5 met`). Task 5 shrinks to one clause.
+
+The baseline already finds gaps without a reviewer: S24 and S25 raised the combining question, the migration, and add-track validation on their own. What the change adds is the record (the coverage table, the review line, Review Focus) and the order: questions before `brain-update`, and the impl plan before the startup questions.
+
 ### Counters added to the skill
 
 These come from the baseline failures:
