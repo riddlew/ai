@@ -95,15 +95,15 @@ Skills refer to a "standard tier" and a "strongest tier". Root [`CLAUDE.md`](CLA
 | `brain-brainstorm` | Resolves open requirements and design decisions through a visible decision table, lens-guided options, and dependency-ordered questions. | Behavior, constraints, or architectural direction is unclear. | A confirmed direction summary; decisions recorded through `brain-update`. |
 | `brain-diagnose` | Investigates failures using reproduction and discriminating hypotheses; applies a bounded fix only when authorized. | A failure, regression, or intermittent issue needs explanation. | Diagnosis in conversation; `.brain/diagnoses/` only on request. |
 | `brain-distill-content` **(manual)** | Removes verbosity from technical documents while preserving all material information and structure. | AI-generated docs, MR descriptions, or RFCs are padded. | The distilled document. |
-| `brain-implement` **(manual)** | Implements approved work in test-first increments, starting from specification examples, and maintains resumable progress. Asks once per feature whether to use a git worktree and which execution mode to use (subagent-driven, with a per-task reviewer, or inline). Pauses after each task for you to commit, with a suggested Conventional Commits message, and ends with a review proportional to the change. | You are ready to change code, with or without a formal spec. | Code, checks, and for tracked features `.brain/impl_plans/<feature>.md`. |
+| `brain-implement` **(manual)** | Implements approved work in test-first increments, starting from specification examples, and maintains resumable progress. Asks once per feature whether to use a git worktree and which execution mode to use (subagent-driven, with a per-task reviewer, or inline). Pauses after each task for you to commit, with a suggested Conventional Commits message, and ends with a review proportional to the change; a new impl plan gets a builder review, and its Review Focus reaches the final review. | You are ready to change code, with or without a formal spec. | Code, checks, and for tracked features `.brain/impl_plans/<feature>.md`. |
 | `brain-plan-feature` | Tracks multi-session planning with dependency-aware research, consult, prototype, and task tickets. | An initiative has many interdependent decisions and spans days or sessions. | `.brain/planning/<feature>/INDEX.md` and planning tickets. |
 | `brain-refine-backlog` | Reviews Jira stories for refinement readiness without changing them. | Preparing for backlog refinement. | Suggested gaps, draft acceptance criteria, and questions. |
 | `brain-review-architecture` | Discovers architectural friction **or** assesses a selected boundary, using concrete evidence. | You want improvement candidates or a focused design evaluation. | Findings in conversation; `.brain/reviews/architecture/` only on request. |
 | `brain-review-code` | Assesses a bounded change set for correctness, requirement fit, and repository fit, delegating to subagents for larger changes. | A substantive change needs review, or you request one. | Three-section findings report, with a coverage table marking each spec Example and ticket acceptance criterion met, unmet, or unverifiable. |
 | `brain-review-merge-request` **(manual)** | Reviews an MR/PR against Jira acceptance criteria using `brain-review-code`, adding coverage, tests, performance, and a merge recommendation. Read-only. | You want an advisory merge assessment. | Consolidated findings and Approve / Request changes. |
 | `brain-review-security` | Examines realistic threats, trust boundaries, access control, credentials, and sensitive-data flows. | Work changes a security boundary or you request an audit. | Findings in conversation; `.brain/reviews/security/` only on request. |
-| `brain-write-spec` **(manual)** | Records established requirements, invariants, concrete examples, and decisions without inventing missing choices. | A substantial feature needs a stable implementation contract. | `.brain/specs/<NN>-<slug>.md`. |
-| `brain-write-tickets` | Decomposes approved work into verifiable increments whose acceptance criteria reference spec examples, with your approval of the set. | Work benefits from independent tickets or staged delivery. | `.brain/tickets/<feature>/<NN>-<slug>.md`. |
+| `brain-write-spec` **(manual)** | Records established requirements, invariants, concrete examples, and decisions without inventing missing choices; each spec is self-checked and read by a fresh builder reviewer. | A substantial feature needs a stable implementation contract. | `.brain/specs/<NN>-<slug>.md`. |
+| `brain-write-tickets` | Decomposes approved work into verifiable increments whose acceptance criteria reference spec examples, with your approval of the set; the set comes with a coverage table and a builder review before you approve it. | Work benefits from independent tickets or staged delivery. | `.brain/tickets/<feature>/<NN>-<slug>.md`. |
 
 ## Example workflows
 
@@ -193,6 +193,20 @@ Implementation uses focused test-first increments, starting from the specificati
 All review skills share one severity scale (Critical / High / Medium / Low), a separate confidence rating, and common finding fields, defined in `brain-review-code/references/findings.md`.
 
 The skills themselves are verified with the scenarios in `tests/scenarios.md`: each runs a fresh agent against a throwaway sample project (`tests/fixture/`), first without the skill (baseline) and then with it, and checks the agent's replies and the resulting files and git state.
+
+## Reviews
+
+Every spec, ticket set, and new impl plan gets an author self-check, then a fresh standard-tier builder review that reads it as someone who must build from it without asking.
+
+| Skill | Review |
+|---|---|
+| `brain-brainstorm` | None |
+| `brain-plan-feature` | None of its own; tickets go through `brain-write-tickets` |
+| `brain-write-spec` | Write the spec → self-check → fresh reviewer |
+| `brain-write-tickets` | Draft the set → self-check (coverage table) → fresh reviewer → you approve → write the files |
+| `brain-implement` | New impl plan → self-check (Review Focus) → fresh reviewer → first change; per-task reviews (subagent-driven); final review |
+
+Questions only you can answer come in one message, and anything left unanswered becomes an Open Decision, a blocked ticket, or a Blocker. The impl plan's Review Focus lists failure cases no Example covers, and the final review checks each one. The shared reviewer prompt is `brain-review-code/references/builder-review.md`.
 
 ## Changes from experimental_v3
 
