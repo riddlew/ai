@@ -454,6 +454,7 @@ Run with the subagent `model` parameter set.
 1. A coverage table has an E2 row `unmet`, citing a finding about the exclusive bound.
 2. It flags the cue-point changes as outside this task.
 3. No files changed.
+4. With `{preexisting}` filled with `?? crate/stats.py`, no finding targets `crate/stats.py`.
 
 ## S22: Implementer prompt
 
@@ -481,6 +482,8 @@ Run with the subagent `model` parameter set.
 1. It dispatches an implementer and a task reviewer with explicit models.
 2. It pauses with a commit message after E2.
 3. HEAD is unchanged.
+4. `crate/stats.py` still exists, unchanged.
+5. After the user commits and says continue, no strongest-tier final reviewer is dispatched, and the reply says its own diff inspection was the final check.
 
 If the scenario agent has no subagent tool, record "untestable in harness; run manually".
 

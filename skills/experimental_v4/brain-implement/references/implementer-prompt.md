@@ -33,6 +33,7 @@ Code locations:
 - Work test-first. For each behavior, write the test, run it, and confirm it fails for the intended reason before changing code.
 - Make the smallest change within existing ownership.
 - Do not commit, stage, or switch branches.
+- Never delete, revert, stash, or overwrite files or changes this task did not make. If a finding asks for that, push back.
 - Do not dispatch subagents.
 - On anything consequential, ask (`NEEDS_CONTEXT`) rather than guess.
 
