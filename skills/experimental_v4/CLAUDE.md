@@ -45,7 +45,7 @@ Skills refer to "standard tier" and "strongest tier"; this table is the only pla
 
 | Role | Tier | Model today |
 |---|---|---|
-| Task implementer, task reviewer, scoped re-review | standard | Sonnet |
+| Task implementer, task reviewer, scoped re-review, spec, ticket-set, and impl plan builder reviews | standard | Sonnet |
 | Fix-round 4–5 implementer, final reviewer, final fix pass | strongest | Opus |
 | Main session: brainstorming, writing specs, architecture review | strongest | Opus |
 | Main session: coordinating subagent-driven mode | standard | Sonnet |

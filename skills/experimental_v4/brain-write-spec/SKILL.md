@@ -116,11 +116,28 @@ Record **approved** decisions about responsibility and ownership boundaries, lif
 
 For each gap state what is unknown, why implementation depends on it, the plausible choices if known, and that it requires the user's decision. Mark the affected scope **not implementation-ready**; independent, fully specified scope remains implementable.
 
+## 5. Check and review
+
+Do these in order, after the file is written.
+
+1. **Self-check.** Fix the file until:
+   - every required behavior and invariant has at least one Example, including the failure paths that apply (§2's list). Write the missing Example when approved requirements determine its outcome. Record an Open Decision only when the outcome depends on a choice nobody has made;
+   - no Example settles an open choice;
+   - terms match `.brain/glossary.md`;
+   - Example IDs are unique;
+   - the Verification Strategy names a test boundary for every Example.
+2. **Builder review.** Follow `../brain-review-code/references/builder-review.md`, with `spec` as `{artifact_kind}`. `{sources}` is "none: the spec must stand alone".
+3. **Pile-3 questions.** Ask them now, after the file is written. Wait for the reply, then apply the answers to the file. Unanswered ones go under Open Decisions. These questions are bounded to the gaps a builder hit. They are not a new requirements interview.
+4. **Structural revision.** A spec that gains or loses behaviors gets one more review.
+5. **Only then** finish, below. Do not invoke `brain-update` before the questions are answered and applied.
+
 ## Boundaries
 
 - This skill writes the specification only. `brain-implement` creates its impl plan in `.brain/impl_plans/` when work begins.
 - When the user approves a consequential change to a feature under implementation, update this specification, not the impl plan.
 
-Write only the spec file into `.brain/`; leave the index, `state.md`, and other root files to `brain-update`. Then invoke `brain-update` with a one-line summary of what changed.
+## Finish
 
-Report the created or updated path, and whether open decisions block implementation.
+Write only the spec file into `.brain/`; leave the index, `state.md`, and other root files to `brain-update`. After §5 is complete, invoke `brain-update` with a one-line summary of what changed.
+
+Report the created or updated path, whether open decisions block implementation, and the `Builder review:` line.
