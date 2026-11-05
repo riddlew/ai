@@ -58,9 +58,9 @@ Number tickets in dependency-consistent order; numbering itself is not a depende
 
 ## 5. Check, review, and obtain approval
 
-Do these in order, before creating files.
+Do these in order, before creating files. Consult on §3 architecture questions before drafting, outside the one approval message.
 
-1. **Draft the set.** Present each proposed ticket with:
+1. **Draft the set.** Draft each proposed ticket with:
    - **Title** — the behavioral increment.
    - **Depends on** — genuine prerequisites, or none.
    - **Outcome** — what becomes observable or verifiable.
@@ -79,9 +79,9 @@ Do these in order, before creating files.
    - the coverage table;
    - the uncovered failure cases and what happened to each;
    - the `Builder review:` line;
-   - any questions only the user can answer.
+   - any questions only the user can answer. Each one left unanswered becomes a blocked ticket or a blocked note on the affected ticket.
 
-Revise until the user approves. A revision that adds, splits, or merges tickets gets one more builder review before approval; answers to review questions do not. If the user already supplied and approved the exact decomposition, do not ask again; the self-check and review still apply. Approval of the set does not approve an architectural decision that was neither disclosed nor established.
+Revise until the user approves. A revision that adds, splits, or merges tickets gets one more builder review before approval; answers to review questions do not. If the user already supplied and approved the exact decomposition, the self-check and review still run. The one message then becomes a report with the same contents, minus the approval request. Write files without a fresh approval unless the review changed the set structurally (added, split, or merged tickets) or raised questions only the user can answer; in those cases ask for approval in that message. Approval of the set does not approve an architectural decision that was neither disclosed nor established.
 
 ## 6. Write approved tickets
 
