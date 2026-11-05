@@ -41,6 +41,11 @@ Format: `Ruling: <decision> — <why> — <cost if wrong>`
 
 - E6 retry backoff tuning — out of scope for this feature
 
+## Review Focus
+
+- RF1: crate missing → exit 1 with `no such crate` — tested in "Handle missing crate"
+- RF2: <case> — blocked: <decision needed> (also under Blockers and Open Decisions)
+
 ## Verification
 
 - Passed: `pytest tests/test_messages.py` (at last verification)
@@ -56,3 +61,4 @@ Format: `Ruling: <decision> — <why> — <cost if wrong>`
 - Mark an item `[x]` only when the result is present and verified; if uncertain, leave it open and say why.
 - Keep the next actionable item, unresolved approvals, and validation status easy to find.
 - Track pre-existing failures separately from new failures when evidence permits.
+- Review Focus lists failure cases no Example covers. It is filled in at creation and reviewed by the final review.
