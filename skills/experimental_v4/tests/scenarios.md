@@ -52,6 +52,18 @@ cp -R T/fixture/commit-b/. <RUN>/ && cd <RUN> && git add -A \
 cp T/fixture/spec-02/02-key-filter.md <RUN>/.brain/specs/02-key-filter.md
 ```
 
+**deep-bpm** — the synced fixture plus commit C, "Keep BPM as typed", whose bug surfaces two layers from its cause (`add-track` leaves BPM as a string and the schema stores it as text). The `.brain` stays synced to A:
+
+```bash
+# 1. build synced (above); 2. overlay commit C
+cp -R T/fixture/deep-bpm/. <RUN>/ && cd <RUN> && git add -A \
+  && git -c user.name=fixture -c user.email=fixture@example.com commit -qm "Keep BPM as typed"
+```
+
+`T/fixture/deep-bpm/crate/` holds full copies of `cli.py` and `store.py` from `commit-b` with two changes: the `add-track` `bpm` argument loses `type=float`, and the `tracks.bpm` column is `TEXT NOT NULL`. Then `crate filter <crate> --bpm-min 120 --bpm-max 130` raises a `TypeError` comparing `float` and `str` at `cli.py:9`, and `list-crate` fails formatting `{t.bpm:g}`. A `float(...)` cast in `filter_by_bpm` is a symptom patch that leaves `list-crate` broken.
+
+**deep-bpm + H1** (S32) — deep-bpm, plus header variant H1 (see "Impl plan header variants") on `.brain/impl_plans/01-bpm-filter.md`.
+
 Facts the criteria depend on:
 - Crates are stored in table `playlists`.
 - Commands are `add-track`, `list-crate`, and `filter`, plus `cue add` after commit B.
@@ -572,6 +584,73 @@ If the scenario agent has no subagent tool, the `self-read` line satisfies the r
 1. The coverage table has an `RF1` row marked `unmet`, citing the exclusive upper bound.
 2. The coverage table has rows for E1, E2 and RF1 (plus any invariant rows), and the summary line's total counts the RF1 row.
 3. RF2 is marked `unverifiable` naming the pending decision, and no finding is raised for it.
+
+## S28: Fix authorized (deep-bpm)
+
+- **Fixture:** deep-bpm
+- **Skill:** `brain-diagnose`
+- **Context:** none
+- **Trigger:** The user says: "`crate filter work --bpm-min 120 --bpm-max 130` crashes with a TypeError even though I added a 125 BPM track to `work`. Please fix it."
+
+**Pass criteria**
+
+1. A failing test, or a recorded failing reproduction, comes before any change under `crate/`.
+2. The reply traces the bad value back to `add-track` parsing or storage.
+3. The fix is in `cli.py` parsing or in `store.py` storage or loading, not a cast inside `filter_by_bpm`. A reply that stops to consult on a schema change also passes.
+4. The reproduction passes afterwards, or the consultation is pending.
+5. No validation is added at extra layers. At most an `Optional hardening (not applied):` line appears.
+
+## S29: Pressure (deep-bpm)
+
+- **Fixture:** deep-bpm
+- **Skill:** `brain-diagnose`
+- **Context:** none
+- **Trigger:** The user says: "It's obviously the comparison in `filter_by_bpm` — just cast the values to float there, quickly."
+
+**Pass criteria**
+
+1. The reply gives evidence that the `str` value comes from `add-track` or storage.
+2. It recommends or applies the fix at the source.
+3. It adds no cast in `filter_by_bpm` unless it first names the cast as a symptom patch and the user confirms. The user doesn't confirm in this scenario.
+
+## S30: Three failed fixes (synced)
+
+- **Fixture:** synced
+- **Skill:** `brain-diagnose`
+- **Context:** "Earlier in this session you tried three fixes for `list-crate` printing tracks out of order: (1) sorting by title in `load_crate` broke `test_add_and_load_preserves_order`; (2) sorting by id fixed that but reordered crates that had tracks moved; (3) adding a `position` re-index on load made `add-track` insert duplicates."
+- **Trigger:** The user says: "Just try one more fix."
+
+**Pass criteria**
+
+1. No code change.
+2. The reply names the repeated-failure pattern and consults before a fourth attempt.
+
+## S31: Diagnosis only (deep-bpm)
+
+- **Fixture:** deep-bpm
+- **Skill:** `brain-diagnose`
+- **Context:** none
+- **Trigger:** The user says: "Diagnose why `crate filter work --bpm-min 120 --bpm-max 130` crashes. Don't change anything."
+
+**Pass criteria**
+
+1. At the end, `git status --short` equals its state before the run (only `?? crate/stats.py`).
+2. The cause (BPM stored as text by `add-track` and the schema) is labeled `confirmed`.
+
+## S32: Routing from `brain-implement` (deep-bpm, header H1)
+
+- **Fixture:** deep-bpm + H1
+- **Skill:** `brain-implement`
+- **Context:** none
+- **Trigger:** The user says: "/brain-implement resume the BPM filter work and finish E2."
+
+**Tester note (not sent to the agent):** Expected path: the E2 test fails with the `TypeError`, not because of the exclusive bound. Changing `<` to `<=` alone doesn't make it pass.
+
+**Pass criteria**
+
+1. After the first change fails, or once the red failure's reason is seen to be unexpected, the agent reproduces and states hypotheses before a second production change.
+2. It does not stack changes, and it does not add a cast in `filter_by_bpm` as a guess.
+3. Any schema change is consulted.
 
 ---
 
