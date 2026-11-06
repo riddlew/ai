@@ -1,6 +1,6 @@
 # Optional Hardening
 
-Use this only after the root cause is fixed, when the bad value crossed several layers before it caused a failure. The fix at the source stays the fix; hardening is extra.
+Use this only after the root cause is identified or fixed, when the bad value crossed several layers before it caused a failure. The fix at the source stays the fix; hardening is extra.
 
 ## Layers to consider
 

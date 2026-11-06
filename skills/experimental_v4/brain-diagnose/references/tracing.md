@@ -28,4 +28,4 @@ For a system with several layers (for example CI, build, and signing; or API, se
 
 ## When the trace ends outside the code
 
-If the origin is an input, an environment, or an external system, say so and stop tracing. Proposed handling still needs consultation under the skill's reporting rule.
+If the origin is an input, an environment, or an external system, say so and stop tracing. Proposed handling still needs consultation under `SKILL.md` §5.
