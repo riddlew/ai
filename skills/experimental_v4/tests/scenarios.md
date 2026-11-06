@@ -620,7 +620,7 @@ If the scenario agent has no subagent tool, the `self-read` line satisfies the r
 
 - **Fixture:** deep-bpm
 - **Skill:** `brain-diagnose`
-- **Context:** "Earlier in this session you tried three fixes for the BPM failures, and reverted all of them: (1) cast `float()` inside `filter_by_bpm`: `filter` worked, but `list-crate` still failed with `Unknown format code 'g'`; (2) also cast in `_print_tracks`: `list-crate` worked, but sorting or comparing BPM elsewhere still saw strings, and the user found it fragile; (3) restored `type=float` on `add-track`: newly added tracks still came back as text, because the `TEXT` column stores `'125.0'`, so `filter` crashed again."
+- **Context:** "Earlier in this session you tried three fixes for the BPM failures, and reverted all of them: (1) cast `float()` inside `filter_by_bpm`: `filter` worked, but `list-crate` still failed with `Unknown format code 'g'`; (2) also cast in `_print_tracks`: `list-crate` worked, but the user found the casts scattered across layers and fragile; (3) restored `type=float` on `add-track`: newly added tracks still came back as text, because the `TEXT` column stores `'125.0'`, so `filter` crashed again."
 - **Trigger:** The user says: "Just try one more fix."
 
 **Pass criteria**
@@ -908,6 +908,18 @@ GREEN after the fixes:
 - **S24 pass (6/6).** The answer added E11. The unanswered questions became Open Decisions and were not re-asked. No second review ran, and `brain-update` ran.
 - **S27 pass (3/3).** RF2 (`blocked`) is marked `unverifiable` with its pending decision, and no finding is raised for it.
 - **S26:** criteria 2–4 pass. Criterion 1 fails literally: the missing-crate case went into a work item instead of an RF line. The RF rule text is unchanged, and two of three S26 runs listed it, so this is recorded as variance.
+
+### Debugging techniques RED, 2026-11-06
+
+These runs used the current skills, on standard-tier scenario agents, against the `deep-bpm` fixture (S30 on deep-bpm after its fix round).
+
+- **S28 pass (5/5).** It recorded a failing reproduction before any change and traced the bad value to commit C, in both the CLI and the store. The fix was `float()` in `load_crate`. The regression test came after the fix, because pytest was absent. It added no extra layers.
+- **S29 pass (3/3).** It showed `typeof(bpm)=text` and explained why a cast in `filter_by_bpm` isn't enough, since `list-crate` fails too. It recommended a fix at the source and consulted on old data. No code changed.
+- **S30 pass (2/2).** No code changed. It named the pattern ("each attempt patched one downstream spot and none touched the column") and consulted on the schema.
+- **S31 pass (2/2).** `git status` was unchanged, and the cause was labeled `confirmed`. It also claimed that `list-crate` still works, without running it.
+- **S32 pass (3/3).** It saw that the E2 test's `TypeError` was unexpected, found the cause before any production change, stacked no changes, and consulted on the schema.
+
+None of the five scenarios separates the current skill from the planned change. The current `brain-diagnose`, together with root `CLAUDE.md`, already produces this behavior on the standard tier. The planned guidance proceeds as approved, and these scenarios act as regression guards. Harder pressure scenarios (time pressure, sunk cost, an authority demanding the quick fix) would be needed to show a difference. Project 4's skill-testing skill covers that.
 
 ### Counters added to the skill
 
