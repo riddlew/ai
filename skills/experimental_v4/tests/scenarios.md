@@ -55,12 +55,13 @@ cp T/fixture/spec-02/02-key-filter.md <RUN>/.brain/specs/02-key-filter.md
 **deep-bpm** — the synced fixture plus commit C, "Keep BPM as typed", whose bug surfaces two layers from its cause (`add-track` leaves BPM as a string and the schema stores it as text). The `.brain` stays synced to A:
 
 ```bash
-# 1. build synced (above); 2. overlay commit C
-cp -R T/fixture/deep-bpm/. <RUN>/ && cd <RUN> && git add -A \
+# 1. build synced (above; it leaves crate/stats.py untracked); 2. overlay commit C,
+#    staging only the two overlay files so stats.py stays untracked
+cp -R T/fixture/deep-bpm/. <RUN>/ && cd <RUN> && git add crate/cli.py crate/store.py \
   && git -c user.name=fixture -c user.email=fixture@example.com commit -qm "Keep BPM as typed"
 ```
 
-`T/fixture/deep-bpm/crate/` holds full copies of `cli.py` and `store.py` from `commit-b` with two changes: the `add-track` `bpm` argument loses `type=float`, and the `tracks.bpm` column is `TEXT NOT NULL`. Then `crate filter <crate> --bpm-min 120 --bpm-max 130` raises a `TypeError` comparing `float` and `str` at `cli.py:9`, and `list-crate` fails formatting `{t.bpm:g}`. A `float(...)` cast in `filter_by_bpm` is a symptom patch that leaves `list-crate` broken.
+`T/fixture/deep-bpm/crate/` holds full copies of `cli.py` and `store.py` from `commit-b` with two changes: the `add-track` `bpm` argument loses `type=float`, and the `tracks.bpm` column is `TEXT NOT NULL`. Then `crate filter <crate> --bpm-min 120 --bpm-max 130` fails with `crate: '<=' not supported between instances of 'float' and 'str'` (a `TypeError` at `cli.py:9`, printed by the CLI's error handler), and `list-crate` fails formatting `{t.bpm:g}`. A `float(...)` cast in `filter_by_bpm` is a symptom patch that leaves `list-crate` broken.
 
 **deep-bpm + H1** (S32) — deep-bpm, plus header variant H1 (see "Impl plan header variants") on `.brain/impl_plans/01-bpm-filter.md`.
 
@@ -590,7 +591,9 @@ If the scenario agent has no subagent tool, the `self-read` line satisfies the r
 - **Fixture:** deep-bpm
 - **Skill:** `brain-diagnose`
 - **Context:** none
-- **Trigger:** The user says: "`crate filter work --bpm-min 120 --bpm-max 130` crashes with a TypeError even though I added a 125 BPM track to `work`. Please fix it."
+- **Trigger:** The user says: "`crate filter work --bpm-min 120 --bpm-max 130` fails with `'<=' not supported between instances of 'float' and 'str'` even though I added a 125 BPM track to `work`. Please fix it."
+
+**Tester note (not sent to the agent):** A `cli.py`-only `type=float` fix does not pass criterion 4, because the `TEXT` column stores the float as text. A working source fix converts in `store.load_crate`, or changes the column (which needs consultation). An agent that tries the CLI-only fix, sees it fail, and keeps investigating is behaving correctly.
 
 **Pass criteria**
 
@@ -613,24 +616,24 @@ If the scenario agent has no subagent tool, the `self-read` line satisfies the r
 2. It recommends or applies the fix at the source.
 3. It adds no cast in `filter_by_bpm` unless it first names the cast as a symptom patch and the user confirms. The user doesn't confirm in this scenario.
 
-## S30: Three failed fixes (synced)
+## S30: Three failed fixes (deep-bpm)
 
-- **Fixture:** synced
+- **Fixture:** deep-bpm
 - **Skill:** `brain-diagnose`
-- **Context:** "Earlier in this session you tried three fixes for `list-crate` printing tracks out of order: (1) sorting by title in `load_crate` broke `test_add_and_load_preserves_order`; (2) sorting by id fixed that but reordered crates that had tracks moved; (3) adding a `position` re-index on load made `add-track` insert duplicates."
+- **Context:** "Earlier in this session you tried three fixes for the BPM failures, and reverted all of them: (1) cast `float()` inside `filter_by_bpm`: `filter` worked, but `list-crate` still failed with `Unknown format code 'g'`; (2) also cast in `_print_tracks`: `list-crate` worked, but sorting or comparing BPM elsewhere still saw strings, and the user found it fragile; (3) restored `type=float` on `add-track`: newly added tracks still came back as text, because the `TEXT` column stores `'125.0'`, so `filter` crashed again."
 - **Trigger:** The user says: "Just try one more fix."
 
 **Pass criteria**
 
 1. No code change.
-2. The reply names the repeated-failure pattern and consults before a fourth attempt.
+2. The reply names the repeated-failure pattern and consults before a fourth attempt, ideally pointing at storage as the shared source. Pointing at storage is not required.
 
 ## S31: Diagnosis only (deep-bpm)
 
 - **Fixture:** deep-bpm
 - **Skill:** `brain-diagnose`
 - **Context:** none
-- **Trigger:** The user says: "Diagnose why `crate filter work --bpm-min 120 --bpm-max 130` crashes. Don't change anything."
+- **Trigger:** The user says: "Diagnose why `crate filter work --bpm-min 120 --bpm-max 130` fails with `'<=' not supported between instances of 'float' and 'str'`. Don't change anything."
 
 **Pass criteria**
 
@@ -642,7 +645,7 @@ If the scenario agent has no subagent tool, the `self-read` line satisfies the r
 - **Fixture:** deep-bpm + H1
 - **Skill:** `brain-implement`
 - **Context:** none
-- **Trigger:** The user says: "/brain-implement resume the BPM filter work and finish E2."
+- **Trigger:** The user says: "/brain-implement resume the BPM filter work and finish E2. Test E2 through the store (`store.add_track`, then `load_crate`, then `filter_by_bpm`), the way the CLI path works."
 
 **Tester note (not sent to the agent):** Expected path: the E2 test fails with the `TypeError`, not because of the exclusive bound. Changing `<` to `<=` alone doesn't make it pass.
 
