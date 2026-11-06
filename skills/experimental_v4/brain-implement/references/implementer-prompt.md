@@ -35,6 +35,7 @@ Code locations:
 - Do not commit, stage, or switch branches.
 - Never delete, revert, stash, or overwrite files or changes this task did not make. If a finding asks for that, push back.
 - Do not dispatch subagents.
+- When a test fails unexpectedly, investigate as `brain-diagnose` §1–§2 describes (symptom, reproduction, competing hypotheses) before a second change. After three failed attempts in this dispatch, stop and report `BLOCKED` with the attempts.
 - On anything consequential, ask (`NEEDS_CONTEXT`) rather than guess.
 
 ## Report

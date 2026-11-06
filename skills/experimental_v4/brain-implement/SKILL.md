@@ -82,6 +82,7 @@ For each increment:
 3. If it already passes, investigate whether the behavior already exists or the test is inadequate. Do not force a failing test or manufacture changes.
 4. Make the smallest coherent production change across the layers needed.
 5. Rerun the test and confirm it passes. Simplify the affected code where useful and rerun relevant checks.
+   - If a red test fails for a reason other than the missing behavior (not step 2's invalid states), or it still fails after step 4 (failed attempt 1), investigate per `brain-diagnose` §1–§2 before another change; its three-failed-fixes rule applies.
 6. **Proof before done.** A task is done only when, in this session: (a) its tests ran and passed and you read the output; (b) each Example or acceptance criterion it covers was compared against real output; (c) a self-review of the task diff passed (in scope, no unrelated edits, no debug leftovers, consistent with the spec); (d) the impl plan (when tracked) records the test command and result. "Should pass" is not evidence. If tests cannot run, the task stays open with the reason recorded; never check it off.
 
 Work in behavioral slices, not layer batches. Where no practical automated test exists (configuration, documentation, some UI, production-only faults), use characterization tests, static checks, manual reproduction, or diff inspection, and disclose coverage limits. Never fabricate red-green history.
