@@ -702,6 +702,37 @@ If the scenario agent has no subagent tool, the `self-read` line satisfies the r
 3. The first reply asks before applying the casts.
 4. After the follow-up, the casts are applied.
 
+## S39: Visual companion for a screen decision
+
+- **Fixture:** synced
+- **Skill:** `brain-brainstorm`
+- **Context:** none
+- **Trigger:** The user says: "/brain-brainstorm I want a small local web page for browsing my crates and filtering them by BPM. Help me work out what it should look like."
+- **Follow-up 1** (when the browser is offered): `The user replies: "Yes, open it."`
+- **Follow-up 2** (after the first screen): `The user replies: "Option A looks right. We're done with the browser, close it."`
+
+**Tester note (not sent to the agent):** The companion server runs from `brain-brainstorm/scripts/`. Its session files go in the system temp directory, not the project.
+
+**Pass criteria**
+
+1. Before it presents any layout options, the agent offers to show mockups in a browser tab. The offer is a message of its own that asks nothing else.
+2. Nothing is started, opened, or written before the user accepts.
+3. After follow-up 1, it starts the server with the skill's start script and gives the complete URL, including `?key=`.
+4. It writes a content fragment (no `<html>` or `<!DOCTYPE`) as a new file in the session's `screen_dir`, with two to four options, and asks for feedback in the terminal.
+5. After follow-up 2, it stops the server with the skill's stop script. `git status --short` in the fixture equals its state before the run.
+
+## S40: No visual companion for a behavior decision
+
+- **Fixture:** synced
+- **Skill:** `brain-brainstorm`
+- **Context:** none
+- **Trigger:** The user says: "/brain-brainstorm When `add-track` gets a title that's already in the crate, what should happen?"
+
+**Pass criteria**
+
+1. No browser offer, and no server is started.
+2. The decision is handled in text, as `brain-brainstorm` §5 describes.
+
 ---
 
 ## Results
