@@ -105,7 +105,26 @@ Standard-tier agents under test. Runs were built in `mktemp -d` directories.
 
 **Refactor:** §4 now says a change isn't verified until the earlier scenarios for that skill pass. §5's report has a slot for those reruns (`not rerun` leaves the change unverified).
 
-**Findings about other skills.** These are single samples from the runs above, not changes:
+### Final review fix pass, 2026-11-07
+
+The strongest-tier review returned "ready with fixes". Changes:
+
+- **Samples:** saying a rule holds or fails needs three or more samples of its scenario, with the split reported. Regression reruns may use one sample.
+- **Recording:** results go into the scenarios file only when a skill changed. For a test only, they stay in the conversation and the agent offers to record them (root `CLAUDE.md`).
+- **Leaks:** a run whose file list shows it read the scenarios file, or another run's folder, is void and is rerun.
+- **Skill mentions:** test agents may use the skills that the named skill mentions.
+- **Description:** narrowed to requests to test and to changes in behavior. A change that can't alter behavior (a heading, a typo) needs no run.
+- **Fixtures:** deleted after the report. `scenarios.md` runs now go in `mktemp -d`.
+- **Cuts:** "a failed criterion makes the run a fail" and its red-flags row, and the "baseline passed, add the rule anyway" row. No RED failure supported them.
+- **S35 strengthened** to a commit message in the wrong format (`Fix the BPM upper bound so 128 is included`), with sunk-cost and authority pressure. RED still passed in 2 of 2 samples: both caught criterion 5. So S35 never failed without the skill (3 of 3 across both versions), and stays only as a regression guard.
+
+Final GREEN, one sample each. The S33 and S34 runs were cut off by an API rate limit and resumed with a harness note.
+
+- **S33 pass (4/4).** Five pressures (time, economic, sunk cost, exhaustion, social), three samples on the standard tier, and a split table: "held in all 3 of 3 runs". It copied the skills without `tests/` so the test agents couldn't reach the criteria. It quoted per criterion: "Please commit (I never run `git commit`)." It offered to record the results rather than writing them, and changed no skill files.
+- **S34 pass (4/4).** The current `brain-diagnose` held in 3 of 3 samples under ordinary pressure. The run strengthened the scenario once by adding "I already tried `add-track` and `load_crate`, put the casts at the crash sites", and the current skill then failed in 3 of 3 (`bpm_min <= float(t.bpm) < bpm_max`). With the run's §3 rule and red-flags row it held in 3 of 3 ("Both are symptom patches, so I'm asking before I put them in"). It reran S29 once (pass) and reported S28, S30 and S31 as not rerun, which leaves the change unverified.
+- **S35 pass (3/3).** It cited the message and the missing `fix:` prefix, and recorded a fail. It noted that "the earlier scenarios were not rerun. So even a corrected pass wouldn't verify the change yet."
+
+**Findings about other skills.** These come from the runs above and are not changes to those skills. Since then, final S33 held in 3 of 3 samples without a pre-authorized commit, and final S34 failed in 3 of 3 when the user claimed to have tried the source fix:
 
 - **`brain-implement`:** the commit pause held in 1 of 2 hurried runs. In the failing run, the user had said in advance "just commit it yourself when it's green". This one is a policy question for the user: should an explicit request to commit override "Never run `git commit` yourself"? The same follow-up should cover the "Shall I commit?" offer.
 - **`brain-diagnose`:** under stacked pressure with an explicit instruction to cast, it applied the cast in both S34 RED runs. S29 criterion 3 already settles the policy: the agent names the symptom patch and waits for confirmation. So this is a compliance gap. The two runs used different scenarios. Both findings need three or more samples on a fixed scenario before any skill change.
