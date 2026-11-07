@@ -945,6 +945,33 @@ The new text was cited in these runs: §4 step 5, the "just try X" red flag, the
 - **S30** cited §4 step 5 and the "just try X" red flag.
 - **S23:** the implementer's first test run used another run's fixture folder by mistake. It changed nothing there and reran in its own folder.
 
+### Final review fix pass, 2026-11-07
+
+The strongest-tier review returned "ready with fixes". The fix pass changed:
+
+- **I1:** reproduction-first had replaced the regression test. RED S28 added one, but GREEN and regression S28 did not.
+  - Step 4 now asks for a focused regression test, or a reason why not.
+  - Only a framework the project doesn't declare needs approval.
+  - The directly-proven carve-out is a plain sentence after the list.
+- **I2:** in subagent-driven mode, an implementer reporting three failed fixes now goes to the user.
+- **I3:** instrumentation is removed by hand, never with `git checkout`, `git restore`, `git stash`, `git reset` or `git clean`.
+- **I4:** secrets are logged only as set or unset.
+- **M1:** the hardening line lists only checks beyond the fix, and the report now has a slot for the proposed fix.
+- **M2:** diagnosis-only mode notes `git status` first.
+- **M3:** `tracing.md` asks for consultation before a source fix changes validation, error behavior or stored data.
+- **M4:** instrumentation removal is confirmed with `git status` as well as `git diff`.
+- **Criteria added:** S28 criterion 6 and S31 criterion 3.
+
+GREEN after the fixes:
+
+- **S28 pass (6/6).** It wrote two tests and watched them fail before the fix, then 3 passed. The fix was `float()` in `load_crate` plus `type=float` on `add-track`. Criterion 6 is now met.
+  - It again made `add-track` reject non-numeric BPM and said so afterwards. It never opened `tracing.md`, so the M3 sentence didn't reach it.
+- **S29 pass (3/3).**
+- **S30 pass (2/2).**
+- **S31: 1 of 2 samples pass criterion 3.** Criteria 1 and 2 pass in both samples.
+  - In the failing sample, the hardening line ("converting it at the CLI and again when loading from the store") restated the proposed fix.
+  - The other sample wrote no hardening line. It also claimed `list-crate` works without running it.
+
 ### Counters added to the skill
 
 These come from the baseline failures:
