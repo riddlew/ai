@@ -40,7 +40,7 @@ Use `${CLAUDE_SKILL_DIR}/references/scenario-format.md` for the scenario fields,
 Grade each criterion from evidence you saw: the agent's words, `git status`, the files. A criterion you couldn't check is `unverified`, not passed.
 
 - **RED passes** (the baseline already complies): there is no failure to fix. Strengthen the scenario once, with more pressure or a harder case, and rerun. If it still passes, tell the user the current skill holds, and ask before adding text.
-- **RED fails, GREEN passes:** the change works for that scenario. Rerun earlier scenarios that cover the same skill.
+- **RED fails, GREEN passes:** the change works for that scenario. Then rerun the earlier scenarios that cover the same skill. The change isn't verified until they pass.
 - **GREEN fails:** revise and rerun the same scenarios. Match the fix to the failure:
   - a rule skipped under pressure: name the exact rationalization in a red-flags row;
   - a missing element: add a slot to the template the agent fills in;
@@ -57,7 +57,8 @@ Report in the conversation, and record the results in the scenarios file's Resul
 2. the criteria;
 3. the runs: RED or GREEN, the model, and the number of samples;
 4. pass, fail, or `unverified` per criterion, each with a verbatim quote from the test agent or the observed state;
-5. the verdict, plus the next step when anything failed.
+5. for a change, the earlier scenarios rerun and their results, or `not rerun`, which leaves the change unverified;
+6. the verdict, plus the next step when anything failed.
 
 With no run, there is nothing to fill in: write `No test run` and give the reading separately, labelled as a review. Delete run fixtures when the results are recorded.
 
