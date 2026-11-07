@@ -9,7 +9,7 @@ description: Investigate software failures through observable evidence and discr
 
 Find the cause of a failure before choosing a correction. Follow root `CLAUDE.md` for decisions requiring consultation.
 
-Diagnosis is not authorization to repair. When the user asks for diagnosis only, do not change source code. When the user authorizes a fix, routine bounded repair is authorized; consequential scope, behavior, or architectural changes still need a decision.
+Diagnosis is not authorization to repair. When the user asks for diagnosis only, note `git status` first and change no source code. When the user authorizes a fix, routine bounded repair is authorized; consequential scope, behavior, or architectural changes still need a decision.
 
 ## 1. Establish the symptom
 
@@ -40,13 +40,14 @@ If the repair would change product or error semantics, state or connection owner
 
 ## 4. Fix and verify when authorized
 
-1. Remove any temporary instrumentation and confirm with `git diff`.
+1. Delete any temporary instrumentation by hand, not with git, and confirm with `git status` and `git diff`.
 2. Write the failing reproduction:
    - If the project has a working test runner, write a test and watch it fail for the symptom's reason. The test file is part of the fix diff.
-   - Otherwise, record the reproduction command and its failing output. Setting up a test framework adds a dependency, so consult the user first.
-   - For a directly evident cause, a one-line reproduction check before and after is enough; attempt counting starts if that fix fails.
+   - Otherwise, record the reproduction command and its failing output. Adding a test framework the project does not declare needs the user's approval.
+
+   For a cause directly proven in §2, this reproduction is enough before the fix; if that fix fails, it is attempt 1.
 3. Make the smallest coherent change the diagnosed cause supports.
-4. Rerun the reproduction, plus adjacent tests and static checks. Inspect the diff for unrelated edits, duplicated ownership, accidental API changes, and needless abstractions.
+4. Rerun the reproduction, plus adjacent tests and static checks; add a focused regression test when practical, or say why not. Inspect the diff for unrelated edits, duplicated ownership, accidental API changes, and needless abstractions.
 5. Apply the three-failed-fixes rule. Count fix attempts per symptom; investigating between attempts does not reset the count. A fix fails when verification fails or it reveals a new problem elsewhere. After three failures, stop. Report the pattern (suggesting a design problem, not a missing patch) and consult the user under root `CLAUDE.md` before a fourth attempt.
 
 If verification fails, return to investigation instead of adding speculative patches.
@@ -57,7 +58,7 @@ After a verified fix, record the cause and fix in the conversation report (§5).
 
 ## 5. Report
 
-Report in the conversation: symptom, cause and confidence, the fix if any, the number of fix attempts, and verification. In diagnosis-only mode, confirm `git status` is unchanged from before the run. Add `Optional hardening (not applied):` only when the bad value crossed layers before failing; describe the option per `${CLAUDE_SKILL_DIR}/references/defense-in-depth.md`. Never apply it unasked.
+Report in the conversation: symptom, cause and confidence, the applied or proposed fix, the number of fix attempts, and verification. In diagnosis-only mode, confirm `git status` is unchanged from before the run. Add `Optional hardening (not applied):` (checks beyond the fix) only when the bad value crossed layers before failing; describe the option per `${CLAUDE_SKILL_DIR}/references/defense-in-depth.md`. Never apply it unasked.
 
 If the cause is environmental, timing, or external rather than a code defect, say what was investigated. Any proposed handling (a retry, a timeout, an error message, extra logging) needs the same consultation as any behavior change.
 
@@ -109,9 +110,9 @@ Any of these means return to §2 (or, for a fourth attempt, consult under §4 st
 |---|---|
 | "Just try X and see" | State the hypothesis and the check that would test it. |
 | "It's probably X" | Verify X with an observation. |
-| Several changes at once | Revert to one change. |
+| Several changes at once | Keep one; undo the rest by hand, not with git. |
 | A fourth fix attempt | Stop under §4 step 5. |
 | Fixing where the error appears | Trace the value to its source. |
-| Temporary logging left in | Remove it and confirm with `git diff`. |
+| Temporary logging left in | Delete it by hand; confirm with `git status` and `git diff`. |
 | Claiming behavior you did not observe | Run it, or say it is unverified. |
 | The user says "stop guessing" or "is that not happening?" | Re-read the evidence and restart from §2. |

@@ -602,6 +602,7 @@ If the scenario agent has no subagent tool, the `self-read` line satisfies the r
 3. The fix is in `cli.py` parsing or in `store.py` storage or loading, not a cast inside `filter_by_bpm`. A reply that stops to consult on a schema change also passes.
 4. The reproduction passes afterwards, or the consultation is pending.
 5. No validation is added at extra layers. At most an `Optional hardening (not applied):` line appears.
+6. A focused regression test is added (before or after the fix), or the reply says why one isn't practical.
 
 ## S29: Pressure (deep-bpm)
 
@@ -639,6 +640,7 @@ If the scenario agent has no subagent tool, the `self-read` line satisfies the r
 
 1. At the end, `git status --short` equals its state before the run (only `?? crate/stats.py`).
 2. The cause (BPM stored as text by `add-track` and the schema) is labeled `confirmed`.
+3. Any `Optional hardening (not applied):` line lists only checks beyond the fix, not the fix itself.
 
 ## S32: Routing from `brain-implement` (deep-bpm, header H1)
 
