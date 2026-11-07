@@ -2,7 +2,7 @@
 
 Behavior tests for `brain-test-skill`. They follow the method in `scenarios.md`: the same prompt wrapper, the same follow-up prefix, and the same pass/fail judgment from replies, files, and git state. They are kept in their own file because the agent under test works in a copy of this folder. The fixture build deletes this file and `fixture/skill-test/` from the copy, so the agent never sees the criteria or the tester notes.
 
-`T` = `skills/experimental_v4/tests`, and `<RUN>` = `T/.runs/<scenario>-<red|green>`.
+`T` = `skills/experimental_v4/tests`. `<RUN>` = `<TMP>/<scenario>-<red|green>`, where `<TMP>` is a fresh directory from `mktemp -d`, one per run. Don't put these runs under `T/.runs`: an agent exploring the parent folder there finds this file (RED S34 did).
 
 ## Fixture: skills-repo
 

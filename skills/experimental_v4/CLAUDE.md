@@ -50,6 +50,7 @@ Skills refer to "standard tier" and "strongest tier"; this table is the only pla
 | Main session: brainstorming, writing specs, architecture review | strongest | Opus |
 | Main session: coordinating subagent-driven mode | standard | Sonnet |
 | `brain-review-code` delegated assessment subagents | standard | Sonnet |
+| `brain-test-skill` test agents, unless the role under test is strongest tier | standard | Sonnet |
 
 Rules:
 - Every subagent dispatch names its model explicitly, using this table.

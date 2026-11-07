@@ -1,6 +1,6 @@
 # Claude Code Skills
 
-An opinionated set of **13 Claude Code skills** for collaborative software development, built around a **project brain**: a `.brain/` folder that holds what the project is, how it is built, what you decided, what is open, and what is done. A new session reads the brain instead of re-reading the codebase. The goal is to produce straightforward, maintainable changes while keeping consequential product and architectural decisions under your control.
+An opinionated set of **14 Claude Code skills** for collaborative software development, built around a **project brain**: a `.brain/` folder that holds what the project is, how it is built, what you decided, what is open, and what is done. A new session reads the brain instead of re-reading the codebase. The goal is to produce straightforward, maintainable changes while keeping consequential product and architectural decisions under your control.
 
 The skills are **tools to use when needed**, not a mandatory pipeline. Small changes should stay small; complex or multi-session work can use more structure.
 
@@ -23,6 +23,7 @@ project/
         ├── brain-review-code/           # SKILL.md + references/findings.md
         ├── brain-review-merge-request/
         ├── brain-review-security/
+        ├── brain-test-skill/            # SKILL.md + references/scenario-format.md
         ├── brain-update/                # SKILL.md + references/templates.md
         ├── brain-write-spec/
         └── brain-write-tickets/
@@ -66,7 +67,7 @@ Then run `/brain-update` once in the project to create its brain.
 └── NN_<topic>/          Detail split out of root file NN_<topic>.md
 ```
 
-- **Reading:** every skill except `brain-distill-content` reads all root files once per session (again after context compaction), and reads subfolders only when linked or needed. Root files are kept under about 25,000 words in total; a root file over about 4,000 words moves its detail into a `NN_<topic>/` subfolder and keeps a summary.
+- **Reading:** every skill except `brain-distill-content` and `brain-test-skill` reads all root files once per session (again after context compaction), and reads subfolders only when linked or needed. Root files are kept under about 25,000 words in total; a root file over about 4,000 words moves its detail into a `NN_<topic>/` subfolder and keeps a summary.
 - **Writing:** `brain-update` owns the root files and `adrs/`. Other skills write only their own documents into the subfolders, then invoke `brain-update` to index them and propagate what changed. `brain-update` never runs your code, never commits, and never edits another skill's documents.
 - **Git:** `.brain` is untracked by default. The first run asks, and adds `.brain/` to the repository's local `info/exclude` unless you choose to track it. Inside a linked git worktree, an untracked brain is found in the main checkout.
 
@@ -102,6 +103,7 @@ Skills refer to a "standard tier" and a "strongest tier". Root [`CLAUDE.md`](CLA
 | `brain-review-code` | Assesses a bounded change set for correctness, requirement fit, and repository fit, delegating to subagents for larger changes. | A substantive change needs review, or you request one. | Three-section findings report, with a coverage table marking each spec Example and ticket acceptance criterion met, unmet, or unverifiable. |
 | `brain-review-merge-request` **(manual)** | Reviews an MR/PR against Jira acceptance criteria using `brain-review-code`, adding coverage, tests, performance, and a merge recommendation. Read-only. | You want an advisory merge assessment. | Consolidated findings and Approve / Request changes. |
 | `brain-review-security` | Examines realistic threats, trust boundaries, access control, credentials, and sensitive-data flows. | Work changes a security boundary or you request an audit. | Findings in conversation; `.brain/reviews/security/` only on request. |
+| `brain-test-skill` | Tests whether a skill changes what an agent does by running it in fresh agents on throwaway fixtures, before and after a change, with pressure scenarios for rules an agent may skip. It reports pass or fail per criterion with verbatim quotes, and never reports a reading of the skill as a test result. | You want to know whether a skill's rule holds, or you are creating or editing a skill. | Per-criterion results in conversation and in the project's scenarios file. |
 | `brain-write-spec` **(manual)** | Records established requirements, invariants, concrete examples, and decisions without inventing missing choices; each spec is self-checked and read by a fresh builder reviewer. | A substantial feature needs a stable implementation contract. | `.brain/specs/<NN>-<slug>.md`. |
 | `brain-write-tickets` | Decomposes approved work into verifiable increments whose acceptance criteria reference spec examples, with your approval of the set; the set comes with a coverage table and a builder review before you approve it. | Work benefits from independent tickets or staged delivery. | `.brain/tickets/<feature>/<NN>-<slug>.md`. |
 
@@ -192,7 +194,7 @@ Implementation uses focused test-first increments, starting from the specificati
 
 All review skills share one severity scale (Critical / High / Medium / Low), a separate confidence rating, and common finding fields, defined in `brain-review-code/references/findings.md`.
 
-The skills themselves are verified with the scenarios in `tests/scenarios.md`: each runs a fresh agent against a throwaway sample project (`tests/fixture/`), first without the skill (baseline) and then with it, and checks the agent's replies and the resulting files and git state.
+The skills themselves are verified with the scenarios in `tests/scenarios.md`: each runs a fresh agent against a throwaway sample project (`tests/fixture/`), first without the skill (baseline) and then with it, and checks the agent's replies and the resulting files and git state. `brain-test-skill` runs this method. Its own scenarios are in `tests/skill-test-scenarios.md`.
 
 ## Reviews
 
