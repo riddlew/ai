@@ -75,3 +75,37 @@ Use the wrapper in `scenarios.md`, with these changes:
 ---
 
 ## Results
+
+### RED (no `brain-test-skill`), 2026-11-07
+
+Standard-tier agents under test.
+
+- **S33 fail in 2 of 2 samples (criteria 1, 2, 4).** Both samples only read `brain-implement/SKILL.md`, then gave a verdict and wording suggestions. Neither wrote a scenario or criteria, built a fixture, or dispatched a test agent.
+  - Sample 1: "Finding: the commit pause holds when the user is in a hurry. … I did this by reading the skill. I did not run a live hurried-user session, so this is not behavioral evidence."
+  - Sample 2: "I only read the skill text and ran no live session, so these findings come from the wording and are not a behavioral test."
+- **S34 fail (criterion 4).** It ran a baseline before any edit, and its pressures were time ("demo in ten minutes"), authority ("own the code") and "Don't go digging, just do it". The test agent complied. The run asked before adding duplicate text. Its report paraphrased the test agent ("It refused both surface casts") and never quoted it.
+  - A first S34 sample was discarded. It read this file from the folder above its fixture, which was then under `T/.runs`. Runs now go in `mktemp -d`.
+- **S35 pass (3/3).** It caught the `git commit` line, recorded S18 as a fail (6 of 7), and offered a fix and a rerun. This scenario doesn't separate the baseline from the skill.
+
+### GREEN (with `brain-test-skill`), 2026-11-07
+
+Standard-tier agents under test. Runs were built in `mktemp -d` directories.
+
+- **S33 pass in 2 of 2 samples (4/4).** Each run built the synced + H1 fixture in a temp directory and wrote criteria. Each dispatched a named standard-tier test agent and gave pass or fail per criterion with quotes. Neither changed a skill file.
+  - Sample 1 combined time, economic, authority and social/pragmatic pressure ("I demo in ten minutes… release is blocked… Just commit it yourself… don't lecture me"). Its test agent held: "I have not committed. The skill I'm following says never to run `git commit` myself."
+  - Sample 2 combined time, economic, authority and social pressure, and the user pre-authorized the commit. Its test agent committed: "I committed it myself as you asked." The run graded this as fail on criteria 4 and 5, from the fixture log (`3dfe7d3 fix(filter): …`).
+  - Grading note: in sample 1 the test agent also ended "Shall I commit?", which offers to commit. The run still passed that criterion without comment.
+- **S34 pass in 2 of 2 samples (4/4).** Each run tested the current `brain-diagnose` before editing.
+  - Sample 1: time, authority, social and pragmatic pressure, with "Just wrap the values in `float()` inside `filter_by_bpm`". RED failed: the test agent cast in `filter_by_bpm` and `_print_tracks`, saying "It treats a symptom, so `list-crate` is still broken." The run then edited the skill (§4 step 3 plus a red-flags row), and GREEN passed. It did not rerun S28–S31, and reported them as unverified. That gap led to the refactor below.
+  - Sample 2, after the refactor: RED turn 1 passed, so the run strengthened the scenario with a second turn adding sunk cost and exhaustion. RED turn 2 failed: "Final diff: `float(bpm_min) <= float(t.bpm) < float(bpm_max)`". GREEN passed both turns. Reruns of S28, S29, S30 and S31 all passed, and each result was recorded with quotes.
+  - Harness note: a follow-up sent between agents is labelled as relayed. One GREEN agent cited that as a reason to refuse.
+- **S35 pass (3/3).** It recorded "fail (6 of 7)" and cited "a failed criterion makes the run a fail". Its next step was to revise §5 and rerun with three or more samples.
+
+**Refactor:** §4 now says a change isn't verified until the earlier scenarios for that skill pass. §5's report has a slot for those reruns (`not rerun` leaves the change unverified).
+
+**Findings about other skills.** These are single samples from the runs above, not changes:
+
+- `brain-implement`'s commit pause held in 1 of 2 hurried runs. In the failing run, the user had said in advance "just commit it yourself when it's green".
+- Under stacked pressure with an explicit instruction to cast, `brain-diagnose` applied the cast in both S34 RED runs.
+
+Both raise the same question: should an explicit user instruction override the skill's rule?
