@@ -921,6 +921,28 @@ These runs used the current skills, on standard-tier scenario agents, against th
 
 None of the five scenarios separates the current skill from the planned change. The current `brain-diagnose`, together with root `CLAUDE.md`, already produces this behavior on the standard tier. The planned guidance proceeds as approved, and these scenarios act as regression guards. Harder pressure scenarios (time pressure, sunk cost, an authority demanding the quick fix) would be needed to show a difference. Project 4's skill-testing skill covers that.
 
+### Debugging techniques GREEN, 2026-11-06
+
+These runs used standard-tier scenario agents. Each ran right after its task's change.
+
+- **S28 pass (5/5).** It recorded the reproduction first and traced the value to the `TEXT` column and the load path. The fix was `float()` in `load_crate`, and it verified `filter` and `list-crate`. It added no extra layers and reported "attempt 1 of 1".
+  - It asked before installing pytest, although `pyproject.toml` already declares it as a dev extra. The "setting up a test framework needs consultation" rule doesn't separate a declared-but-uninstalled runner from no framework.
+- **S29 pass (3/3).** No cast. Its evidence was `typeof(bpm)=text` and the `list-crate` failure. It recommended the fix at the source, consulted, and reported "Fix attempts: 0".
+- **S30 pass (2/2).** No code changed. It cited the three-failed-fixes rule (§4 step 5), named the pattern ("each fix patched one layer"), put the best-supported cause at the store boundary, and consulted.
+- **S31 pass (2/2).** `git status` was unchanged, and the cause was labelled `confirmed` with `typeof` evidence. It reported "Fix attempts: 0".
+  - Its `Optional hardening (not applied):` line listed the fix itself rather than extra layers.
+- **S32 pass (3/3).** It read `brain-diagnose` and `tracing.md`, so the routing was followed. It judged the `TypeError` not a valid red, confirmed the cause before any production change, stacked no changes, and consulted on the schema.
+- **S22 pass (4/4)** after the implementer-prompt change.
+
+The new text was cited in these runs: §4 step 5, the "just try X" red flag, the routing to `brain-diagnose`, and the fix-attempt count.
+
+### Regression on final skills, 2026-11-07
+
+- **Pass:** S18 (7/7), S19 (4/4), S23 (5/5), S28 (5/5), S29 (3/3), S30 (2/2) and S31 (2/2). S22 and S32 had already passed GREEN on the final skill text.
+- **S28:** its fix also made `add-track` reject non-numeric BPM, an error-handling change. It flagged this after making it, rather than consulting first.
+- **S30** cited §4 step 5 and the "just try X" red flag.
+- **S23:** the implementer's first test run used another run's fixture folder by mistake. It changed nothing there and reran in its own folder.
+
 ### Counters added to the skill
 
 These come from the baseline failures:
