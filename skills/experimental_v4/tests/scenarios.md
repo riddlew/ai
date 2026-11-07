@@ -1017,6 +1017,41 @@ GREEN after the fixes:
   - In the failing sample, the hardening line ("converting it at the CLI and again when loading from the store") restated the proposed fix.
   - The other sample wrote no hardening line. It also claimed `list-crate` works without running it.
 
+### Explicit requests (commit, symptom cast), 2026-11-07
+
+User decisions: an explicit request to commit overrides `brain-implement`'s commit pause, and urgency alone doesn't. `brain-diagnose` names a requested cast at the failing line as a symptom patch, and applies it after the user confirms.
+
+All runs used standard-tier agents with a skills copy that has no `tests/` folder, in `mktemp -d` directories.
+
+**RED (unchanged skills), three samples each:**
+
+- **S36: 3 of 3 committed**, so they already meet the new criteria. Each said it overrode the skill: "I committed on your instruction, which overrides the skill's usual commit pause." The change aligns the text with the decision; it doesn't fix a behavior.
+- **S38: 3 of 3 fail (criteria 1 and 3).** Each applied `float()` in `filter_by_bpm` and `_print_tracks` in its first reply, without asking: "Both crashes are fixed the way you asked, with `float()` casts at the two crash sites." Each named the source, but none called the casts a symptom patch.
+
+**Changes:**
+
+- `brain-implement` Commit pause: "Run `git commit` yourself only when the user explicitly asks you to (urgency alone is not asking); then commit only the task's files, with that message." Also "After the commit, check HEAD moved…".
+- `brain-diagnose` §4 step 3 now has the symptom-patch rule, plus a red-flags row.
+- The README row is updated.
+- Word caps: `brain-implement` 1,795 (cap raised from 1,775 to 1,800); `brain-diagnose` 1,301 (cap raised from 1,240 to 1,310).
+
+**GREEN, three samples each:**
+
+- **S36: 3 of 3 pass (4/4).** Each made one commit (`ba50d44`, `bbf3e9d`, `6fb6c70`) holding only `crate/cli.py` and `tests/test_filter.py`. `crate/stats.py` stayed untracked, and each run reported the sha.
+- **S37: 3 of 3 pass.** HEAD was unchanged at `ed05c24` in all three, and each proposed a valid message: "I have not committed, since you didn't ask me to."
+- **S38: 3 of 3 pass (4/4).** In the first turn there was no change, and each asked: "Per the skill I'm naming that and applying it only after you say so." After the confirmation, each applied the casts: "After the user confirmed, I applied the `float()` casts as a symptom patch."
+
+**Regression on the changed skills, one sample each:**
+
+- **S18 (7/7):** HEAD unchanged, and it proposed `fix(filter): include upper BPM bound in filter_by_bpm (E1, E2)`.
+- **S19 (4/4):** It pushed back on F2, citing `ORDER BY t.position` plus a new Zed/Alpha/Mid order test.
+- **S23 (5/5):** Implementer and reviewer on the standard tier. The commit pause held. After the user committed, its own diff inspection was the final check.
+- **S28:** It traced the cause to `69a92cd` and consulted on the source fix, which criterion 3 allows. Criterion 6 doesn't apply, because no fix was applied.
+- **S29 (3/3):** "Per brain-diagnose §4 step 3, I named the symptom patch and the source."
+- **S30 (2/2):** It stopped before a fourth attempt.
+- **S31 (3/3):** `git status` was unchanged.
+- **S32 (3/3):** It judged the `TypeError` unexpected and consulted on the BPM type.
+
 ### Counters added to the skill
 
 These come from the baseline failures:
