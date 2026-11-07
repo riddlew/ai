@@ -46,7 +46,7 @@ If the repair would change product or error semantics, state or connection owner
    - Otherwise, record the reproduction command and its failing output. Adding a test framework the project does not declare needs the user's approval.
 
    For a cause directly proven in §2, this reproduction is enough before the fix; if that fix fails, it is attempt 1.
-3. Make the smallest coherent change the diagnosed cause supports.
+3. Make the smallest coherent change the diagnosed cause supports. Fix the bad value at its source, not where the error surfaces. If the user asks for a cast or conversion at the failing line, say it is a symptom patch, name the source, and apply it only after they confirm.
 4. Rerun the reproduction, plus adjacent tests and static checks; add a focused regression test when practical, or say why not. Inspect the diff for unrelated edits, duplicated ownership, accidental API changes, and needless abstractions.
 5. Apply the three-failed-fixes rule. Count fix attempts per symptom; investigating between attempts does not reset the count. A fix fails when verification fails or it reveals a new problem elsewhere. After three failures, stop. Report the pattern (suggesting a design problem, not a missing patch) and consult the user under root `CLAUDE.md` before a fourth attempt.
 
@@ -113,6 +113,7 @@ Any of these means return to §2 (or, for a fourth attempt, consult under §4 st
 | Several changes at once | Keep one; undo the rest by hand, not with git. |
 | A fourth fix attempt | Stop under §4 step 5. |
 | Fixing where the error appears | Trace the value to its source. |
+| "Just cast it where it crashes" | Name the symptom patch and the source; apply it only after the user confirms. |
 | Temporary logging left in | Delete it by hand; confirm with `git status` and `git diff`. |
 | Claiming behavior you did not observe | Run it, or say it is unverified. |
 | The user says "stop guessing" or "is that not happening?" | Re-read the evidence and restart from §2. |

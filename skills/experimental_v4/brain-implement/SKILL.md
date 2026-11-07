@@ -89,7 +89,7 @@ Work in behavioral slices, not layer batches. Where no practical automated test 
 
 ### Commit pause
 
-After each task, and after the final fix pass if it changed anything: report the task, the test command and its result, propose a Conventional Commits message (e.g. `fix(parser): reject empty input lines`), ask the user to commit, and wait. Never run `git commit` yourself. Once the user confirms, check HEAD moved and record the sha in the impl plan. The next task starts only after the commit; if the user says to continue without committing, do so and note that the next task's review covers both tasks' changes.
+After each task, and after the final fix pass if it changed anything: report the task, the test command and its result, propose a Conventional Commits message (e.g. `fix(parser): reject empty input lines`), ask the user to commit, and wait. Run `git commit` yourself only when the user explicitly asks you to (urgency alone is not asking); then commit only the task's files, with that message. After the commit, check HEAD moved and record the sha in the impl plan. The next task starts only after the commit; if the user says to continue without committing, do so and note that the next task's review covers both tasks' changes.
 
 ## 6. Keep state accurate
 
