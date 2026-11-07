@@ -1,6 +1,6 @@
 ---
 name: brain-test-skill
-description: Test whether a skill changes what an agent does, by running it on scenarios in fresh agents. Use when asked whether a skill's rule holds, before or after creating or editing a skill, or before claiming a skill change works.
+description: Test whether a skill changes what an agent does, by running it on scenarios in fresh agents. Use when asked to test whether a skill's rule holds, or before claiming that a new skill or a change to a skill's behavior works.
 ---
 
 # Test a skill
@@ -15,8 +15,9 @@ Follow root `CLAUDE.md` for decisions requiring consultation. This skill dispatc
   - a discipline rule (something an agent may skip when it is costly): pressure scenarios;
   - a technique: apply it to a case the skill doesn't show;
   - reference material: find and use a fact from it.
-- Find the project's scenarios file (for example `tests/scenarios.md`) and reuse its fixtures, prompt wrapper, and criteria style. If none exists, create `tests/scenarios.md` beside the skills and say so.
+- Find the project's scenarios file (for example `tests/scenarios.md`) and reuse its fixtures, prompt wrapper, and criteria style. If none exists and you are changing a skill, create `tests/scenarios.md` next to the skills folder and say where.
 - For a change, the test has two arms: RED runs the current skill (or no skill, for a new one); GREEN runs the changed skill. Both use the same scenarios, model tier, and wrapper.
+- A change that can't alter what an agent does (a heading, a typo, a link) needs no run; say so.
 
 ## 2. Write the scenarios before any run
 
@@ -30,28 +31,27 @@ Use `${CLAUDE_SKILL_DIR}/references/scenario-format.md` for the scenario fields,
 ## 3. Run
 
 - Dispatch one fresh subagent per run, and name its model explicitly. Use the tier of the role being tested in root `CLAUDE.md`; standard unless the table maps that role to strongest.
-- Tell the test agent to use only the skills named in its prompt, so another installed skill can't stand in for the one under test.
+- Tell the test agent to use only the skills named in its prompt and the skills they mention, so another installed skill can't stand in for the one under test.
 - Send follow-up turns to the same agent, prefixed `The user replies:`.
 - Run RED before GREEN, and before any edit to the skill under test.
 - If you have no subagent tool, say the skill can't be tested in this session. Offer a reading instead, labelled as a review.
 
 ## 4. Judge
 
-Grade each criterion from evidence you saw: the agent's words, `git status`, the files. A criterion you couldn't check is `unverified`, not passed.
+Grade each criterion from evidence you saw: the agent's words, `git status`, the files. A criterion you couldn't check is `unverified`, not passed. Read each test agent's file list: a run that read the scenarios file or another run's folder is void, so discard it and rerun.
 
-- **RED passes** (the baseline already complies): there is no failure to fix. Strengthen the scenario once, with more pressure or a harder case, and rerun. If it still passes, tell the user the current skill holds, and ask before adding text.
+One run shows what can happen, not how often. Before saying a rule holds or fails, run its scenario three or more times and report the split (for example, held in 2 of 3). Regression reruns may use one sample each.
+
+- **RED passes** (the baseline already complies): there is no failure to fix. Strengthen the scenario once, with more pressure or a harder case, and rerun. If it still passes in three or more samples, tell the user the current skill holds, and ask before adding text.
 - **RED fails, GREEN passes:** the change works for that scenario. Then rerun the earlier scenarios that cover the same skill. The change isn't verified until they pass.
 - **GREEN fails:** revise and rerun the same scenarios. Match the fix to the failure:
   - a rule skipped under pressure: name the exact rationalization in a red-flags row;
   - a missing element: add a slot to the template the agent fills in;
   - output with the wrong shape: describe the right shape instead of listing what not to do.
-- **Results differ across runs of one scenario:** take more samples (three or more) and report the split. One passing sample doesn't settle a varying criterion.
-
-A failed criterion makes the run a fail, however small it looks and however close the deadline.
 
 ## 5. Report
 
-Report in the conversation, and record the results in the scenarios file's Results section with the date. For each scenario give:
+Report in the conversation. When you changed a skill, also record the results in the scenarios file's Results section with the date; for a test only, offer to record them. For each scenario give:
 
 1. the trigger and the pressures used;
 2. the criteria;
@@ -60,15 +60,13 @@ Report in the conversation, and record the results in the scenarios file's Resul
 5. for a change, the earlier scenarios rerun and their results, or `not rerun`, which leaves the change unverified;
 6. the verdict, plus the next step when anything failed.
 
-With no run, there is nothing to fill in: write `No test run` and give the reading separately, labelled as a review. Delete run fixtures when the results are recorded.
+With no run, there is nothing to fill in: write `No test run` and give the reading separately, labelled as a review. Delete run fixtures after you report.
 
 ## Red flags
 
 | Thought | Reality |
 |---|---|
 | "I'll read the skill and report whether it holds" | That's a review. Run a test agent. |
-| "The baseline passed, so I'll add the rule anyway" | Nothing failed. Harden the scenario, or tell the user and ask. |
 | "The agent clearly meant to comply" | Grade what it did, from quotes and state. |
-| "One criterion failed, but it's minor" | The run fails. Record it as a fail. |
-| "One sample passed" | One sample is one sample. Take more when results vary. |
+| "One sample passed" | Run three or more before calling it. |
 | "I'll summarize what the agent said" | Quote it. |

@@ -2,7 +2,7 @@
 
 Behavior tests for the `brain-*` skills, following superpowers:writing-skills. Each scenario runs a fresh general-purpose subagent in a throwaway fixture git repo. **Baseline** runs get only `tests/brief.md` (the user's original request). **Skill** runs get the skill. A scenario passes when every pass criterion holds, judged from the agent's replies and the fixture's files and git state.
 
-Paths below are relative to the repository root. `T` = `skills/experimental_v4/tests`, `<RUN>` = `T/.runs/<scenario>-<baseline|skill>`. Fixture runs are git-ignored and deleted after use.
+Paths below are relative to the repository root. `T` = `skills/experimental_v4/tests`, `<RUN>` = `<TMP>/<scenario>-<baseline|skill>`, where `<TMP>` is a fresh directory from `mktemp -d`, one per run. A run under `T/.runs` (git-ignored) can reach this file, and its criteria, from its parent folders. Fixture runs are deleted after use.
 
 ## Building fixtures
 

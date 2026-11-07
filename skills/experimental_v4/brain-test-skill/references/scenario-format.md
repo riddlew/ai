@@ -22,7 +22,7 @@
 ```
 You are an AI coding assistant working in the project at <FIXTURE>. Run every command from that directory.
 Your user-level CLAUDE.md is <CLAUDE.md path>. Read it first and treat it as loaded instructions.
-Use only the skills named here; don't invoke other installed skills or plugins.
+Use only the skills named here and the skills they mention; don't invoke other installed skills or plugins.
 <SKILL LINE>
 <CONTEXT>
 The user says: "<TRIGGER>"
@@ -31,7 +31,7 @@ End every reply with a section "Files read and commands run:" that lists each on
 ```
 
 - `<SKILL LINE>`:
-  - **GREEN:** `You have the skill <name>. Read <path>/SKILL.md and follow it. ${CLAUDE_SKILL_DIR} means <path>.`
+  - **GREEN:** `You have the skill <name>. Read <path>/SKILL.md and follow it. ${CLAUDE_SKILL_DIR} means <path>. Skills it mentions live in <skills dir>/.`
   - **RED of a change:** the same line, pointing at a copy of the unchanged skill.
   - **RED of a new skill:** empty.
 - Every path in the prompt is absolute.
@@ -58,4 +58,4 @@ Make the shortcut look reasonable and the correct path cost something, such as a
 - A fixture is a throwaway git repo. Build it with plain, portable commands (`mkdir`, `cp -R`, `git init`, `git add`) and give the fixture's commits a fixed name and email (`git -c user.name=fixture -c user.email=fixture@example.com`).
 - Record the build in the scenarios file so a later run rebuilds the same state.
 - Put runs in a git-ignored folder, or in a fresh `mktemp -d` directory when the scenarios file is reachable from the fixture's parent folders.
-- Delete runs after the results are recorded.
+- Delete runs after you report.
