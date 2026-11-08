@@ -1178,6 +1178,25 @@ GREEN after the fixes, one sample each:
 - **S40 pass.**
 - **S20a pass**, now with no mention of the companion.
 
+### Saved brain location, 2026-11-08
+
+S41 ran on the standard tier, as `brain-update` does. S42 ran on the strongest tier, as spec writing does. A scenario agent doesn't load `CLAUDE.local.md`, so its content was given in the context line.
+
+RED (skills before the change):
+
+- **S41: failed 3 of 3** (criteria 3, 4 and 6). All three used and updated the brain at the path given, but saved the location nowhere. `CLAUDE.local.md` was unchanged and still showed in `git status`.
+- **S42: passed 3 of 3.** Each used the brain named in `CLAUDE.local.md`. Two said `brain-update`'s own lookup "only looks inside the checkout, so I pointed it there". So the other skills' preambles are unchanged, and `brain-update`'s lookup now checks that line first.
+
+The change to `brain-update` §1:
+- it looks first where the user says the brain is, or where a `Project brain:` line in loaded instructions points;
+- when the user names a brain, it saves that line to `CLAUDE.local.md` at the checkout root and excludes the file from git unless git already ignores it.
+
+GREEN:
+
+- **S41: passed 3 of 3.** All three checked `git ls-files` and `git check-ignore`, appended the line and kept the British-spelling line. Each added `CLAUDE.local.md` to the common `info/exclude`. `git status` in the worktree was clean.
+- **S42: passed 1 of 1.**
+- **Regression (one sample each):** S3 and S4 passed. S11 failed: a first run from a worktree created the brain in the worktree. The skills from before the change did the same in 2 of 2 runs, so the gap predates this change; the earlier S11 pass was one lucky sample. §1 now says a first run from a linked worktree creates the brain in the main checkout. After that, **S11 passed 3 of 3.** Each run said in its first reply that the brain would go in the main checkout.
+
 ### Counters added to the skill
 
 These come from the baseline failures:
