@@ -17,15 +17,15 @@ description: Use when a project has no .brain/ folder and the user wants one set
 
 ## 1. Find the brain and choose a mode
 
-A brain exists only when `.brain/00_index.md` exists. Look first where the user says it is, or where a `Project brain:` line in your loaded instructions points. Then look at the current worktree root. Inside a linked git worktree, then look in the main checkout: the parent directory of `git rev-parse --path-format=absolute --git-common-dir`. Use the first `.brain/` that has `00_index.md`, and write there. If none has one, a first run creates `.brain/` in the main checkout when you are in a linked git worktree, so every worktree shares it; otherwise, at the current worktree root.
+A brain exists only when `.brain/00_index.md` exists. Look first where the user says it is, or where a `Project brain:` line in your loaded instructions points; if that folder has no `00_index.md`, say so and ask what they want, and don't start a first run. Then look at the current worktree root. Inside a linked git worktree, then look in the main checkout: the parent directory of `git rev-parse --path-format=absolute --git-common-dir`. Use the first `.brain/` that has `00_index.md`, and write there. If none has one, a first run from a linked git worktree creates an untracked brain in the main checkout, so every worktree shares it. If the user chooses to track it, or you are not in a linked worktree, create it at the current worktree root.
 
-**Saving a location the user gives.** When the user tells you where the brain is and that folder has `00_index.md`, save it for later sessions before anything else:
+**Isolated worktree sessions.** When Claude Code isolates a session in a worktree, it refuses edits to the main checkout. If the brain you would write is in the main checkout, say so before investigating, and stop. Don't write the brain anywhere else or through shell commands. Tell the user to run `/brain-update` from a session in the main checkout, or to move the brain outside the repository and give you its location.
 
-1. In `CLAUDE.local.md` at the root of the current checkout (`git rev-parse --show-toplevel`), put the line `Project brain: <absolute path of the .brain folder>`. Replace an existing `Project brain:` line and keep the rest of the file. If git tracks `CLAUDE.local.md` (`git ls-files --error-unmatch CLAUDE.local.md` succeeds), don't write it; tell the user instead.
+**Saving a location the user gives.** When the user tells you where the brain is and that folder has `00_index.md`, save it for later sessions before anything else. Run these from the checkout root (`git rev-parse --show-toplevel`):
+
+1. In `CLAUDE.local.md` there, put the line `Project brain: <absolute path of the .brain folder>`. Replace an existing `Project brain:` line and keep the rest of the file. If git tracks `CLAUDE.local.md` (`git ls-files --error-unmatch CLAUDE.local.md` succeeds), don't write it; give the user the line instead.
 2. Unless `git check-ignore -q CLAUDE.local.md` succeeds, append `CLAUDE.local.md` to `info/exclude` under `git rev-parse --git-common-dir`.
-3. Tell the user where you saved it.
-
-If that folder has no `00_index.md`, save nothing, say so, and ask what they want.
+3. Tell the user where you saved it. Claude Code loads `CLAUDE.local.md` from the working directory and every folder above it, so a line saved in the main checkout covers the worktrees inside it, such as `.claude/worktrees/`; a line saved in a linked worktree covers only that worktree.
 
 | Situation | Mode |
 |---|---|
