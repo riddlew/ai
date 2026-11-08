@@ -9,17 +9,16 @@ disable-model-invocation: true
 
 ## Purpose
 
-Transform verbose technical content into a concise, information-dense version that preserves all material details and the original document structure.
+Transform verbose technical content into a concise, information-dense version that preserves all material details.
 
-**Remove words, not information. Preserve formatting, not fluff.**
+**Remove words and fluff, not information.**
 
 Assume the reader is an experienced software engineer reviewing technical documentation or a merge request.
 
 Prioritize, in order:
 1. Completeness and technical accuracy.
-2. Preservation of original formatting and structure.
-3. Removal of redundancy and unnecessary wording.
-4. Clarity and readability.
+2. Removal of redundancy and unnecessary wording.
+3. Clarity and readability.
 
 When brevity conflicts with completeness, completeness wins.
 
