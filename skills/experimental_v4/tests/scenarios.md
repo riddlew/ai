@@ -1242,7 +1242,7 @@ GREEN:
 S43 and S44 test the isolation handling. RED used the skills from before this fix pass:
 
 - **S43: failed 3 of 3.** Each planned the brain for the main checkout and asked the git-tracking question, with no word about the isolation.
-- **S44: failed.** Three of three asked the worktree question with no warning. Two continued to the follow-up: each added the worktree, then wrote the plan header in the main checkout. (The third run's follow-up was cut off by the rate limit.)
+- **S44: failed 3 of 3.** Each asked the worktree question with no warning and added the worktree after the follow-up. Two then wrote the plan header in the main checkout. The tester deleted the third run's fixture before it finished, so it never reached the header.
 
 `brain-implement` grew from 1,795 to 1,859 words. **Ruling:** cap raised from 1,800 to 1,860.
 
