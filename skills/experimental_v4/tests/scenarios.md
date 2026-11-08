@@ -1277,6 +1277,18 @@ GREEN:
   - **S16:** criteria 1 and 3 pass. Criterion 2 fails on the known reconciliation edit.
   - **S11: pass**, after a harness note. Its first attempt hit the tester's own guard on compound shell commands, which it took for isolation and stopped. The note told it the session wasn't isolated.
 
+### Distill without preserving the original format, 2026-11-08
+
+The user decided that preserving information and accuracy matters more than preserving the original format, because keeping the format can leave a document disorganized. S45 ran on the standard tier.
+
+- **RED: failed 3 of 3** (criterion 3). The skill at that point had the user's edits to Purpose and priorities, but rule 1 still said to preserve the original structure. Each run kept every original section, so the retry details stayed spread over five sections: jitter under Error Handling, the 4xx rule in the FAQ. All three kept every fact and the 5-vs-3 conflict.
+- **The change:**
+  - rule 1, "Preserve Original Formatting and Structure", is removed;
+  - links, anchors, and referenced numbering moved to Traceability;
+  - the output requirement is now "Organize it for clarity … the original headings, order, and layout are not binding";
+  - final check 4 now asks that each condition, qualifier, and value stays attached to its fact after restructuring.
+- **GREEN: passed 3 of 3.** Each put the backoff, jitter, error rules, and the count conflict in one "Retry behavior" section. Each kept the table, every exact value, and the circuit breaker marked as not built. No run added a summary, and the source was unchanged.
+
 ### Counters added to the skill
 
 These come from the baseline failures:
