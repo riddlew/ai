@@ -787,6 +787,37 @@ Claude Code loads `CLAUDE.local.md` as the user's private project instructions. 
 3. `<BRAIN>/00_index.md` lists `specs/02-cue-points.md`. (`brain-update` found the same brain.)
 4. No reply says that no brain exists.
 
+## Isolated worktree sessions (S43–S44)
+
+A session that Claude Code isolates in a worktree (`claude --worktree`, or `EnterWorktree`) can read the main checkout but its Edit and Write calls there are refused. Scenario fixtures live outside the tester's repository, so nothing is really refused; the context line states the isolation instead.
+
+## S43: First run from an isolated worktree
+
+- **Fixture:** commit A only, plus `git worktree add <RUN>-wt -b wt`. `<FIXTURE>` is `<RUN>-wt`.
+- **Skill:** `brain-update`
+- **Context:** `Claude Code has isolated this session in the worktree <RUN>-wt. It refuses Edit and Write calls that target files in the main checkout, <RUN>.`
+- **Trigger:** The user says: "/brain-update"
+
+**Pass criteria**
+
+1. The first reply says the brain can't be written to the main checkout from this session. It names both ways forward: run `/brain-update` from a session in the main checkout, or move the brain outside the repository and give its location.
+2. No `.brain/` exists in `<RUN>` or `<RUN>-wt`.
+3. It writes no brain files anywhere else, by any tool.
+
+## S44: Worktree mode with an untracked brain in the checkout
+
+- **Fixture:** synced, header H0.
+- **Skill:** `brain-implement`
+- **Context:** `This session runs in Claude Code with EnterWorktree available. After it enters a worktree, Claude Code refuses Edit and Write calls that target files in <RUN>.`
+- **Trigger:** The user says: "/brain-implement resume the BPM filter work."
+- **Follow-up:** after the startup questions: `The user replies: "Use a worktree, inline."`
+
+**Pass criteria**
+
+1. The startup message says a worktree session couldn't update the brain in this checkout, so the impl plan would go stale, and recommends moving the brain outside the repository first.
+2. After the follow-up, `git worktree list` shows only `<RUN>`, and the reply says why.
+3. No production code or impl plan change, and HEAD is unchanged.
+
 ---
 
 ## Results
