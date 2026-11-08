@@ -1084,6 +1084,47 @@ All runs used standard-tier agents with a skills copy that has no `tests/` folde
 - **S31 (3/3):** `git status` was unchanged.
 - **S32 (3/3):** It judged the `TypeError` unexpected and consulted on the BPM type.
 
+### Brainstorm visual companion, 2026-11-07
+
+Test agents ran on the strongest tier (brainstorming is a strongest-tier role), except S20a, which runs on the standard tier by design. The skills copy had no `tests/` folder, and each run was in its own `mktemp -d` directory.
+
+**RED (unchanged `brain-brainstorm`):**
+
+- **S39: no run offered the browser (0 of 3).** All three presented layout options as ASCII sketches in text. One added, at the end of a three-question message, "If the text sketches aren't enough to judge the layout, I can make a throwaway HTML mockup outside the repo."
+- **S40 pass (1 of 1).** No offer.
+
+**Change:** a Visual companion subsection in §5, plus `references/visual-companion.md`. `scripts/` is adapted from superpowers, with no remote branding or version lookup; see `scripts/README.md`.
+
+**GREEN, three samples each:**
+
+- **S39: 3 of 3 offered the browser in a message of its own, after checking `node --version`.** All three started the server with the skill's script and gave the full keyed URL. Each pushed a fragment screen with three choices, and stopped the server with the stop script.
+  - Two runs first asked the scope and serving questions in text, and offered once the layout question was next. The tester answered those questions in between; the scenario now scripts this as follow-up 0.
+  - One run offered before the layout's prerequisite was settled, which left the tab empty for a turn.
+  - One run left `crate/__pycache__/` from its own `python3 -c` check. That failed criterion 5 as first written; the criterion now excludes `__pycache__/`.
+- **S40: 3 of 3 pass.** "I didn't run `node --version` or offer the browser companion, because D3 is about behavior, not something you'd look at."
+- **S20a regression (standard tier): pass.** It suggested `/model opus` once and made no offer. It did mention the companion ("None of this needs a mockup").
+
+**Final review fix pass.** The strongest-tier review returned "ready with fixes". Changes:
+
+- **Trigger:** "an output format" and "a structure" were dropped, so the companion is for layouts and visual designs only. Ownership and text or data formats stay in text.
+- **Timing:** the offer comes only when the visual decision is the next question.
+- **Session folders:** `mktemp -d`.
+- **Guide:**
+  - an error path;
+  - self-contained screens;
+  - neutral examples;
+  - card attributes;
+  - quoted paths;
+  - a stop fallback;
+  - the Windows `server-info` lookup;
+  - attribution.
+
+GREEN after the fixes, one sample each:
+
+- **S39 (5/5).** It asked delivery and scope in text first ("Once D3 is settled, the layout is next"), then offered on its own. The session folder came from `mktemp`, the screen was a fragment with three choices and no remote URL, and the stop script deleted the folder.
+- **S40 pass.**
+- **S20a pass**, now with no mention of the companion.
+
 ### Counters added to the skill
 
 These come from the baseline failures:
