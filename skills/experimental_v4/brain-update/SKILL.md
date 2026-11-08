@@ -17,7 +17,7 @@ description: Use when a project has no .brain/ folder and the user wants one set
 
 ## 1. Find the brain and choose a mode
 
-A brain exists only when `.brain/00_index.md` exists. Look first where the user says it is, or where a `Project brain:` line in your loaded instructions points. Then look at the current worktree root. Inside a linked git worktree, then look in the main checkout: the parent directory of `git rev-parse --path-format=absolute --git-common-dir`. Use the first `.brain/` that has `00_index.md`, and write there.
+A brain exists only when `.brain/00_index.md` exists. Look first where the user says it is, or where a `Project brain:` line in your loaded instructions points. Then look at the current worktree root. Inside a linked git worktree, then look in the main checkout: the parent directory of `git rev-parse --path-format=absolute --git-common-dir`. Use the first `.brain/` that has `00_index.md`, and write there. If none has one, a first run creates `.brain/` in the main checkout when you are in a linked git worktree, so every worktree shares it; otherwise, at the current worktree root.
 
 **Saving a location the user gives.** When the user tells you where the brain is and that folder has `00_index.md`, save it for later sessions before anything else:
 
