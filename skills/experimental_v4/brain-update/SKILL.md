@@ -9,7 +9,7 @@ description: Use when a project has no .brain/ folder and the user wants one set
 
 **Always:**
 
-- Write only inside `.brain/`. During a first run you also write `info/exclude` and carry out approved moves (§2 step 3), including deleting originals and fixing links to them anywhere. Learn facts by reading code and git history. Never run the project's code, tests, or build; a fact that needs an experiment goes in `spikes.md`.
+- Write only inside `.brain/`. During a first run you also write `info/exclude` and carry out approved moves (§2 step 3), including deleting originals and fixing links to them anywhere. When saving a brain location (§1), you also write `CLAUDE.local.md` and `info/exclude`. Learn facts by reading code and git history. Never run the project's code, tests, or build; a fact that needs an experiment goes in `spikes.md`.
 - Never stage, commit, or push.
 - Never dispatch subagents unless the user asks.
 - Ask the user one question per message.
@@ -17,7 +17,15 @@ description: Use when a project has no .brain/ folder and the user wants one set
 
 ## 1. Find the brain and choose a mode
 
-A brain exists only when `.brain/00_index.md` exists. Look at the current worktree root first. Inside a linked git worktree, then look in the main checkout: the parent directory of `git rev-parse --path-format=absolute --git-common-dir`. Use the first `.brain/` that has `00_index.md`, and write there.
+A brain exists only when `.brain/00_index.md` exists. Look first where the user says it is, or where a `Project brain:` line in your loaded instructions points. Then look at the current worktree root. Inside a linked git worktree, then look in the main checkout: the parent directory of `git rev-parse --path-format=absolute --git-common-dir`. Use the first `.brain/` that has `00_index.md`, and write there.
+
+**Saving a location the user gives.** When the user tells you where the brain is and that folder has `00_index.md`, save it for later sessions before anything else:
+
+1. In `CLAUDE.local.md` at the root of the current checkout (`git rev-parse --show-toplevel`), put the line `Project brain: <absolute path of the .brain folder>`. Replace an existing `Project brain:` line and keep the rest of the file. If git tracks `CLAUDE.local.md` (`git ls-files --error-unmatch CLAUDE.local.md` succeeds), don't write it; tell the user instead.
+2. Unless `git check-ignore -q CLAUDE.local.md` succeeds, append `CLAUDE.local.md` to `info/exclude` under `git rev-parse --git-common-dir`.
+3. Tell the user where you saved it.
+
+If that folder has no `00_index.md`, save nothing, say so, and ask what they want.
 
 | Situation | Mode |
 |---|---|
