@@ -1228,6 +1228,33 @@ GREEN:
 - **S42: passed 1 of 1.**
 - **Regression (one sample each):** S3 and S4 passed. S11 failed: a first run from a worktree created the brain in the worktree. The skills from before the change did the same in 2 of 2 runs, so the gap predates this change; the earlier S11 pass was one lucky sample. §1 now says a first run from a linked worktree creates the brain in the main checkout. After that, **S11 passed 3 of 3.** Each run said in its first reply that the brain would go in the main checkout.
 
+**Final review, strongest tier: "not ready".**
+- **Critical C1.** A session that Claude Code isolates in a worktree can't edit the main checkout. That covers `claude --worktree`, `EnterWorktree`, and `brain-implement`'s worktree mode. Confirmed in the docs, and live: a Write to the main checkout from this tester's isolated session was refused.
+- **User decisions:**
+  - recommend a brain outside the repository;
+  - `brain-update` stops and explains rather than writing around the refusal;
+  - fix `brain-implement`'s worktree mode in this change.
+- **Fixed from the review:** the location saved from a worktree covers only that worktree, and the reply says so (I1). A tracked first-run brain goes at the worktree root (I3). A saved location with no `00_index.md` makes it ask instead of starting a first run (I4). The git checks run from the checkout root (M1). A tracked `CLAUDE.local.md` gets the line handed to the user (M2). The README parenthetical is gone (M8).
+- **Not acted on:**
+  - **I2:** a new `CLAUDE.local.md` stops Claude Code from reading `AGENTS.md`. The install puts `CLAUDE.md` at the root, so that fallback is already off.
+  - **M3–M7** are deferred.
+
+S43 and S44 test the isolation handling. RED used the skills from before this fix pass:
+
+- **S43: failed 3 of 3.** Each planned the brain for the main checkout and asked the git-tracking question, with no word about the isolation.
+- **S44: failed.** Three of three asked the worktree question with no warning. Two continued to the follow-up: each added the worktree, then wrote the plan header in the main checkout. (The third run's follow-up was cut off by the rate limit.)
+
+`brain-implement` grew from 1,795 to 1,859 words. **Ruling:** cap raised from 1,800 to 1,860.
+
+GREEN:
+
+- **S43: passed 3 of 3.** Each stopped before investigating, wrote nothing, and named both ways forward. One said: "I won't write the brain elsewhere or work around the refusal with shell commands."
+- **S44: passed 2 of 3; the third passed criteria 1 and 2.** None created a worktree. Each gave the reason and offered to move the brain or work without a worktree. The third edited the impl plan while reconciling, before the startup questions. That is the known S16 criterion 2 issue. It also wrote `Workspace: worktree requested (not yet created…)` into the header.
+- **Regression (one sample each):**
+  - **S41: pass.** It also said the line "covers only that worktree".
+  - **S16:** criteria 1 and 3 pass. Criterion 2 fails on the known reconciliation edit.
+  - **S11: pass**, after a harness note. Its first attempt hit the tester's own guard on compound shell commands, which it took for isolation and stopped. The note told it the session wasn't isolated.
+
 ### Counters added to the skill
 
 These come from the baseline failures:
