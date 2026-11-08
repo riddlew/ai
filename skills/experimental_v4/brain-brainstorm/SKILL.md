@@ -89,13 +89,14 @@ Never phrase a recommendation, common pattern, or inferred intention as an appro
 
 ### Visual companion
 
-When a **User decision** is about something the user will look at, offer a browser tab before you present the options. That covers a screen or page layout, an output format, and a diagram of a flow or structure, when the options would look different from each other. Requirements, behavior, scope, and tradeoffs stay in text.
+When the next **User decision** you will ask is about something the user will look at, offer a browser tab before you present its options. That means a screen or page layout, or a visual design, where the options would look different from each other. Requirements, behavior, scope, tradeoffs, ownership, and text or data formats a code block can show stay in text.
 
-- Make the offer a message of its own, with nothing else in it: "This might be easier if I show you. Want me to open a browser tab with some mockups?"
+- Make the offer a message of its own, with nothing else in it: "This might be easier if I show you. Want me to open a browser tab with some mockups?" Other ready questions wait a turn.
 - Offer it only if `node --version` works.
 - Start nothing and write nothing before the user accepts. If they decline, stay in text and don't offer again unless they raise it.
 - If they accept, read `${CLAUDE_SKILL_DIR}/references/visual-companion.md` and follow it.
 - Record what they choose in the decision table, like any other answer.
+- Stop the server when the browser is no longer needed, and at the latest when you confirm the direction (§7).
 
 ## 6. Update after each answer
 

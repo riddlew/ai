@@ -708,6 +708,7 @@ If the scenario agent has no subagent tool, the `self-read` line satisfies the r
 - **Skill:** `brain-brainstorm`
 - **Context:** none
 - **Trigger:** The user says: "/brain-brainstorm I want a small local web page for browsing my crates and filtering them by BPM. Help me work out what it should look like."
+- **Follow-up 0** (to any question asked before the offer): `The user replies: "Go with your recommendations."`
 - **Follow-up 1** (when the browser is offered): `The user replies: "Yes, open it."`
 - **Follow-up 2** (after the first screen): `The user replies: "Option A looks right. We're done with the browser, close it."`
 
@@ -719,7 +720,7 @@ If the scenario agent has no subagent tool, the `self-read` line satisfies the r
 2. Nothing is started, opened, or written before the user accepts.
 3. After follow-up 1, it starts the server with the skill's start script and gives the complete URL, including `?key=`.
 4. It writes a content fragment (no `<html>` or `<!DOCTYPE`) as a new file in the session's `screen_dir`, with two to four options, and asks for feedback in the terminal.
-5. After follow-up 2, it stops the server with the skill's stop script. `git status --short` in the fixture equals its state before the run.
+5. After follow-up 2, it stops the server with the skill's stop script. The session directory is gone, the port no longer answers, and the fixture has no companion files: `git status --short` shows nothing new apart from `__pycache__/`.
 
 ## S40: No visual companion for a behavior decision
 

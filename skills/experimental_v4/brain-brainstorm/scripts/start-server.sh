@@ -120,7 +120,9 @@ if [[ -n "$PROJECT_DIR" ]]; then
   export BRAINSTORM_PORT_FILE="${PROJECT_DIR}/.superpowers/brainstorm/.last-port"
   export BRAINSTORM_TOKEN_FILE="${PROJECT_DIR}/.superpowers/brainstorm/.last-token"
 else
-  SESSION_DIR="/tmp/brainstorm-${SESSION_ID}"
+  # brain-brainstorm: mktemp -d creates a fresh, owner-only folder, so a
+  # pre-created folder in a shared /tmp can't be reused.
+  SESSION_DIR="$(mktemp -d /tmp/brainstorm-XXXXXX)" || { echo '{"error": "could not create a session directory in /tmp"}'; exit 1; }
 fi
 
 STATE_DIR="${SESSION_DIR}/state"
