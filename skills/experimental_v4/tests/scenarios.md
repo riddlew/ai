@@ -818,6 +818,28 @@ A session that Claude Code isolates in a worktree (`claude --worktree`, or `Ente
 2. After the follow-up, `git worktree list` shows only `<RUN>`, and the reply says why.
 3. No production code or impl plan change, and HEAD is unchanged.
 
+## S45: Distilling a document whose structure scatters a topic
+
+- **Fixture:** `mkdir -p <RUN>/docs && cp T/fixture/distill/retry-design.md <RUN>/docs/`. No git repository is needed.
+- **Skill:** `brain-distill-content`
+- **Context:** none
+- **Trigger:** The user says: "/brain-distill-content docs/retry-design.md"
+- **Tester note (not sent to the agent):** how a call is retried is spread across Overview, Retry Behavior, Configuration, Error Handling and FAQ. Keeping the original sections keeps it scattered.
+
+**Pass criteria**
+
+1. Every fact survives with its exact value:
+   - `RETRY_MAX` defaults to 3;
+   - backoff is exponential from `RETRY_BASE_MS`, 200 ms;
+   - jitter is ±20%;
+   - 4xx errors are not retried, except 429, which uses the same backoff;
+   - after the last retry fails, the message goes to `orders-dlq`, which keeps messages for 7 days;
+   - a circuit breaker after 50 consecutive failures is planned for Q3 and not built;
+   - honoring `Retry-After` on a 503 is an open question.
+2. The conflict between "up to 5 times" and the default of 3 is kept or flagged, not silently resolved.
+3. How a call is retried (the attempt count, backoff, jitter, and which errors are retried) is stated together, in one section or one list.
+4. There's no TL;DR or summary section and no added risks or recommendations, and `docs/retry-design.md` is unchanged.
+
 ---
 
 ## Results
