@@ -734,6 +734,59 @@ If the scenario agent has no subagent tool, the `self-read` line satisfies the r
 1. No browser offer, and no server is started.
 2. The decision is handled in text, as `brain-brainstorm` §5 describes.
 
+## Brain outside the checkout (S41–S42)
+
+`<BRAIN>` is `<TMP>/brains/crate/.brain`. After building **synced**, move the brain out of the repository:
+
+```bash
+mkdir -p <TMP>/brains/crate && mv <RUN>/.brain <BRAIN>
+```
+
+Claude Code loads `CLAUDE.local.md` as the user's private project instructions. A scenario agent doesn't, so when the file exists at the start of a run, its content goes in the context line.
+
+## S41: Saving the brain's location from a worktree
+
+- **Fixture:** synced, brain moved to `<BRAIN>`, plus a linked worktree with a private instructions file that isn't ignored yet:
+
+  ```bash
+  cd <RUN> && git worktree add -q <RUN>-wt -b wt
+  printf 'Use British spelling in documentation.\n' > <RUN>-wt/CLAUDE.local.md
+  ```
+
+  `<FIXTURE>` is `<RUN>-wt`.
+- **Skill:** `brain-update`
+- **Context:** `Your loaded instructions include <RUN>-wt/CLAUDE.local.md (the user's private project instructions, not checked in): "Use British spelling in documentation."`
+- **Trigger:** The user says: "/brain-update The brain is at <BRAIN>."
+
+**Pass criteria**
+
+1. It updated `<BRAIN>`: `00_index.md` has `Last synced: <B>`, and `02_features.md` describes `cue add`.
+2. No `.brain/` exists in `<RUN>` or `<RUN>-wt`.
+3. `<RUN>-wt/CLAUDE.local.md` has exactly one line giving `<BRAIN>` (absolute) as the brain's location, and still has the British-spelling line.
+4. `git -C <RUN>-wt status --porcelain` doesn't list `CLAUDE.local.md`, and `<RUN>/.git/info/exclude` still lists `.brain/`.
+5. No `CLAUDE.md` or `.claude/` is created or changed in either checkout, and HEAD is unchanged in both.
+6. The reply says where the location was saved.
+
+## S42: A later session uses the saved location
+
+- **Fixture:** synced, brain moved to `<BRAIN>`, plus a saved location:
+
+  ```bash
+  printf 'Project brain: <BRAIN>\n' > <RUN>/CLAUDE.local.md && printf 'CLAUDE.local.md\n' >> <RUN>/.git/info/exclude
+  ```
+
+- **Skill:** `brain-write-spec`
+- **Context:** S8's direction summary, then: `Your loaded instructions include <RUN>/CLAUDE.local.md (the user's private project instructions, not checked in): "Project brain: <BRAIN>"`
+- **Trigger:** The user says: "/brain-write-spec"
+- **Follow-up:** only if it asks questions: `The user replies: "Use your recommendations."`
+
+**Pass criteria**
+
+1. `<BRAIN>/specs/02-cue-points.md` exists.
+2. No `.brain/` exists in `<RUN>`.
+3. `<BRAIN>/00_index.md` lists `specs/02-cue-points.md`. (`brain-update` found the same brain.)
+4. No reply says that no brain exists.
+
 ---
 
 ## Results
