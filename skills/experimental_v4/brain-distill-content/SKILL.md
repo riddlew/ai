@@ -1,6 +1,6 @@
 ---
 name: brain-distill-content
-description: Remove verbosity and redundancy from AI-generated documentation, MR descriptions, RFCs, and technical text while preserving all material information and original formatting.
+description: Remove verbosity and redundancy from AI-generated documentation, MR descriptions, RFCs, and technical text while preserving all material information and technical accuracy.
 argument-hint: "[file paths or text]"
 disable-model-invocation: true
 ---
@@ -34,30 +34,7 @@ When brevity conflicts with completeness, completeness wins.
 
 ## Rules
 
-### 1. Preserve Original Formatting and Structure
-
-Retain the document's original organization and presentation.
-
-Preserve:
-- Heading hierarchy, titles, and section order.
-- Paragraph and section boundaries when meaningful.
-- Ordered and unordered lists, including nesting.
-- Tables, columns, and meaningful row relationships.
-- Code blocks, commands, and inline code.
-- Links, references, citations, and footnotes.
-- Bold, italic, and other meaningful emphasis.
-- Numbered steps and procedural sequences.
-- Diagrams, callouts, and blockquotes.
-
-Condense content **within its existing structural location**.
-
-Do not reorganize sections, convert tables into prose, flatten nested lists, or introduce a new summary structure.
-
-Remove a section only when it contains no unique material information and removing it does not damage the document's meaning or navigability.
-
-Preserve identifiers, anchors, and numbering that other content references.
-
-### 2. Remove Fluff Aggressively
+### 1. Remove Fluff Aggressively
 
 Eliminate:
 - Generic introductions and unnecessary conclusions.
@@ -80,7 +57,7 @@ Over:
 
 "The system implements a robust retry mechanism designed to gracefully handle transient failures through exponential backoff, ensuring reliable message processing before ultimately leveraging the dead-letter queue."
 
-### 3. Preserve All Material Information
+### 2. Preserve All Material Information
 
 Retain every unique fact necessary to understand or evaluate the content.
 
@@ -121,7 +98,7 @@ This includes, when applicable:
 
 Do not omit details merely because they are complex or require multiple sentences.
 
-### 4. Maintain Technical Precision
+### 3. Maintain Technical Precision
 
 - Preserve exact values, conditions, and qualifiers.
 - Preserve function names, file paths, types, and identifiers.
@@ -135,7 +112,7 @@ Do not omit details merely because they are complex or require multiple sentence
 
 If two statements contradict each other, preserve the discrepancy rather than silently resolving it.
 
-### 5. Distinguish Claims from Verified Facts
+### 4. Distinguish Claims from Verified Facts
 
 Documentation may describe behavior that does not exist in the actual implementation.
 
@@ -150,19 +127,16 @@ Do not label documentation claims as verified.
 
 Do not inspect repository implementation unless explicitly requested.
 
-Preserve these distinctions within the original document structure rather than creating additional sections.
+### 5. Preserve Traceability
 
-### 6. Preserve Traceability
-
-When processing repository files:
-- Preserve references to relevant files and identifiers.
-- Include original `file:line` references for important claims when available and useful.
+- Preserve links, citations, and references to files and identifiers.
+- Preserve identifiers, anchors, and numbering that other documents reference.
+- When processing repository files, include original `file:line` references for important claims when available and useful.
 - Never invent source locations.
-- Keep references unobtrusive and consistent with the original formatting.
 
 For multiple input documents, maintain source boundaries unless explicitly instructed to combine them.
 
-### 7. Avoid Unrequested Analysis
+### 6. Avoid Unrequested Analysis
 
 This is a content-distillation skill, not a code-review skill.
 
@@ -174,7 +148,7 @@ This is a content-distillation skill, not a code-review skill.
 
 Preserve risks, concerns, and unresolved questions already present in the source.
 
-Flag clear contradictions or material ambiguities in place without unnecessarily changing the document structure.
+Flag clear contradictions or material ambiguities where they occur.
 
 ## Completeness and Review Integrity
 
@@ -188,21 +162,19 @@ Flag clear contradictions or material ambiguities in place without unnecessarily
   security, performance, and testing.
 - Identify concrete verification needs supported by the
   source; never manufacture speculative concerns.
-- Preserve the original document structure. Incorporate
-  relevant findings in their corresponding sections rather
-  than imposing a separate review format.
-- Consolidate repetition within sections. Across sections,
-  remove duplication only when doing so preserves meaning,
-  context, and traceability.
+- Put relevant findings next to the content they concern
+  rather than imposing a separate review format.
+- Consolidate repetition wherever it occurs, as long as
+  meaning, context, and traceability survive.
 - Never omit substantive content solely to reduce length.
 
 ## Processing Workflow
 
 1. Read the complete supplied content.
-2. Identify all unique material facts, organized by their original sections.
+2. Identify all unique material facts.
 3. Remove filler and consolidate redundant explanations.
 4. Rewrite remaining content with maximum information density.
-5. Preserve the original formatting, hierarchy, and order.
+5. Organize the result for clarity, grouping related facts.
 6. Compare the result against the source for lost information.
 
 For large documents, process every section before finalizing. Do not omit later sections due to length or context limitations.
@@ -211,10 +183,8 @@ For large documents, process every section before finalizing. Do not omit later 
 
 Return the distilled document directly.
 
-- Preserve its existing Markdown structure.
-- Keep original headings and section ordering.
-- Retain tables, code blocks, lists, and formatting.
-- Do not add a TL;DR, executive summary, or new sections.
+- Organize it for clarity. Group related facts, and reorder, merge, or restructure sections when that makes the content easier to follow. The original headings, order, and layout are not binding.
+- Do not add a TL;DR or executive summary.
 - Do not wrap the document in unnecessary commentary.
 - Do not repeat information across sections unnecessarily.
 - Do not enforce arbitrary word counts or compression ratios.
@@ -229,7 +199,7 @@ Before responding, ensure:
 1. Every unique material detail is preserved.
 2. All important conditions and exceptions remain intact.
 3. Technical identifiers and exact values are unchanged.
-4. Original formatting and structural relationships are preserved.
+4. Each condition, qualifier, and value is still attached to the fact it belongs to after any restructuring.
 5. Proposed, claimed, and verified behavior are not conflated.
 6. Redundancy and generic language are removed.
 7. No unsupported information was introduced.
