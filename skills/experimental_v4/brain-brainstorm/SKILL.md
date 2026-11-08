@@ -87,6 +87,16 @@ The session currently owns the service connection (`src/session.py:42`). New com
 
 Never phrase a recommendation, common pattern, or inferred intention as an approved decision.
 
+### Visual companion
+
+When a **User decision** is about something the user will look at, offer a browser tab before you present the options. That covers a screen or page layout, an output format, and a diagram of a flow or structure, when the options would look different from each other. Requirements, behavior, scope, and tradeoffs stay in text.
+
+- Make the offer a message of its own, with nothing else in it: "This might be easier if I show you. Want me to open a browser tab with some mockups?"
+- Offer it only if `node --version` works.
+- Start nothing and write nothing before the user accepts. If they decline, stay in text and don't offer again unless they raise it.
+- If they accept, read `${CLAUDE_SKILL_DIR}/references/visual-companion.md` and follow it.
+- Record what they choose in the decision table, like any other answer.
+
 ## 6. Update after each answer
 
 Update the table: an answer may resolve or eliminate decisions, add new ones, or contradict an assumption. If the user's choice appears technically unsound, explain the concrete concern and alternatives; do not substitute your preferred design.

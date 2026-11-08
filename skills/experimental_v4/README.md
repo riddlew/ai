@@ -13,7 +13,7 @@ project/
 ├── CLAUDE.md
 └── .claude/
     └── skills/
-        ├── brain-brainstorm/            # SKILL.md + lenses/
+        ├── brain-brainstorm/            # SKILL.md + lenses/ + references/ + scripts/
         ├── brain-diagnose/
         ├── brain-distill-content/
         ├── brain-implement/             # SKILL.md + references/
@@ -30,6 +30,8 @@ project/
 ```
 
 Merge `CLAUDE.md` with any existing root instructions rather than replacing project-specific guidance.
+
+`brain-brainstorm/scripts/` is an optional browser companion for mockups. It needs Node.js, has no npm dependencies, and makes no network request beyond localhost. It is adapted from obra/superpowers (MIT; see `scripts/LICENSE` and `scripts/README.md`).
 
 `brain-review-architecture`, `brain-review-security`, and `brain-review-merge-request` read the shared finding format from `brain-review-code/references/findings.md`, so install them together with `brain-review-code`.
 
@@ -93,7 +95,7 @@ Skills refer to a "standard tier" and a "strongest tier". Root [`CLAUDE.md`](CLA
 | Skill | Purpose | Use when | Typical output |
 |---|---|---|---|
 | `brain-update` | Creates and maintains the project brain: investigates and interviews you on the first run, then syncs the root files with commits, decisions, and new documents. | A project has no brain yet, another skill finished work, or you want the brain synced. | `.brain/` root files and ADRs. |
-| `brain-brainstorm` | Resolves open requirements and design decisions through a visible decision table, lens-guided options, and dependency-ordered questions. | Behavior, constraints, or architectural direction is unclear. | A confirmed direction summary; decisions recorded through `brain-update`. |
+| `brain-brainstorm` | Resolves open requirements and design decisions through a visible decision table, lens-guided options, and dependency-ordered questions. For a decision you would look at, such as a page layout or a diagram, it offers a browser tab with mockups. | Behavior, constraints, or architectural direction is unclear. | A confirmed direction summary; decisions recorded through `brain-update`. |
 | `brain-diagnose` | Investigates failures using reproduction and discriminating hypotheses; applies a bounded fix only when authorized. Reproduces the failure before fixing, traces root causes to their source, stops and consults after three failed fixes, and uses a red-flags list. | A failure, regression, or intermittent issue needs explanation. | Diagnosis in conversation; `.brain/diagnoses/` only on request. |
 | `brain-distill-content` **(manual)** | Removes verbosity from technical documents while preserving all material information and structure. | AI-generated docs, MR descriptions, or RFCs are padded. | The distilled document. |
 | `brain-implement` **(manual)** | Implements approved work in test-first increments, starting from specification examples, and maintains resumable progress. Asks once per feature whether to use a git worktree and which execution mode to use (subagent-driven, with a per-task reviewer, or inline). Pauses after each task for you to commit, with a suggested Conventional Commits message (it commits itself only when you explicitly ask), and ends with a review proportional to the change; a new impl plan gets a builder review, and its Review Focus reaches the final review. | You are ready to change code, with or without a formal spec. | Code, checks, and for tracked features `.brain/impl_plans/<feature>.md`. |
