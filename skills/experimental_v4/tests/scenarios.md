@@ -76,6 +76,30 @@ cd <RUN> && git checkout -q main && git -c merge.ff=true merge -q --squash featu
   && git -c user.name=fixture -c user.email=fixture@example.com commit -qm "Add cue points (#12)"
 ```
 
+**forked-early** — synced steps 1–2 (commit A on `main`, the brain synced to A). Branch `feature/version` from A adds `--version`. Then `main` gets commit M, a README-only change, and the brain is synced to M. `<FIXTURE>` is on `feature/version`, which doesn't contain M:
+
+```bash
+cd <RUN> && git checkout -q -b feature/version \
+  && <add parser.add_argument("--version", action="version", version="crate 0.1.0") after the ArgumentParser line in crate/cli.py> \
+  && git -c user.name=fixture -c user.email=fixture@example.com commit -qam "Add --version flag" \
+  && git checkout -q main && printf '\n## License\n\nMIT.\n' >> README.md \
+  && git -c user.name=fixture -c user.email=fixture@example.com commit -qam "Add license note" \
+  && M=$(git rev-parse HEAD) && perl -pi -e "s/^Last synced: [0-9a-f]{40}/Last synced: $M/; s/^Git: ignored\$/Git: ignored\nMain branch: main/" .brain/00_index.md \
+  && git checkout -q feature/version
+```
+
+**branched+spec** — branched, plus a spec for cue points saved on the branch and not yet indexed:
+
+```bash
+cp T/fixture/branch-spec/02-cue-points.md <RUN>/.brain/specs/02-cue-points.md
+```
+
+**renamed-main** — the synced fixture, with `Main branch: master` recorded after `Git:`. The repository has no `master`; its main branch is `main`:
+
+```bash
+perl -pi -e 's/^Git: ignored$/Git: ignored\nMain branch: master/' <RUN>/.brain/00_index.md
+```
+
 **deep-bpm** — the synced fixture plus commit C, "Keep BPM as typed", whose bug surfaces two layers from its cause (`add-track` leaves BPM as a string and the schema stores it as text). The `.brain` stays synced to A:
 
 ```bash
@@ -1033,6 +1057,42 @@ The brain's code descriptions describe the main branch. Other branches' changes 
 
 1. It says merges are applied from the main branch.
 2. The pending file is unchanged, and no root file describes cue points as built.
+
+## S58: A branch that forked before the last sync
+
+- **Fixture:** forked-early
+- **Skill:** `brain-update`
+- **Context:** none
+- **Trigger:** The user says: "/brain-update"
+
+**Pass criteria**
+
+1. It writes `.brain/pending/feature--version.md` with an entry for `--version`, and `02_features.md` doesn't mention `--version`.
+2. `Last synced` is still M, and it doesn't say the brain was synced from another branch or move any root-file content.
+
+## S59: A document saved on a branch
+
+- **Fixture:** branched+spec
+- **Skill:** `brain-update`
+- **Context:** `Session summary: brain-write-spec saved .brain/specs/02-cue-points.md on this branch and invoked brain-update.`
+- **Trigger:** none (invoked by `brain-write-spec`, per the context)
+
+**Pass criteria**
+
+1. `00_index.md` lists `specs/02-cue-points.md` with a status.
+2. Cue points go to `pending/feature--cue-points.md`, not `02` or `04`.
+
+## S60: The recorded main branch no longer exists
+
+- **Fixture:** renamed-main, on `main`
+- **Skill:** `brain-update`
+- **Context:** none
+- **Trigger:** The user says: "/brain-update"
+
+**Pass criteria**
+
+1. It says `master` doesn't exist, and either asks which branch the root files describe or records `Main branch: main` and says so.
+2. It writes no `pending/main.md`. If it continued, it synced commit B into the root files.
 
 ---
 
