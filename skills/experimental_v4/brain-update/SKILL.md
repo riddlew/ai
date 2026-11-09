@@ -23,7 +23,7 @@ A brain exists only when `.brain/00_index.md` exists. Look first where the user 
 
 If the user gave a location that holds a brain, use it, and tell them `/brain-init <path>` saves it for later sessions.
 
-**Isolated worktree sessions.** When Claude Code isolates a session in a worktree, it refuses edits to the main checkout. If the brain is in the main checkout, say so before investigating, and stop. Don't write the brain anywhere else or through shell commands. Tell the user to run `/brain-update` from a session in the main checkout, or to move the brain outside the repository and run `/brain-init <path>`.
+**Isolated worktree sessions.** Claude Code isolates a session in a worktree only when the session was started with `claude --worktree` or entered the worktree you are working in with `EnterWorktree`; a linked worktree alone is not isolation. An isolated session can't edit the main checkout. If this session is isolated, or an edit to the main checkout is refused, and the brain is in the main checkout, say so before investigating, and stop. Don't write the brain anywhere else or through shell commands. Tell the user to run `/brain-update` from a session in the main checkout, or to move the brain outside the repository and run `/brain-init <path>`.
 
 ## 2. Update
 

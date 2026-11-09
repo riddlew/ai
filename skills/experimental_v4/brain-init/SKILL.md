@@ -28,7 +28,7 @@ A brain is a folder that has `00_index.md`.
 
 **Where the first run creates it.** From a linked git worktree, an untracked brain goes in the main checkout, so every worktree shares it. If the user chooses to track it, or you are not in a linked worktree, it goes at the current worktree root.
 
-**Isolated worktree sessions.** When Claude Code isolates a session in a worktree, it refuses edits to the main checkout. If the brain would be created there, say so before investigating, and stop. Don't write it anywhere else or through shell commands. Tell the user to run `/brain-init` from a session in the main checkout.
+**Isolated worktree sessions.** Claude Code isolates a session in a worktree only when the session was started with `claude --worktree` or entered the worktree you are working in with `EnterWorktree`; a linked worktree alone is not isolation. An isolated session can't edit the main checkout. If this session is isolated, or an edit to the main checkout is refused, and the brain would be created there, say so before investigating, and stop. Don't write it anywhere else or through shell commands. Tell the user to run `/brain-init` from a session in the main checkout.
 
 A `.brain/` folder without `00_index.md` (for example, one holding a spec another skill saved) is not a brain; keep its files and index them during the first run.
 
