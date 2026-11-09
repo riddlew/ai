@@ -1545,6 +1545,26 @@ These runs used the skills before the change and the standard tier. They were st
 - **S4 (revised): failed criterion 2.** On `wt`, it synced `--version` into `02_features.md` as "not merged" and set `Last synced` to the `wt` commit.
 - **S12 (revised): failed criterion 2.** It noticed the sync came from a commit only on `wt`, but kept `--version` in `02_features.md`, labelled, instead of moving it to `pending/wt.md`.
 
+### Pending brain changes, GREEN and regression, 2026-11-08
+
+Standard tier, from a session not isolated in a worktree.
+
+- **Finding from the first GREEN batch.** With no `origin/HEAD`, the skills fell back to "the current branch" as the main branch, which on `feature/cue-points` is the feature branch. Every run noticed and used the local `main` instead, so S51, S52, S53 and S57 passed only by correcting the skill. Fixed in both skills: `origin/HEAD`, else a local `main` or `master`, else the current branch. Every later run used the fixed copy.
+- **GREEN:**
+  - **S51: passed 4 of 4** (three before the fix, one after). Each wrote `pending/feature--cue-points.md`, left `02` and `04` without cue points, left `Last synced` at `<A>`, recorded seconds-as-floats in `09`, listed cue points in progress with a link, and added `Main branch: main`.
+  - **S52: passed 3 of 3.** Each listed the pending file first, left it byte-identical, and synced `--version`. One miscounted the entries (2 for 3).
+  - **S53: passed 3 of 3.** Each applied the confirmed entries, reported `position_ms` as not in the code, and asked keep or drop. After "Drop them." each deleted the pending file, marked cue points done, and removed the index row.
+  - **S57: passed 3 of 3.** Each listed the pending file, said merges are applied from the main branch, and wrote nothing.
+  - **S54: passed.** It listed `old-idea` as "branch not found", and kept the file.
+  - **S55: passed.** It stopped on `feature/x`.
+  - **S56: failed once, then passed 3 of 3.** RED had passed 1 of 1, so Task 5 was skipped. The first GREEN run read `state.md` and listed `pending/`, but didn't read the branch's file. With the preamble line added to the 11 skills ("also read `pending/<branch>.md`, a `/` written `--`"), all three runs read it, and two flagged the planted `position_ms` conflict.
+- **Regression (one sample each):**
+  - **S4 (revised): pass.** `--version` went to `pending/wt.md`, and `02` and `Last synced` were unchanged.
+  - **S11 (revised): pass.** It stopped on `wt`, and created no brain.
+  - **S12 (revised): pass.** It said the brain was synced from `wt`, moved `--version` to `pending/wt.md`, and set `Last synced` to `main`'s `HEAD`.
+  - **S2, S5, S46 and S47: pass.**
+  - **S1: pass** on all 10 criteria, with `Main branch: main` in the new index. It took the users from the purpose answer and didn't ask about them separately.
+
 ### Counters added to the skill
 
 These come from the baseline failures:
