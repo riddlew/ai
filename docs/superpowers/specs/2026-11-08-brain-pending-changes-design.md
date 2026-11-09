@@ -16,7 +16,7 @@ The fix: the brain's code descriptions describe the main branch. Work on other b
 
 1. **The code descriptions describe the main branch.** These are `02`–`08`, the features part of `01_about.md`, and `state.md`'s done items. `Last synced` is always a commit on the main branch.
 2. **The main branch is recorded.** `00_index.md` gets the header line `Main branch: <name>`.
-   - `brain-init` detects it: `git symbolic-ref --short refs/remotes/origin/HEAD` without the `origin/` prefix, else the current branch. It records it and reports it.
+   - `brain-init` detects it: `git symbolic-ref --short refs/remotes/origin/HEAD` without the `origin/` prefix, else a local `main` or `master`, else it asks the user. It records it and reports it. `brain-update` re-detects the same way when the recorded branch no longer exists.
    - `brain-update` adds the line the same way to an older brain that lacks it.
 3. **Updating on another branch records pending changes.**
    - When the current branch isn't the main branch, `brain-update` writes no code facts into the root files. Instead it brings `.brain/pending/<branch>.md` up to date with the branch's whole change since its merge base with the main branch (`git merge-base <main> HEAD`).
