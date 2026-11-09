@@ -52,6 +52,30 @@ cp -R T/fixture/commit-b/. <RUN>/ && cd <RUN> && git add -A \
 cp T/fixture/spec-02/02-key-filter.md <RUN>/.brain/specs/02-key-filter.md
 ```
 
+**branched** — synced steps 1–2 (commit A on `main`, the brain synced to A), then commit B on a feature branch. There is no WIP file. `<FIXTURE>` is on `feature/cue-points`:
+
+```bash
+# note the printed sha as <B>
+cd <RUN> && git checkout -q -b feature/cue-points && cp -R T/fixture/commit-b/. <RUN>/ && git add -A \
+  && git -c user.name=fixture -c user.email=fixture@example.com commit -qm "Add cue points" && git rev-parse HEAD
+```
+
+**branched+pending** — branched, plus that branch's pending file, as a run of `brain-update` on the branch would leave it. It includes one planted entry, `position_ms`, which the code contradicts:
+
+```bash
+mkdir -p <RUN>/.brain/pending && cp T/fixture/pending/feature--cue-points.md <RUN>/.brain/pending/ \
+  && sed -i.bak -e 's/__A_SHA__/<A>/' -e 's/__B_SHA__/<B>/' <RUN>/.brain/pending/feature--cue-points.md \
+  && rm -f <RUN>/.brain/pending/feature--cue-points.md.bak \
+  && printf '| Cue points | in progress on `feature/cue-points` | `pending/feature--cue-points.md` |\n' >> <RUN>/.brain/state.md
+```
+
+**merged** — branched+pending, then a squash merge into `main`. `main` does not contain the branch's commits, so ancestry can't show the merge:
+
+```bash
+cd <RUN> && git checkout -q main && git merge -q --squash feature/cue-points \
+  && git -c user.name=fixture -c user.email=fixture@example.com commit -qm "Add cue points (#12)"
+```
+
 **deep-bpm** — the synced fixture plus commit C, "Keep BPM as typed", whose bug surfaces two layers from its cause (`add-track` leaves BPM as a string and the schema stores it as text). The `.brain` stays synced to A:
 
 ```bash
@@ -127,7 +151,7 @@ S1–S14 run `brain-update` unless a scenario names another skill. First runs (S
 3. Each later turn asks exactly one question.
 4. No question asks something the repo answers: language, database, commands, or env vars.
 5. Final state:
-   - `.brain/00_index.md` has `Last synced: <HEAD sha>` and `Git: ignored`;
+   - `.brain/00_index.md` has `Last synced: <HEAD sha>`, `Git: ignored`, and `Main branch: main`;
    - `.brain/` is in `.git/info/exclude`.
 6. Every root file that is left out is marked not applicable in `00_index.md`. No root file is only placeholder text.
 7. Glossary and moved files:
@@ -190,7 +214,7 @@ S1–S14 run `brain-update` unless a scenario names another skill. First runs (S
 **Pass criteria**
 
 1. No `.brain/` exists in `<RUN>-wt`.
-2. `<RUN>/.brain/02_features.md` mentions `--version`.
+2. `wt` isn't the main branch, so `<RUN>/.brain/pending/wt.md` has an entry for `--version`, and `<RUN>/.brain/02_features.md` doesn't mention `--version`. (Revised for pending changes; before them, `02_features.md` got `--version`.)
 3. HEAD of both checkouts is unchanged.
 
 ## S5: Missing sync commit
@@ -309,10 +333,10 @@ S1–S14 run `brain-update` unless a scenario names another skill. First runs (S
   1. To the git-tracking question: `No, don't track it.`
   2. Then: `I don't know yet; record everything else as open and create the brain now.`
 
-**Pass criteria**
+**Pass criteria** (revised for pending changes: the worktree is on `wt`, not `main`)
 
-1. `<RUN>/.brain/00_index.md` exists.
-2. No `.brain/` exists in `<RUN>-wt`.
+1. It says the brain describes the main branch, tells the user to run `/brain-init` from a checkout of `main`, and stops.
+2. No `.brain/` exists in `<RUN>` or `<RUN>-wt`.
 
 ## S12: Brain last synced from another branch (review I3)
 
@@ -323,10 +347,11 @@ S1–S14 run `brain-update` unless a scenario names another skill. First runs (S
   This simulates a sync that was run from `wt`. `<FIXTURE>` is `<RUN>` (on `main`).
 - **Trigger:** The user says: "/brain-update"
 
-**Pass criteria**
+**Pass criteria** (revised for pending changes)
 
-1. The reply says the brain was last synced from a commit that isn't in this branch's history.
-2. `.brain/02_features.md` still mentions `--version`.
+1. The reply says the brain was last synced from a commit that isn't on the main branch.
+2. `--version` moves out of `.brain/02_features.md` into `.brain/pending/wt.md`.
+3. `Last synced` is `main`'s `HEAD`, and `00_index.md` lists `pending/wt.md`.
 
 ## S13: First-run move conflict and links (review I4, I5)
 
@@ -914,6 +939,100 @@ A session that Claude Code isolates in a worktree (`claude --worktree`, or `Ente
 
 1. The reply says the saved location isn't a brain, names `CLAUDE.local.md`, and gives both ways out: `/brain-init <path>`, or remove the line and run `/brain-init` again.
 2. It stops: no question, no `.brain/` created, and `CLAUDE.local.md` unchanged.
+
+## Pending changes for branches (S51–S57)
+
+The brain's code descriptions describe the main branch. Other branches' changes wait in `.brain/pending/<branch>.md`, where a `/` in the branch name becomes `--`, until the user says the branch merged.
+
+## S51: Updating on a feature branch
+
+- **Fixture:** branched.
+- **Skill:** `brain-update`
+- **Context:** S2's session summary.
+- **Trigger:** The user says: "/brain-update"
+
+**Pass criteria**
+
+1. `.brain/pending/feature--cue-points.md` exists and covers `cue add` and the `cue_points` table.
+2. `02_features.md` and `04_data_model.md` don't mention cue points, and `Last synced` is still `<A>`.
+3. `09_user_decisions.md` records seconds-as-floats.
+4. `state.md` lists cue points as in progress on `feature/cue-points` and links the pending file.
+5. `00_index.md` has `Main branch: main` and lists the pending file.
+
+## S52: The reminder on `main`
+
+- **Fixture:** branched+pending, then `cd <RUN> && git checkout -q main`, then S4's `--version` commit on `main`.
+- **Skill:** `brain-update`
+- **Context:** none
+- **Trigger:** The user says: "/brain-update"
+
+**Pass criteria**
+
+1. The reply begins with a list of pending changes that names `feature/cue-points`, before its other content.
+2. The pending file is byte-identical, and no root file describes cue points as built.
+3. `02_features.md` mentions `--version`, and `Last synced` is `main`'s `HEAD`.
+
+## S53: Applying a merged branch
+
+- **Fixture:** merged.
+- **Skill:** `brain-update`
+- **Context:** none
+- **Trigger:** The user says: "/brain-update feature/cue-points merged"
+- **Follow-up:** only if it asks about entries the code doesn't confirm: `The user replies: "Drop them."`
+
+**Pass criteria**
+
+1. `02_features.md` describes `cue add`, and `04_data_model.md` has the `cue_points` table in seconds.
+2. The `position_ms` entry is reported as not matching the code, it asks whether to keep or drop it, and `04_data_model.md` doesn't mention `position_ms`.
+3. After the follow-up, the pending file is deleted, `state.md` marks cue points done, and `00_index.md` no longer lists the file.
+4. `Last synced` is `HEAD`.
+
+## S54: A pending file whose branch is gone
+
+- **Fixture:** synced, plus `mkdir -p <RUN>/.brain/pending && cp T/fixture/pending/old-idea.md <RUN>/.brain/pending/`. No `old-idea` branch exists.
+- **Skill:** `brain-update`
+- **Context:** none
+- **Trigger:** The user says: "/brain-update"
+
+**Pass criteria**
+
+1. The reply begins with the list of pending changes, marking `old-idea` as branch not found.
+2. `.brain/pending/old-idea.md` still exists.
+
+## S55: `brain-init` off the main branch
+
+- **Fixture:** commit A only, then `cd <RUN> && git checkout -q -b feature/x`.
+- **Skill:** `brain-init`
+- **Context:** none
+- **Trigger:** The user says: "/brain-init"
+
+**Pass criteria**
+
+1. It says the brain describes the main branch, and tells the user to run `/brain-init` from a checkout of `main`.
+2. It stops, and no `.brain/` exists.
+
+## S56: Another skill reads its branch's pending changes
+
+- **Fixture:** branched+pending, plus header H1 on `.brain/impl_plans/01-bpm-filter.md`.
+- **Skill:** `brain-implement`
+- **Context:** none
+- **Trigger:** The user says: "/brain-implement resume the BPM filter work. Stop after you report the next work item and the files you read."
+
+**Pass criteria**
+
+1. It reads `.brain/pending/feature--cue-points.md`.
+
+## S57: "Merged", said on the feature branch
+
+- **Fixture:** branched+pending, still on `feature/cue-points`.
+- **Skill:** `brain-update`
+- **Context:** none
+- **Trigger:** The user says: "/brain-update feature/cue-points merged"
+
+**Pass criteria**
+
+1. It says merges are applied from the main branch.
+2. The pending file is unchanged, and no root file describes cue points as built.
 
 ---
 
