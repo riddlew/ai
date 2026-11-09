@@ -9,6 +9,7 @@ Adapt the content to the project. Keep the header lines of `00_index.md` exact; 
 
 Last synced: <40-character commit sha> (<YYYY-MM-DD>)
 Git: ignored
+Main branch: main
 
 ## Root files
 
@@ -29,9 +30,33 @@ Git: ignored
 | `diagnoses/01-<slug>.md` | <one line> | recorded |
 | `reviews/architecture/01-<slug>.md` | <one line> | recorded |
 | `docs/adr/0002-<slug>.md` | Left in place at the user's request | accepted |
+| `pending/<branch>.md` | Changes waiting for `<branch>` to merge | pending |
 ```
 
-`Git:` is `ignored` or `tracked`.
+`Git:` is `ignored` or `tracked`. `Main branch:` names the branch the root files describe.
+
+## `pending/<branch>.md`
+
+A `/` in the branch name becomes `--` in the file name (`feature/cue-points` → `pending/feature--cue-points.md`).
+
+```markdown
+# Pending brain changes: <branch>
+
+Branch: <branch>
+Base: <40-character merge-base sha>
+Updated: <40-character branch HEAD sha> (<YYYY-MM-DD>)
+
+Apply these to the root files when the branch merges, after checking each against the merged code.
+
+## 02_features.md
+
+- **Add:** <what the branch adds>. Source: `specs/NN-<slug>.md`.
+- **Change:** <old description> → <new description>.
+
+## 04_data_model.md
+
+- **Remove:** <what the branch removes>.
+```
 
 ## `09_user_decisions.md` entry
 
