@@ -46,7 +46,7 @@ Mark internal method boundaries, code names, and local helpers as **Deferred**. 
 
 ### Cover every behavior
 
-For each behavior the change adds or touches, add a row for each of these and settle it with the user:
+For each behavior the change adds or touches, put a row for each of these in the first table you publish, then settle each with the user:
 
 - how it is invoked: names, arguments, options, defaults;
 - what it produces when it succeeds;
@@ -144,7 +144,7 @@ Present the final summary in this format, which `brain-write-spec` consumes:
 
 **Relevant facts:** <existing responsibilities and constraints, with locations>
 **Blocking open decisions:** <User decision rows that block the next stage, or "None">
-**Deferred to implementation:** <Deferred rows, or "None">
+**Deferred to implementation:** <Deferred rows only, or "None"; anything observable the user didn't answer goes under Assumptions>
 ```
 
 Ask the user to confirm the direction, including each **Unchanged** and **Assumptions** line, before treating it as established. If it was already confirmed in the discussion, do not ask again. Do not begin implementation without authorization.
