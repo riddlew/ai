@@ -1334,6 +1334,34 @@ The user decided that preserving information and accuracy matters more than pres
   - final check 4 now asks that each condition, qualifier, and value stays attached to its fact after restructuring.
 - **GREEN: passed 3 of 3.** Each put the backoff, jitter, error rules, and the count conflict in one "Retry behavior" section. Each kept the table, every exact value, and the circuit breaker marked as not built. No run added a summary, and the source was unchanged.
 
+### Split into brain-init and brain-update, 2026-11-08
+
+The user asked for:
+- `brain-init` to set up the brain, stop when one already exists, and use a valid brain path it's given;
+- `brain-update` to tell the user to run `brain-init` first, and stop, when no brain exists.
+
+Calls I made:
+- A path with no `00_index.md` is reported as not a brain, and `brain-init` stops.
+- `brain-init` given a valid path saves it and doesn't sync; it points to `/brain-update`.
+- The root-file rules (§3), ADRs (§4), and templates stay in `brain-update`, and `brain-init` reads them there.
+
+All runs used the standard tier.
+
+- **RED, S46: failed 3 of 3.** `brain-update` with no brain started a first run each time: it read the README, the code, and the tests, then asked the git-tracking question. `brain-init` is new, so S47 and S48 have no baseline.
+- **GREEN:**
+  - **S46: passed 3 of 3.** Each said no brain was found, named `/brain-init`, and stopped. None created anything or read the code.
+  - **S47: passed 3 of 3.** Each said where the existing brain is and stopped, and the brain was byte-identical afterward.
+  - **S48: passed.** It said the folder isn't a brain and wrote nothing.
+  - **S41 (now `/brain-init <path>`): passed.** It saved the line, kept the British-spelling line, and excluded the file. It noted the line covers only that worktree, left the brain unchanged, and pointed to `/brain-update`.
+- **Regression (one sample each):**
+  - **S1 (now `brain-init`): pass**, on all 10 criteria, with moves and the interview.
+  - **S2, S3 and S43: pass.**
+  - **S4 and S11: failed first.** With no isolation in the context, both stopped as an "isolated linked worktree". They took any linked worktree for isolation, and the tester's own session really is isolated.
+
+    The fix in both skills: a session is isolated only if it was started with `claude --worktree`, or entered the worktree you are working in with `EnterWorktree`. A linked worktree alone is not isolation. After the fix:
+    - S43 still stops.
+    - S4 and S11 got past that check, then hit the tester's guard on compound git commands, which subagents of an isolated session inherit. After a harness note saying so, both passed.
+
 ### Counters added to the skill
 
 These come from the baseline failures:
