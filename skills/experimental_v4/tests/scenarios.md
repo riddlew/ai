@@ -1625,6 +1625,28 @@ Standard tier, from a session not isolated in a worktree.
   - **S2, S5, S46 and S47: pass.**
   - **S1: pass** on all 10 criteria, with `Main branch: main` in the new index. It took the users from the purpose answer and didn't ask about them separately.
 
+**Final review, strongest tier: "with fixes".** It found two Important issues, and I raised one Minor to Important:
+- **I1:** the ancestor check in "Synced from another branch" also fires on a branch that forked before the last sync.
+- **I2:** on a branch, nothing says to index new `.brain` documents.
+- **I3:** a recorded `Main branch:` that no longer exists, or the current-branch fallback, can make the main branch count as another branch.
+
+S58–S60 test them. **RED passed 1 of 1 each**, so agents already read past the text:
+- **S58:** it wrote a pending file and kept `Last synced` at M.
+- **S59:** it indexed the spec as a draft.
+- **S60:** it corrected `master` to `main` and synced.
+
+The text fixes were kept anyway, because the literal text contradicts §2's own rules:
+- "On the main branch" scopes the ancestor check, and it is skipped on another branch.
+- On a branch, new or changed documents are indexed.
+- A missing recorded branch is detected again.
+- With no `origin/HEAD`, `main` or `master`, both skills ask the user.
+
+After the fixes, one sample each:
+- **S58: pass.** Its `Base:` line recorded M, not the merge base, because it diffed `main..HEAD`. That is a deferred minor.
+- **S59, S60, S12 and S55: pass.**
+
+The other 14 findings are deferred minors. The largest are what happens after a "keep" answer, a detached `HEAD` check that comes last, and cleanup when a branch is abandoned.
+
 ### Counters added to the skill
 
 These come from the baseline failures:
