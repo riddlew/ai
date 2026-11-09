@@ -1094,6 +1094,52 @@ The brain's code descriptions describe the main branch. Other branches' changes 
 1. It says `master` doesn't exist, and either asks which branch the root files describe or records `Main branch: main` and says so.
 2. It writes no `pending/main.md`. If it continued, it synced commit B into the root files.
 
+## Brainstorm without assumptions (S61–S63)
+
+The tester stops each run when the agent presents its direction (`brain-brainstorm` §7), before the user confirms it, so `brain-update` never runs. Turn limit: after five follow-ups, the next one is `The user replies: "Stop asking and give me the direction."`
+
+## S61: A new command
+
+- **Fixture:** synced
+- **Skill:** `brain-brainstorm`
+- **Context:** none
+- **Trigger:** The user says: "/brain-brainstorm I want a command that removes a track from a crate."
+- **Follow-ups:** to each question, `The user replies: "Go with your recommendation."` To an offer to stop or move on, `The user replies: "Nothing else. Write it up."`
+
+**Pass criteria**
+
+1. Before the direction, it asks how the command should handle each of these: a title that isn't in the crate; a title that matches more than one track in the crate; what it prints when it succeeds.
+2. Before the direction, it asks whether there is anything else to settle or whether to stop. The user saying stop also satisfies this.
+3. No observable behavior appears in the direction as decided, or as deferred with a chosen default, unless the user answered it. Anything else is listed as an assumption or open decision for the user to confirm.
+
+## S62: A change to existing behavior
+
+- **Fixture:** synced
+- **Skill:** `brain-brainstorm`
+- **Context:** none
+- **Trigger:** The user says: "/brain-brainstorm I want list-crate to show tracks sorted by BPM instead of crate order."
+- **Follow-ups:** as S61.
+
+**Pass criteria**
+
+1. It states the current order with its code location, and notes that `filter` prints through the same function (`_print_tracks`).
+2. Before the direction, it asks whether `filter`'s order should change too, and how to order tracks with equal BPM.
+3. The direction gives each change as current behavior → new behavior, with the reason.
+4. The direction lists the behaviors that stay the same as unchanged, for the user to confirm.
+
+## S63: The user stops the questions
+
+- **Fixture:** synced
+- **Skill:** `brain-brainstorm`
+- **Context:** none
+- **Trigger:** as S61.
+- **Follow-up 1** (to the first questions): `The user replies: "Stop asking questions. Write up the direction with what you have."`
+
+**Pass criteria**
+
+1. It asks nothing more and presents the direction.
+2. Every behavior the user didn't decide, including the questions it had just asked, is listed as open or as an assumption to confirm. None appears as decided, or deferred with a chosen default.
+
 ---
 
 ## Results
@@ -1646,6 +1692,20 @@ After the fixes, one sample each:
 - **S59, S60, S12 and S55: pass.**
 
 The other 14 findings are deferred minors. The largest are what happens after a "keep" answer, a detached `HEAD` check that comes last, and cleanup when a branch is abandoned.
+
+### Brainstorm without assumptions, RED, 2026-11-09
+
+The user asked that `brain-brainstorm` keep asking until it knows exactly what to build, and assume nothing about behavior. These runs used the skill before the change, standard tier, two runs each.
+
+- **S61: failed 2 of 2.** Both asked about a missing track and about duplicate titles. Neither asked what the command prints on success, and neither asked whether there was anything else before writing up. One deferred "an emptied crate stays" to implementation with a default. The other stated non-goals (undo, bulk removal) the user never gave.
+- **S62: failed 2 of 2** (criterion 3). Both found the current order at `store.py` and noted that `filter` shares `_print_tracks`.
+  - Neither gave changes as current → new.
+  - One deferred the tie order with a default.
+  - The other offered it as a default "I'll record" and recorded it as accepted.
+  - One marked "storage unchanged" as Established, from an assumption the user never confirmed.
+- **S63: failed 2 of 2** (criterion 2). Both stopped and left the asked questions open. One deferred the command name and arguments to implementation. The other stated the command name as decided and asserted non-goals. Neither listed the success output as open.
+
+All six finalized as soon as their own decision list was resolved.
 
 ### Counters added to the skill
 
