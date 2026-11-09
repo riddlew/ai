@@ -67,6 +67,7 @@ Then run `/brain-init` once in the project to create its brain.
 ├── planning/            <feature>/INDEX.md and NNN-<slug>.md
 ├── diagnoses/           NN-<slug>.md
 ├── reviews/             architecture/NN-<slug>.md, security/NN-<slug>.md
+├── pending/             <branch>.md: changes waiting for a branch to merge
 └── NN_<topic>/          Detail split out of root file NN_<topic>.md
 ```
 
@@ -76,7 +77,7 @@ Then run `/brain-init` once in the project to create its brain.
 - **Brain elsewhere:** if a skill can't find your brain, run `/brain-init <path to .brain>`. It saves the location as a `Project brain:` line in `CLAUDE.local.md`, Claude Code's personal file for project instructions, and keeps that file out of git through `info/exclude`. Claude Code loads `CLAUDE.local.md` from the working directory and every folder above it. Saved from the main checkout, the line covers the worktrees inside it, such as `.claude/worktrees/`; saved from a linked worktree, it covers only that worktree.
 - **Isolated worktree sessions:** Claude Code sessions isolated in a worktree (`claude --worktree`, `EnterWorktree`, and `brain-implement`'s worktree mode) can read a brain in the main checkout but can't edit it. If you work that way, keep the brain outside the repository (for example `~/brains/<project>/.brain`) and run `/brain-init <that path>` once from the main checkout. For a new project, run `/brain-init` in the main checkout first, then move the folder out.
 
-**Known limit:** an untracked brain is shared by every worktree and branch, but it records a single `Last synced` commit. After syncing from one branch, the brain can describe code that another branch does not have yet; `brain-update` reports this when it notices.
+**Branches:** the root files describe the main branch (`Main branch:` in `00_index.md`), so one shared brain stays true in every worktree. Run `/brain-update` on another branch, and that branch's changes go to `.brain/pending/<branch>.md` instead, while decisions, glossary terms, and open questions still go straight into the root files. After a branch merges, run `/brain-update <branch> merged` on the main branch; it checks each pending entry against the merged code before applying it, and every run starts by listing the pending files, so none are forgotten.
 
 ## Collaboration rules
 
