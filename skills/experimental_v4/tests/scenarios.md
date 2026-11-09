@@ -1707,6 +1707,40 @@ The user asked that `brain-brainstorm` keep asking until it knows exactly what t
 
 All six finalized as soon as their own decision list was resolved.
 
+### Brainstorm without assumptions, GREEN, 2026-11-09
+
+The changes:
+- every observable behavior is a user decision;
+- a "Cover every behavior" checklist, plus current behavior given as evidence with keep-or-change;
+- the "anything else, or write up?" question, with only the user ending the questions;
+- **Changes**, **Unchanged (confirm)** and **Assumptions (confirm)** sections in the direction.
+
+Standard tier.
+
+- **S61: passed 3 of 3.** Every run asked about:
+  - a missing crate and a missing track;
+  - duplicates;
+  - success output;
+  - an emptied crate.
+
+  Each asked "anything else?" before writing up, and listed what stays unchanged and its assumptions for confirmation. One put "exact wording of the error messages" under Deferred to implementation.
+- **S62: passed 3 of 3.**
+  - Each cited the current order (`store.py:68–69`, `cli.py:47–48`) and asked about `filter`, the tie order, and (where it applied) the flag name.
+  - Each gave changes as current → new, and listed `filter`, the output format, missing-crate behavior and storage as unchanged.
+  - Two showed a "Why" on each change. One's reason was only in the decision table.
+- **S63: passed 1 of 2.** Both stopped and defaulted nothing. One had never added rows for success output or an emptied crate before being stopped, so its write-up left them out.
+- **S40 (regression): pass.** No browser offer.
+
+**Refactor:**
+- The behavior rows go in the first table published.
+- The direction's Deferred line takes Deferred rows only; anything observable the user didn't answer goes under Assumptions.
+
+After the refactor:
+- **S63: passed 2 of 2.** Both first tables had rows for success output and an emptied crate, and both write-ups left all of them open.
+- **S61: passed 1 of 1.** It asked through ten decisions, including a confirmation prompt, and its write-up said "Deferred to implementation: none".
+
+The skill grew from 1,249 to about 1,510 words.
+
 ### Counters added to the skill
 
 These come from the baseline failures:
