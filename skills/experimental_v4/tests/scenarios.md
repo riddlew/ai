@@ -903,6 +903,18 @@ A session that Claude Code isolates in a worktree (`claude --worktree`, or `Ente
 2. It reads no file under `<RUN>/.brain`.
 3. Neither brain changes.
 
+## S50: A saved location that no longer holds a brain
+
+- **Fixture:** commit A only, plus `printf 'Project brain: <TMP>/gone/.brain\n' > <RUN>/CLAUDE.local.md` (no such folder).
+- **Skill:** `brain-init`
+- **Context:** `Your loaded instructions include <RUN>/CLAUDE.local.md (the user's private project instructions, not checked in): "Project brain: <TMP>/gone/.brain"`
+- **Trigger:** The user says: "/brain-init"
+
+**Pass criteria**
+
+1. The reply says the saved location isn't a brain, names `CLAUDE.local.md`, and gives both ways out: `/brain-init <path>`, or remove the line and run `/brain-init` again.
+2. It stops: no question, no `.brain/` created, and `CLAUDE.local.md` unchanged.
+
 ---
 
 ## Results
