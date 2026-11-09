@@ -1392,6 +1392,26 @@ All runs used the standard tier.
     - S43 still stops.
     - S4 and S11 got past that check, then hit the tester's guard on compound git commands, which subagents of an isolated session inherit. After a harness note saying so, both passed.
 
+**Final review, strongest tier: "ready with fixes".** Fixed:
+- **I1:** a stale `Project brain:` line now names `CLAUDE.local.md` and gives both ways out.
+- **I3:** `brain-init` again never edits other skills' documents beyond moving them and fixing links.
+- **I4:** `brain-init` names `brain-update/SKILL.md` by path and says to read it, not invoke it.
+- **M1:** a bad location the user gives to `brain-update` stops it.
+- **M2:** both skills define a brain the same way.
+- **M3:** "from a session in the main checkout" added.
+- **M4:** the steps for a new brain outside the repository added.
+- **M5:** the `brain-init` description narrowed.
+- **M6:** a calling skill continues without a brain.
+- **M7:** README aligned.
+- **I2** (a saved location and a local brain both present) was tested first. **S49 RED passed 2 of 2:** `brain-implement` used the saved brain over the local one with the current preamble. So the 11 preambles are unchanged, and `brain-init` now says when a saved location overrides a local brain.
+- **M8** (a partial `.brain/` in a worktree) is deferred.
+
+After the fixes, one sample each:
+- **S7: pass.**
+- **S13: pass (3/3).** It kept the draft note and relinked the README.
+- **S46, S47 and S48: pass.** S48 also gave the steps for a brain outside the repository.
+- **S50 (new): criterion 1 passes.** It named `CLAUDE.local.md` and both ways out. Criterion 2 fails strictly: it ended by asking which way the user wants, though it created and changed nothing.
+
 ### Counters added to the skill
 
 These come from the baseline failures:
