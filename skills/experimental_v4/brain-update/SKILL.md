@@ -17,13 +17,13 @@ description: Use when another skill finishes work that changed project knowledge
 
 ## 1. Find the brain
 
-A brain exists only when `.brain/00_index.md` exists. Look first where the user says it is, or where a `Project brain:` line in your loaded instructions points. Then look at the current worktree root. Inside a linked git worktree, then look in the main checkout: the parent directory of `git rev-parse --path-format=absolute --git-common-dir`. Use the first `.brain/` that has `00_index.md`, and write there. A `.brain/` folder without `00_index.md` (for example, one holding a spec another skill saved) is not a brain.
+A brain is a folder that has `00_index.md`. Look first where the user says it is, or where a `Project brain:` line in your loaded instructions points. Then look at `.brain/` in the current worktree root. Inside a linked git worktree, then look at `.brain/` in the main checkout: the parent directory of `git rev-parse --path-format=absolute --git-common-dir`. Use the first brain you find, and write there. A `.brain/` folder without `00_index.md` (for example, one holding a spec another skill saved) is not a brain.
 
-**No brain.** If none of these has one, change nothing and do nothing else: tell the user no brain was found and that they should run `/brain-init` first, then stop. This holds whether the user or another skill invoked you. If a location the user gave, or a `Project brain:` line, points to a folder without `00_index.md`, say that too.
+If the user gave a location, use it only if it is a brain, and tell them `/brain-init <path>` saves it for later sessions. If it isn't a brain, say so, and stop.
 
-If the user gave a location that holds a brain, use it, and tell them `/brain-init <path>` saves it for later sessions.
+**No brain.** If none of these is a brain, change nothing and do nothing else: tell the user no brain was found and that they should run `/brain-init` first, then stop. This holds whether the user or another skill invoked you; a skill that invoked you continues without a brain. If a `Project brain:` line points to a folder that isn't a brain, say so too, and that `/brain-init <path>` points it at the right folder.
 
-**Isolated worktree sessions.** Claude Code isolates a session in a worktree only when the session was started with `claude --worktree` or entered the worktree you are working in with `EnterWorktree`; a linked worktree alone is not isolation. An isolated session can't edit the main checkout. If this session is isolated, or an edit to the main checkout is refused, and the brain is in the main checkout, say so before investigating, and stop. Don't write the brain anywhere else or through shell commands. Tell the user to run `/brain-update` from a session in the main checkout, or to move the brain outside the repository and run `/brain-init <path>`.
+**Isolated worktree sessions.** Claude Code isolates a session in a worktree only when the session was started with `claude --worktree` or entered the worktree you are working in with `EnterWorktree`; a linked worktree alone is not isolation. An isolated session can't edit the main checkout. If this session is isolated, or an edit to the main checkout is refused, and the brain is in the main checkout, say so before investigating, and stop. Don't write the brain anywhere else or through shell commands. Tell the user to run `/brain-update` from a session in the main checkout, or to move the brain outside the repository and run `/brain-init <path>` from a session in the main checkout.
 
 ## 2. Update
 

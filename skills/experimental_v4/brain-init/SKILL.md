@@ -1,30 +1,31 @@
 ---
 name: brain-init
-description: Use when a project has no .brain/ folder and the user wants one set up, or when the user gives the location of an existing project brain.
+description: Use when the user asks to set up a project brain, or to save where an existing project brain lives.
 ---
 
 # Brain Init
 
-Sets up a project's `.brain/`, or connects the project to an existing one. `brain-update` maintains the brain afterward. Its §3 (root files) and §4 (ADRs) define what goes where, and `${CLAUDE_SKILL_DIR}/../brain-update/references/templates.md` holds the templates. Follow root `CLAUDE.md` for decision authority.
+Sets up a project's `.brain/`, or connects the project to an existing one. `brain-update` maintains the brain afterward. For what goes where, read §3 (root files) and §4 (ADRs) of `${CLAUDE_SKILL_DIR}/../brain-update/SKILL.md`; read the file, don't invoke that skill. The templates are in `${CLAUDE_SKILL_DIR}/../brain-update/references/templates.md`. Follow root `CLAUDE.md` for decision authority.
 
 **Always:**
 
 - Write only inside `.brain/`, plus `info/exclude`, `CLAUDE.local.md` when saving a location (§1), and the approved moves in §2 step 3, including deleting originals and fixing links to them anywhere. Learn facts by reading code and git history. Never run the project's code, tests, or build; a fact that needs an experiment goes in `spikes.md`.
+- Never edit documents other skills own (`specs/`, `tickets/`, `impl_plans/`, `planning/`, `diagnoses/`, `reviews/`) beyond moving them in §2 step 3 and fixing links to moved files.
 - Never stage, commit, or push.
 - Never dispatch subagents unless the user asks.
 - Ask the user one question per message.
 
 ## 1. Start
 
-A brain is a folder that has `00_index.md`.
+A brain is a folder that has `00_index.md`: the folder a `Project brain:` line or the user names, or a `.brain/` folder in the repository.
 
-**The user gave a path.** If that folder, or the `.brain/` inside it, has `00_index.md`, save its location as below, tell the user `/brain-update` syncs it, and stop. Otherwise, say it isn't a project brain, and stop. To save, work from the checkout root (`git rev-parse --show-toplevel`):
+**The user gave a path.** If that folder, or the `.brain/` inside it, has `00_index.md`, save its location as below, tell the user `/brain-update` syncs it, and stop. If a different brain also exists at the worktree root or in the main checkout, say that skills will now use the saved one. Otherwise, say it isn't a project brain, and stop; to keep a new brain outside the repository, run `/brain-init` without a path, move the folder, then run `/brain-init <new path>`. To save, work from the checkout root (`git rev-parse --show-toplevel`):
 
 1. In `CLAUDE.local.md` there, put the line `Project brain: <absolute path of the .brain folder>`. Replace an existing `Project brain:` line and keep the rest of the file. If git tracks `CLAUDE.local.md` (`git ls-files --error-unmatch CLAUDE.local.md` succeeds), don't write it; give the user the line instead.
 2. Unless `git check-ignore -q CLAUDE.local.md` succeeds, append `CLAUDE.local.md` to `info/exclude` under `git rev-parse --git-common-dir`.
 3. Tell the user where you saved it. Claude Code loads `CLAUDE.local.md` from the working directory and every folder above it, so a line saved in the main checkout covers the worktrees inside it, such as `.claude/worktrees/`; a line saved in a linked worktree covers only that worktree.
 
-**No path.** Look where a `Project brain:` line in your loaded instructions points, then at the current worktree root, then, inside a linked git worktree, in the main checkout: the parent directory of `git rev-parse --path-format=absolute --git-common-dir`. If any of them has `00_index.md`, tell the user a brain already exists, say where, and stop. If a `Project brain:` line points to a folder without `00_index.md`, say so, and stop. Otherwise, do the first run (§2).
+**No path.** Look where a `Project brain:` line in your loaded instructions points, then at `.brain/` in the current worktree root, then, inside a linked git worktree, at `.brain/` in the main checkout: the parent directory of `git rev-parse --path-format=absolute --git-common-dir`. If any of them is a brain, tell the user a brain already exists, say where, and stop. If a `Project brain:` line points to a folder that isn't a brain, say so, name the file that holds the line, and stop: `/brain-init <path>` points it at the brain, or the user can remove the line and run `/brain-init` again to create one. Otherwise, do the first run (§2).
 
 **Where the first run creates it.** From a linked git worktree, an untracked brain goes in the main checkout, so every worktree shares it. If the user chooses to track it, or you are not in a linked worktree, it goes at the current worktree root.
 
