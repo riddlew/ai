@@ -72,7 +72,7 @@ mkdir -p <RUN>/.brain/pending && cp T/fixture/pending/feature--cue-points.md <RU
 **merged** — branched+pending, then a squash merge into `main`. `main` does not contain the branch's commits, so ancestry can't show the merge:
 
 ```bash
-cd <RUN> && git checkout -q main && git merge -q --squash feature/cue-points \
+cd <RUN> && git checkout -q main && git -c merge.ff=true merge -q --squash feature/cue-points \
   && git -c user.name=fixture -c user.email=fixture@example.com commit -qm "Add cue points (#12)"
 ```
 
@@ -1530,6 +1530,20 @@ After the fixes, one sample each:
 - **S13: pass (3/3).** It kept the draft note and relinked the README.
 - **S46, S47 and S48: pass.** S48 also gave the steps for a brain outside the repository.
 - **S50 (new): criterion 1 passes.** It named `CLAUDE.local.md` and both ways out. Criterion 2 fails strictly: it ended by asking which way the user wants, though it created and changed nothing.
+
+### Pending brain changes, RED, 2026-11-08
+
+These runs used the skills before the change and the standard tier. They were started from a session that wasn't isolated in a worktree, so test agents didn't inherit the tester's git guard.
+
+- **S51: failed 3 of 3.** On `feature/cue-points`, each run synced the branch into `02_features.md` and `04_data_model.md` as fact. Each set `Last synced` to `<B>`, wrote no pending file and no `Main branch:` line, and marked cue points done. Criterion 3 passed: each recorded seconds-as-floats in `09`.
+- **S52: criterion 1 failed 3 of 3.** No run listed pending changes at the start. All three left the unmerged pending file alone, synced `--version`, and set `Last synced` to `HEAD`.
+- **S53: failed 3 of 3** (criteria 2 and 3). Without any skill text for it, each run applied the pending notes after checking them against the merged code, and left out `position_ms`. But none asked whether to keep or drop the unconfirmed entry, and none deleted the pending file ("can be deleted").
+- **S57: criterion 1 failed 3 of 3.** Two runs took "merged" at its word on the feature branch and synced it into the root files. One asked whether to sync the branch "as though it has landed".
+- **S54: failed criterion 1.** There was no reminder, and the run never checked whether `old-idea` exists. It kept the file.
+- **S55 and S11: failed.** On a feature branch, `brain-init` started a first run and asked the git-tracking question.
+- **S56: passed.** `brain-implement` read `pending/feature--cue-points.md` with the current preamble. Task 5 (the preamble line) is skipped.
+- **S4 (revised): failed criterion 2.** On `wt`, it synced `--version` into `02_features.md` as "not merged" and set `Last synced` to the `wt` commit.
+- **S12 (revised): failed criterion 2.** It noticed the sync came from a commit only on `wt`, but kept `--version` in `02_features.md`, labelled, instead of moving it to `pending/wt.md`.
 
 ### Counters added to the skill
 
