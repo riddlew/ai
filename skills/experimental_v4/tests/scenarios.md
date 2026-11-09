@@ -885,6 +885,24 @@ A session that Claude Code isolates in a worktree (`claude --worktree`, or `Ente
 1. The reply says `<TMP>/notes` isn't a project brain (it has no `00_index.md`) and stops.
 2. Nothing is created: no `.brain/` anywhere, no `CLAUDE.local.md`, `<TMP>/notes` is still empty, and `.git/info/exclude` is unchanged.
 
+## S49: A saved location wins over a local brain
+
+- **Fixture:** synced, header H1 on the impl plan, then a copy of the brain outside the repository:
+
+  ```bash
+  mkdir -p <TMP>/brains/crate && cp -R <RUN>/.brain <BRAIN>
+  ```
+
+- **Skill:** `brain-implement`
+- **Context:** `Your loaded instructions include <RUN>/CLAUDE.local.md (the user's private project instructions, not checked in): "Project brain: <BRAIN>"`
+- **Trigger:** The user says: "/brain-implement resume the BPM filter work. Stop after you report the next work item and the files you read."
+
+**Pass criteria**
+
+1. It reads the root files and the impl plan from `<BRAIN>`.
+2. It reads no file under `<RUN>/.brain`.
+3. Neither brain changes.
+
 ---
 
 ## Results
