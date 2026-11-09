@@ -25,7 +25,7 @@ Statuses:
 - **Established** — decided by the user or an applicable project record. Resolution states the choice, its essential rationale, and its source.
 - **Investigate** — a fact answerable from the repository, documentation, tooling, or an experiment.
 - **User decision** — a consequential choice about requirements, behavior, tradeoffs, or architecture.
-- **Deferred** — a routine, reversible implementation detail left to implementation.
+- **Deferred** — an internal detail no user of the software can observe, left to implementation.
 
 Mark assumptions as unverified until investigated or accepted. Do not convert your own preferences into requirements.
 
@@ -33,6 +33,7 @@ Mark assumptions as unverified until investigated or accepted. Do not convert yo
 
 A question is a **User decision** when its answer could materially change:
 
+- anything a user of the software can observe: names, arguments, defaults, output, messages, exit codes, ordering, limits, and edge cases;
 - required behavior, scope, user experience, or failure semantics;
 - component responsibilities, ownership, or lifecycle;
 - state management, concurrency, persistence, or public contracts;
@@ -41,7 +42,19 @@ A question is a **User decision** when its answer could materially change:
 
 A proposal to introduce a manager, service, layer, or other component that takes over an existing responsibility is an architectural decision, not a routine detail.
 
-Mark ordinary method boundaries, naming, local helpers, and speculative extension points as **Deferred** rather than asking about them.
+Mark internal method boundaries, code names, and local helpers as **Deferred**. Don't raise speculative extension points. Scope comes from the user: ask about a scope edge rather than stating a non-goal they didn't give.
+
+### Cover every behavior
+
+For each behavior the change adds or touches, add a row for each of these and settle it with the user:
+
+- how it is invoked: names, arguments, options, defaults;
+- what it produces when it succeeds;
+- each failure: missing, invalid, or ambiguous input, and what is left unchanged when it fails;
+- boundaries: empty, one, many, duplicates, limits;
+- existing behavior that shares its code or data.
+
+The code tells you what is, never what should be. For behavior that exists today, state what it does and where (`file:line`), then ask whether to keep or change it.
 
 ## 3. Investigate facts yourself
 
@@ -104,7 +117,7 @@ Update the table: an answer may resolve or eliminate decisions, add new ones, or
 
 Publish the decision table **at most once per response**, and only when something changed since the last published table. Show the rows that changed.
 
-Stop asking when every consequential decision needed for the next stage is **Established**. Do not prolong the discussion to settle **Deferred** details or hypothetical future requirements.
+When every row is **Established** or **Deferred**, ask: "Is there anything else about how this should behave, or should I write up the direction?" Keep asking until the user says to write it up. If the user tells you to stop earlier, stop: each unanswered question stays an open decision, never a default. Don't settle **Deferred** details or hypothetical future requirements.
 
 ## 7. Confirm the direction
 
@@ -114,7 +127,14 @@ Present the final summary in this format, which `brain-write-spec` consumes:
 ## Direction: <feature>
 
 **Behavior and scope:** <intended behavior and what is in scope>
-**Non-goals:** <explicit exclusions>
+**Non-goals:** <exclusions the user stated, or "None stated">
+
+### Changes
+
+- <behavior>: <current behavior with `file:line`, or "new"> → <new behavior>. Why: <the user's reason, or the requirement it serves>
+
+**Unchanged (confirm):** <existing behaviors the change touches or sits next to that stay as they are>
+**Assumptions (confirm):** <everything in this direction the user didn't answer, or "None">
 
 ### Decisions
 
@@ -127,6 +147,6 @@ Present the final summary in this format, which `brain-write-spec` consumes:
 **Deferred to implementation:** <Deferred rows, or "None">
 ```
 
-Ask the user to confirm the direction before treating it as established. If it was already confirmed in the discussion, do not ask again. Do not begin implementation without authorization.
+Ask the user to confirm the direction, including each **Unchanged** and **Assumptions** line, before treating it as established. If it was already confirmed in the discussion, do not ask again. Do not begin implementation without authorization.
 
 Once the user confirms the direction, it is established. Then invoke `brain-update` with a one-line summary of what changed.
