@@ -5,7 +5,7 @@ description: Use when the user asks to set up a project brain, or to save where 
 
 # Brain Init
 
-Sets up a project's `.brain/`, or connects the project to an existing one. `brain-update` maintains the brain afterward. For what goes where, read §3 (root files) and §4 (ADRs) of `${CLAUDE_SKILL_DIR}/../brain-update/SKILL.md`; read the file, don't invoke that skill. The templates are in `${CLAUDE_SKILL_DIR}/../brain-update/references/templates.md`. Follow root `CLAUDE.md` for decision authority.
+Sets up a project's `.brain/`, or connects the project to an existing one. `brain-update` maintains the brain afterward. For what goes where, read §4 (root files) and §5 (ADRs) of `${CLAUDE_SKILL_DIR}/../brain-update/SKILL.md`; read the file, don't invoke that skill. The templates are in `${CLAUDE_SKILL_DIR}/../brain-update/references/templates.md`. Follow root `CLAUDE.md` for decision authority.
 
 **Always:**
 
@@ -25,7 +25,7 @@ A brain is a folder that has `00_index.md`: the folder a `Project brain:` line o
 2. Unless `git check-ignore -q CLAUDE.local.md` succeeds, append `CLAUDE.local.md` to `info/exclude` under `git rev-parse --git-common-dir`.
 3. Tell the user where you saved it. Claude Code loads `CLAUDE.local.md` from the working directory and every folder above it, so a line saved in the main checkout covers the worktrees inside it, such as `.claude/worktrees/`; a line saved in a linked worktree covers only that worktree.
 
-**No path.** Look where a `Project brain:` line in your loaded instructions points, then at `.brain/` in the current worktree root, then, inside a linked git worktree, at `.brain/` in the main checkout: the parent directory of `git rev-parse --path-format=absolute --git-common-dir`. If any of them is a brain, tell the user a brain already exists, say where, and stop. If a `Project brain:` line points to a folder that isn't a brain, say so, name the file that holds the line, and stop: `/brain-init <path>` points it at the brain, or the user can remove the line and run `/brain-init` again to create one. Otherwise, do the first run (§2).
+**No path.** Look where a `Project brain:` line in your loaded instructions points, then at `.brain/` in the current worktree root, then, inside a linked git worktree, at `.brain/` in the main checkout: the parent directory of `git rev-parse --path-format=absolute --git-common-dir`. If any of them is a brain, tell the user a brain already exists, say where, and stop. If a `Project brain:` line points to a folder that isn't a brain, say so, name the file that holds the line, and stop: `/brain-init <path>` points it at the brain, or the user can remove the line and run `/brain-init` again to create one. Otherwise, check the branch before the first run: the brain describes the main branch, which is `git symbolic-ref --short refs/remotes/origin/HEAD` without the `origin/` prefix, or the current branch if that fails. If `git branch --show-current` is another branch, or `HEAD` is detached, say so, tell the user to run `/brain-init` from a checkout of the main branch, and stop. Otherwise, do the first run (§2).
 
 **Where the first run creates it.** From a linked git worktree, an untracked brain goes in the main checkout, so every worktree shares it. If the user chooses to track it, or you are not in a linked worktree, it goes at the current worktree root.
 
@@ -63,5 +63,5 @@ Take these steps in order.
    - decisions already made.
 
    Keep asking until every applicable root file can be written without guessing. When the user doesn't know, record the question in `open_questions.md` and move on. Never ask process questions this skill answers: the file layout, where something is recorded, or how `.brain` is ignored.
-5. **Write the brain.** Create the applicable root files (`brain-update` §3) from the templates. Leave out a root file that doesn't apply, and list it in `00_index.md` as "not applicable: <reason>"; never write a placeholder file. Record decisions the user already made in `09_user_decisions.md`, with an ADR only when one qualifies (`brain-update` §4). Planned integrations whose behavior is unverified (file formats, SDKs, OS APIs) go in `spikes.md`. Set `Last synced` to the full 40-character `HEAD` sha.
+5. **Write the brain.** Create the applicable root files (`brain-update` §4) from the templates. Leave out a root file that doesn't apply, and list it in `00_index.md` as "not applicable: <reason>"; never write a placeholder file. Record decisions the user already made in `09_user_decisions.md`, with an ADR only when one qualifies (`brain-update` §5). Planned integrations whose behavior is unverified (file formats, SDKs, OS APIs) go in `spikes.md`. Set `Last synced` to the full 40-character `HEAD` sha, and `Main branch:` to the main branch.
 6. **Report** what you created and moved, then list the open questions and unverified assumptions.
