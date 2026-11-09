@@ -24,7 +24,7 @@ Use the wrapper in `scenarios.md`, with these changes:
 
 - `<ABS v4>` means `<RUN>`.
 - `<GUIDANCE>` starts with two lines for every run, red or green:
-  - `Your user-level CLAUDE.md is <RUN>/CLAUDE.md. Read it first and treat it as loaded instructions.`
+  - `Your CLAUDE.local.md is <RUN>/CLAUDE.local.md. Read it first and treat it as loaded instructions.`
   - `Use only the skills named here; don't invoke other installed skills or plugins.` This stops an installed skill-writing plugin from standing in for the skill under test.
 - Red runs add no skill line.
 - Green runs add: `You have the skill brain-test-skill. Read <RUN>/brain-test-skill/SKILL.md and follow it. ${CLAUDE_SKILL_DIR} means <RUN>/brain-test-skill. Skills it mentions live in <RUN>/.`
@@ -110,7 +110,7 @@ Standard-tier agents under test. Runs were built in `mktemp -d` directories.
 The strongest-tier review returned "ready with fixes". Changes:
 
 - **Samples:** saying a rule holds or fails needs three or more samples of its scenario, with the split reported. Regression reruns may use one sample.
-- **Recording:** results go into the scenarios file only when a skill changed. For a test only, they stay in the conversation and the agent offers to record them (root `CLAUDE.md`).
+- **Recording:** results go into the scenarios file only when a skill changed. For a test only, they stay in the conversation and the agent offers to record them (`CLAUDE.local.md`).
 - **Leaks:** a run whose file list shows it read the scenarios file, or another run's folder, is void and is rerun.
 - **Skill mentions:** test agents may use the skills that the named skill mentions.
 - **Description:** narrowed to requests to test and to changes in behavior. A change that can't alter behavior (a heading, a typo) needs no run.

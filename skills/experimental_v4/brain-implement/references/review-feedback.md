@@ -7,7 +7,7 @@ Use these rules for every review finding, whether you are the main session or an
 3. Decide per finding:
    - Correct: fix it.
    - Wrong: push back with evidence, such as `file:line` or test output.
-   - Unclear: ask the reviewer. If the answer is consequential under the root `CLAUDE.md`, ask the user.
+   - Unclear: ask the reviewer. If the answer is consequential under `CLAUDE.local.md`, ask the user.
 4. Skip performative agreement. Do not write "you're right", "great catch", or similar before verifying. State what changed, or why nothing did.
 5. Apply YAGNI. Before adding a capability a reviewer suggests, check that a requirement or real use needs it. If none does, say so and leave it out.
 6. Fix in severity order, Critical first. Rerun the covering tests after each fix. For behavior fixes, write the failing test first.

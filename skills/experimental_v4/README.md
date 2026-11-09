@@ -6,11 +6,11 @@ The skills are **tools to use when needed**, not a mandatory pipeline. Small cha
 
 ## Install
 
-Copy `CLAUDE.md` to the root of your project and copy each skill directory into the project's `.claude/skills/` directory:
+Copy `CLAUDE.local.md` to the root of your project and copy each skill directory into the project's `.claude/skills/` directory:
 
 ```text
 project/
-├── CLAUDE.md
+├── CLAUDE.local.md
 └── .claude/
     └── skills/
         ├── brain-brainstorm/            # SKILL.md + lenses/ + references/ + scripts/
@@ -30,7 +30,7 @@ project/
         └── brain-write-tickets/
 ```
 
-Merge `CLAUDE.md` with any existing root instructions rather than replacing project-specific guidance.
+`CLAUDE.local.md` holds the brain skills' instructions, so the project's own `CLAUDE.md` stays about the project. It is your personal file: add `CLAUDE.local.md` to `.git/info/exclude` unless git already ignores it. If the project already has one, merge into it; `/brain-init` also saves its `Project brain:` line there. Claude Code loads it from the working directory and every folder above it, so worktrees inside the checkout, such as `.claude/worktrees/`, use it too.
 
 `brain-brainstorm/scripts/` is an optional browser companion for mockups. It needs Node.js, has no npm dependencies, and makes no network request beyond localhost. It is adapted from obra/superpowers (MIT; see `scripts/LICENSE` and `scripts/README.md`).
 
@@ -81,7 +81,7 @@ Then run `/brain-init` once in the project to create its brain.
 
 ## Collaboration rules
 
-Root [`CLAUDE.md`](CLAUDE.md) contains the shared decision policy, which the skills reference instead of restating:
+[`CLAUDE.local.md`](CLAUDE.local.md) contains the decision policy, which the skills reference instead of restating:
 
 - **Investigate facts independently.** Read code, tests, configuration, documentation, and the brain rather than asking questions the repository can answer.
 - **Respect established decisions.** Follow approved specifications, architectural decisions, ADRs, and the decisions recorded in `.brain/09_user_decisions.md`.
@@ -92,7 +92,7 @@ For example, a request to extend communication in an existing `Session` does not
 
 ## Model tiers
 
-Skills refer to a "standard tier" and a "strongest tier". Root [`CLAUDE.md`](CLAUDE.md) maps tiers to models in one table, which is the only place to change them. At skill start, Claude suggests a `/model` switch once, and only on a clear mismatch.
+Skills refer to a "standard tier" and a "strongest tier". [`CLAUDE.local.md`](CLAUDE.local.md) maps tiers to models in one table, which is the only place to change them. At skill start, Claude suggests a `/model` switch once, and only on a clear mismatch.
 
 ## Skills
 

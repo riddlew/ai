@@ -7,7 +7,7 @@ Use this when a failure crosses components, or an error surfaces deep in a call 
 1. Find the immediate cause: the line that fails and the value it received.
 2. Ask what called it, and with what value.
 3. Keep going up the callers, checking the value at each step, until you reach the original trigger: the place where the bad value, state, or configuration first appears.
-4. Fix at the source. Patching the symptom further down leaves the origin free to cause the next failure. If that fix changes input validation, error behavior, or stored data, consult the user first (root `CLAUDE.md`).
+4. Fix at the source. Patching the symptom further down leaves the origin free to cause the next failure. If that fix changes input validation, error behavior, or stored data, consult the user first (`CLAUDE.local.md`).
 
 If you cannot trace by reading, add observation (below) rather than guessing. Record each step with its source location so the chain is checkable.
 

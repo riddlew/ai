@@ -7,7 +7,7 @@ description: Test whether a skill changes what an agent does, by running it on s
 
 A skill is tested by running it. A test is a fresh agent, a throwaway fixture, a trigger, and pass criteria checked against what the agent did: its replies, the files, the git state. Reading the skill finds wording gaps; that is a review. Never report a reading as a test result, and never conclude from one that a rule "holds".
 
-Follow root `CLAUDE.md` for decisions requiring consultation. This skill dispatches test agents; it changes no skill text unless the user asked for a change.
+Follow `CLAUDE.local.md` for decisions requiring consultation. This skill dispatches test agents; it changes no skill text unless the user asked for a change.
 
 ## 1. Define the test
 
@@ -30,7 +30,7 @@ Use `${CLAUDE_SKILL_DIR}/references/scenario-format.md` for the scenario fields,
 
 ## 3. Run
 
-- Dispatch one fresh subagent per run, and name its model explicitly. Use the tier of the role being tested in root `CLAUDE.md`; standard unless the table maps that role to strongest.
+- Dispatch one fresh subagent per run, and name its model explicitly. Use the tier of the role being tested in `CLAUDE.local.md`; standard unless the table maps that role to strongest.
 - Tell the test agent to use only the skills named in its prompt and the skills they mention, so another installed skill can't stand in for the one under test.
 - Send follow-up turns to the same agent, prefixed `The user replies:`.
 - Run RED before GREEN, and before any edit to the skill under test.

@@ -7,7 +7,7 @@ description: Investigate software failures through observable evidence and discr
 
 **Project brain:** If `.brain/00_index.md` exists (at this worktree's root, or in the main checkout when working in a linked git worktree) and you have not read its root files in this session (or they were lost to context compaction), read every root `.md` file in that `.brain/` now. On a branch other than the brain's `Main branch:`, also read `pending/<branch>.md` (a `/` in the branch name is written `--`) when it exists. Read subfolders only when a root file links to them or the task needs them. Do not load `.brain` into subagents wholesale; pass only what their task needs. Write any `.brain/` document into that same `.brain/`. If no brain exists, proceed without one and mention once that `/brain-init` can create it.
 
-Find the cause of a failure before choosing a correction. Follow root `CLAUDE.md` for decisions requiring consultation.
+Find the cause of a failure before choosing a correction. Follow `CLAUDE.local.md` for decisions requiring consultation.
 
 Diagnosis is not authorization to repair. When the user asks for diagnosis only, note `git status` first and change no source code. When the user authorizes a fix, routine bounded repair is authorized; consequential scope, behavior, or architectural changes still need a decision.
 
@@ -48,7 +48,7 @@ If the repair would change product or error semantics, state or connection owner
    For a cause directly proven in §2, this reproduction is enough before the fix; if that fix fails, it is attempt 1.
 3. Make the smallest coherent change the diagnosed cause supports. Fix the bad value at its source, not where the error surfaces. If the user asks for a cast or conversion at the failing line, say it is a symptom patch, name the source, and apply it only after they confirm.
 4. Rerun the reproduction, plus adjacent tests and static checks; add a focused regression test when practical, or say why not. Inspect the diff for unrelated edits, duplicated ownership, accidental API changes, and needless abstractions.
-5. Apply the three-failed-fixes rule. Count fix attempts per symptom; investigating between attempts does not reset the count. A fix fails when verification fails or it reveals a new problem elsewhere. After three failures, stop. Report the pattern (suggesting a design problem, not a missing patch) and consult the user under root `CLAUDE.md` before a fourth attempt.
+5. Apply the three-failed-fixes rule. Count fix attempts per symptom; investigating between attempts does not reset the count. A fix fails when verification fails or it reveals a new problem elsewhere. After three failures, stop. Report the pattern (suggesting a design problem, not a missing patch) and consult the user under `CLAUDE.local.md` before a fourth attempt.
 
 If verification fails, return to investigation instead of adding speculative patches.
 

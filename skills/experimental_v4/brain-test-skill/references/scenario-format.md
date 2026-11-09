@@ -21,7 +21,7 @@
 
 ```
 You are an AI coding assistant working in the project at <FIXTURE>. Run every command from that directory.
-Your user-level CLAUDE.md is <CLAUDE.md path>. Read it first and treat it as loaded instructions.
+Your `CLAUDE.local.md` is <CLAUDE.local.md path>. Read it first and treat it as loaded instructions.
 Use only the skills named here and the skills they mention; don't invoke other installed skills or plugins.
 <SKILL LINE>
 <CONTEXT>

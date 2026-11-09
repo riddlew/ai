@@ -13,7 +13,7 @@ Choose only the layers that would have caught this particular bug. Naming all fo
 
 ## Opt-in only
 
-Hardening adds code, behavior, and maintenance that the bug fix did not require. Root `CLAUDE.md` prefers the smallest coherent solution, and new validation can change error behavior or contracts.
+Hardening adds code, behavior, and maintenance that the bug fix did not require. `CLAUDE.local.md` prefers the smallest coherent solution, and new validation can change error behavior or contracts.
 
 - Never apply hardening unasked.
 - Propose it in the report as `Optional hardening (not applied):`, naming each layer, where it would go, and what it would have caught.

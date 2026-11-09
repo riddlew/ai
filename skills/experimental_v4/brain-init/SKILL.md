@@ -5,7 +5,7 @@ description: Use when the user asks to set up a project brain, or to save where 
 
 # Brain Init
 
-Sets up a project's `.brain/`, or connects the project to an existing one. `brain-update` maintains the brain afterward. For what goes where, read §4 (root files) and §5 (ADRs) of `${CLAUDE_SKILL_DIR}/../brain-update/SKILL.md`; read the file, don't invoke that skill. The templates are in `${CLAUDE_SKILL_DIR}/../brain-update/references/templates.md`. Follow root `CLAUDE.md` for decision authority.
+Sets up a project's `.brain/`, or connects the project to an existing one. `brain-update` maintains the brain afterward. For what goes where, read §4 (root files) and §5 (ADRs) of `${CLAUDE_SKILL_DIR}/../brain-update/SKILL.md`; read the file, don't invoke that skill. The templates are in `${CLAUDE_SKILL_DIR}/../brain-update/references/templates.md`. Follow `CLAUDE.local.md` for decision authority.
 
 **Always:**
 

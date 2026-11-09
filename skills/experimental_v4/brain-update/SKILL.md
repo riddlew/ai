@@ -5,7 +5,7 @@ description: Use when another skill finishes work that changed project knowledge
 
 # Brain Update
 
-`.brain/` is the project's central memory: what the project is, how it is built, what the user decided, what is open, and what is done. `brain-init` creates it. After that, this skill is the only writer of the root files and `adrs/`. Other skills write their own documents into `.brain/` subfolders, then invoke this skill. Follow root `CLAUDE.md` for decision authority.
+`.brain/` is the project's central memory: what the project is, how it is built, what the user decided, what is open, and what is done. `brain-init` creates it. After that, this skill is the only writer of the root files and `adrs/`. Other skills write their own documents into `.brain/` subfolders, then invoke this skill. Follow `CLAUDE.local.md` for decision authority.
 
 **Always:**
 

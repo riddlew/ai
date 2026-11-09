@@ -7,7 +7,7 @@ description: Decompose an approved specification, plan, or discussion into small
 
 **Project brain:** If `.brain/00_index.md` exists (at this worktree's root, or in the main checkout when working in a linked git worktree) and you have not read its root files in this session (or they were lost to context compaction), read every root `.md` file in that `.brain/` now. On a branch other than the brain's `Main branch:`, also read `pending/<branch>.md` (a `/` in the branch name is written `--`) when it exists. Read subfolders only when a root file links to them or the task needs them. Do not load `.brain` into subagents wholesale; pass only what their task needs. Write any `.brain/` document into that same `.brain/`. If no brain exists, proceed without one and mention once that `/brain-init` can create it.
 
-Convert established requirements into the **smallest practical set of independently verifiable delivery increments**. Follow root `CLAUDE.md`: tickets describe authorized outcomes and cannot settle unresolved behavior or approve a redesign.
+Convert established requirements into the **smallest practical set of independently verifiable delivery increments**. Follow `CLAUDE.local.md`: tickets describe authorized outcomes and cannot settle unresolved behavior or approve a redesign.
 
 Use this skill only when the user requests tickets or a long-running workflow delegates ticket generation. If one ticket would merely restate the specification, recommend implementing from the specification directly.
 

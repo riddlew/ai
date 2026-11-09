@@ -30,4 +30,4 @@ Follow `${CLAUDE_SKILL_DIR}/../brain-review-code/references/builder-review.md`, 
 - `{artifact}` is the absolute path of the impl plan file.
 - `{sources}` is the spec and tickets, or the governing request recorded in the plan when neither exists.
 - Questions only the user can answer join the startup-question message. Unanswered ones become Blockers.
-- When the user answers a blocked RF's decision, record it where root `CLAUDE.md` says (the governing spec or `09_user_decisions.md`), rewrite the line as `RF<n>: <case> — tested in <work item>`, and remove it from Blockers.
+- When the user answers a blocked RF's decision, record it where `CLAUDE.local.md` says (the governing spec or `09_user_decisions.md`), rewrite the line as `RF<n>: <case> — tested in <work item>`, and remove it from Blockers.
