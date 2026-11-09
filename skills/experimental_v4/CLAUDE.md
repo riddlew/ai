@@ -67,7 +67,7 @@ Rules:
 - Implement incrementally, verify observable behavior, and keep changes within scope. Do not introduce a new architecture merely to make a test convenient.
 - Treat reviews and research as evidence and proposals, not as authority to expand scope or change approved decisions.
 - Keep process proportional: routine changes may be implemented and verified directly; substantial features may need specs; long-running work may need planning and tickets.
-- `.brain/` is the project's single document store. `brain-update` owns its root files and `adrs/`; other skills write only their own documents into its subfolders, then invoke `brain-update`.
+- `.brain/` is the project's single document store. `brain-init` creates it; after that, `brain-update` owns its root files and `adrs/`; other skills write only their own documents into its subfolders, then invoke `brain-update`.
 - Deliver review and diagnosis results in the conversation unless the user requests a saved record.
 - Record **approved** durable decisions through the project's existing documentation conventions when justified; do not turn unapproved recommendations into ADRs.
 - Impl plans in `.brain/impl_plans/` and the descriptive `.brain` root files (`01`–`08`, `state.md`) are **continuity aids** that summarize other sources. Verify them against current code and tests; they never override specifications, ADRs, or recorded decisions. `.brain/09_user_decisions.md` is itself an authority on intent, alongside specifications and ADRs, and `.brain/glossary.md` is the authority on terminology. Record approved consequential changes in the governing specification, ADR, or `09_user_decisions.md` first.
