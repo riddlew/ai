@@ -95,9 +95,12 @@ Follow-up turns go to the same subagent through SendMessage, prefixed `The user 
 
 ## S1: First run
 
+S1–S14 run `brain-update` unless a scenario names another skill. First runs (S1, S7, S11, S13) run `brain-init`.
+
 - **Fixture:** fresh
+- **Skill:** `brain-init`
 - **Context:** none
-- **Trigger:** The user says: "/brain-update"
+- **Trigger:** The user says: "/brain-init"
 - **Answers, in order:**
   1. To the git-tracking question: `No, don't track it.`
   2. To the move proposal: `Move them.`
@@ -167,7 +170,7 @@ Follow-up turns go to the same subagent through SendMessage, prefixed `The user 
 **Pass criteria**
 
 1. No root `.md` file is created in `.brain/`.
-2. The reply says no brain exists and that `/brain-update` sets one up.
+2. The reply says no brain exists and that `/brain-init` sets one up.
 3. `.brain/specs/01-bpm-filter.md` is unchanged.
 
 ## S4: Worktree
@@ -224,8 +227,9 @@ Follow-up turns go to the same subagent through SendMessage, prefixed `The user 
 ## S7: Partial folder, first run
 
 - **Fixture:** partial
+- **Skill:** `brain-init`
 - **Context:** none
-- **Trigger:** The user says: "/brain-update"
+- **Trigger:** The user says: "/brain-init"
 
 **Pass criteria** (turn 1)
 
@@ -299,7 +303,8 @@ Follow-up turns go to the same subagent through SendMessage, prefixed `The user 
 ## S11: First run from a worktree (review I1)
 
 - **Fixture:** commit A only (no legacy docs), plus `git worktree add <RUN>-wt -b wt`. `<FIXTURE>` is `<RUN>-wt`.
-- **Trigger:** The user says: "/brain-update"
+- **Skill:** `brain-init`
+- **Trigger:** The user says: "/brain-init"
 - **Answers:**
   1. To the git-tracking question: `No, don't track it.`
   2. Then: `I don't know yet; record everything else as open and create the brain now.`
@@ -331,7 +336,8 @@ Follow-up turns go to the same subagent through SendMessage, prefixed `The user 
   After commit A:
   - copy `docs/specs/01-bpm-filter.md` to `.brain/specs/`;
   - append `Draft note: E3 pending.` to the copy.
-- **Trigger:** The user says: "/brain-update"
+- **Skill:** `brain-init`
+- **Trigger:** The user says: "/brain-init"
 - **Answers:**
   1. `No, don't track it.`
   2. `Move them.`
@@ -754,13 +760,13 @@ Claude Code loads `CLAUDE.local.md` as the user's private project instructions. 
   ```
 
   `<FIXTURE>` is `<RUN>-wt`.
-- **Skill:** `brain-update`
+- **Skill:** `brain-init`
 - **Context:** `Your loaded instructions include <RUN>-wt/CLAUDE.local.md (the user's private project instructions, not checked in): "Use British spelling in documentation."`
-- **Trigger:** The user says: "/brain-update The brain is at <BRAIN>."
+- **Trigger:** The user says: "/brain-init <BRAIN>"
 
 **Pass criteria**
 
-1. It updated `<BRAIN>`: `00_index.md` has `Last synced: <B>`, and `02_features.md` describes `cue add`.
+1. `<BRAIN>` is unchanged (`00_index.md` still has `Last synced: <A>`).
 2. No `.brain/` exists in `<RUN>` or `<RUN>-wt`.
 3. `<RUN>-wt/CLAUDE.local.md` has exactly one line giving `<BRAIN>` (absolute) as the brain's location, and still has the British-spelling line.
 4. `git -C <RUN>-wt status --porcelain` doesn't list `CLAUDE.local.md`, and `<RUN>/.git/info/exclude` still lists `.brain/`.
@@ -794,13 +800,13 @@ A session that Claude Code isolates in a worktree (`claude --worktree`, or `Ente
 ## S43: First run from an isolated worktree
 
 - **Fixture:** commit A only, plus `git worktree add <RUN>-wt -b wt`. `<FIXTURE>` is `<RUN>-wt`.
-- **Skill:** `brain-update`
+- **Skill:** `brain-init`
 - **Context:** `Claude Code has isolated this session in the worktree <RUN>-wt. It refuses Edit and Write calls that target files in the main checkout, <RUN>.`
-- **Trigger:** The user says: "/brain-update"
+- **Trigger:** The user says: "/brain-init"
 
 **Pass criteria**
 
-1. The first reply says the brain can't be written to the main checkout from this session. It names both ways forward: run `/brain-update` from a session in the main checkout, or move the brain outside the repository and give its location.
+1. The first reply says the brain can't be created in the main checkout from this session, and tells the user to run `/brain-init` from a session in the main checkout.
 2. No `.brain/` exists in `<RUN>` or `<RUN>-wt`.
 3. It writes no brain files anywhere else, by any tool.
 
@@ -839,6 +845,45 @@ A session that Claude Code isolates in a worktree (`claude --worktree`, or `Ente
 2. The conflict between "up to 5 times" and the default of 3 is kept or flagged, not silently resolved.
 3. How a call is retried (the attempt count, backoff, jitter, and which errors are retried) is stated together, in one section or one list.
 4. There's no TL;DR or summary section and no added risks or recommendations, and `docs/retry-design.md` is unchanged.
+
+## Separate init and update (S46–S48)
+
+## S46: `/brain-update` with no brain
+
+- **Fixture:** commit A only.
+- **Skill:** `brain-update`
+- **Context:** none
+- **Trigger:** The user says: "/brain-update"
+
+**Pass criteria**
+
+1. The reply says no brain was found and tells the user to run `/brain-init` first.
+2. It asks no question and stops: no `.brain/` exists, and `.git/info/exclude` is unchanged.
+3. It doesn't investigate the project: no reads of `README.md`, `crate/`, or `tests/`.
+
+## S47: `/brain-init` with a brain already present
+
+- **Fixture:** synced.
+- **Skill:** `brain-init`
+- **Context:** none
+- **Trigger:** The user says: "/brain-init"
+
+**Pass criteria**
+
+1. The reply says a brain already exists, says where, and stops without asking a question.
+2. `.brain/` is unchanged: `00_index.md` still has `Last synced: <A>`, and no file in it is added or modified.
+
+## S48: `/brain-init` with a path that isn't a brain
+
+- **Fixture:** commit A only, plus an empty folder `<TMP>/notes`.
+- **Skill:** `brain-init`
+- **Context:** none
+- **Trigger:** The user says: "/brain-init <TMP>/notes"
+
+**Pass criteria**
+
+1. The reply says `<TMP>/notes` isn't a project brain (it has no `00_index.md`) and stops.
+2. Nothing is created: no `.brain/` anywhere, no `CLAUDE.local.md`, `<TMP>/notes` is still empty, and `.git/info/exclude` is unchanged.
 
 ---
 
