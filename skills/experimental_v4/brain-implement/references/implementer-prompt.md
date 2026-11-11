@@ -30,7 +30,7 @@ Code locations:
 
 ## Rules
 
-- Work test-first. For each behavior, write the test, run it, and confirm it fails for the intended reason before changing code.
+- Work test-first when a reliable test surface exists. For each behavior, write the test, run it, and confirm it fails for the intended reason before changing code. Otherwise use the strongest practical alternative verification and disclose the limitation; do not invent red-green evidence.
 - Make the smallest change within existing ownership.
 - Do not commit, stage, or switch branches.
 - Never delete, revert, stash, or overwrite files or changes this task did not make. If a finding asks for that, push back.
@@ -42,7 +42,7 @@ Code locations:
 
 The first line is exactly one of `DONE`, `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT`, `BLOCKED`. Then:
 
-1. The test commands run and the relevant output (red and green), or why tests could not run.
+1. The test commands run and relevant output (red and green), or the alternative verification used and why tests were inapplicable.
 2. The files changed.
 3. Any concerns.
 

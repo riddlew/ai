@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Review Merge Request
 
-**Project brain:** If `.brain/00_index.md` exists (at this worktree's root, or in the main checkout when working in a linked git worktree) and you have not read its root files in this session (or they were lost to context compaction), read every root `.md` file in that `.brain/` now. On a branch other than the brain's `Main branch:`, also read `pending/<branch>.md` (a `/` in the branch name is written `--`) when it exists. Read subfolders only when a root file links to them or the task needs them. Do not load `.brain` into subagents wholesale; pass only what their task needs. Write any `.brain/` document into that same `.brain/`. If no brain exists, proceed without one and mention once that `/brain-init` can create it.
+**Project brain:** Follow `CLAUDE.local.md` §Project brain loading: read **all** root `.md` files once per session (again after compaction), plus the active branch's pending file when present. Inspect linked detail and verify task-critical facts against current source. Do not send the whole brain to subagents. If no brain exists, proceed and mention `/brain-init` once.
 
 Produce one advisory assessment of the **current proposed change**. The analysis comes from `brain-review-code`; this skill owns the inputs, acceptance-criteria coverage, merge-specific checks, and the recommendation. Follow `CLAUDE.local.md`.
 
@@ -14,7 +14,7 @@ Produce one advisory assessment of the **current proposed change**. The analysis
 
 Do not edit project code or documentation, commit, push, post comments, change merge-request state, or approve or request changes on the hosting platform. The recommendation is advisory.
 
-Deeper verification may use an isolated temporary worktree or disposable fixtures; never change reviewed files or persistent repository state. Before executing code from an untrusted contribution, assess its side effects and exposure to credentials, networks, and production resources. Do not run destructive operations, intrusive security tests, or commands against production without separate explicit authorization. Never expose secrets in findings.
+Deeper verification may use a disposable checkout or isolated temporary worktree; never change reviewed files. A temporary worktree changes Git administrative state until removed: clean it up safely after review and verify it is gone, or do not create it if cleanup is uncertain. Before executing code from an untrusted contribution, assess its side effects and exposure to credentials, networks, and production resources. Do not run destructive operations, intrusive security tests, or commands against production without separate explicit authorization. Never expose secrets in findings.
 
 ## 1. Inputs
 

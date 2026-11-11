@@ -13,6 +13,14 @@ Distinguish four things:
 
 A feature request authorizes work within its agreed scope; it does not authorize unapproved redesign. The existing code is a starting point and evidence, not proof that its design is ideal.
 
+## Project brain loading
+
+When a skill needs project context, locate the brain from an explicitly supplied valid path, then the `Project brain:` line in loaded instructions, then `.brain/` at the current worktree root, then `.brain/` in the main checkout of a linked worktree (the parent of `git rev-parse --path-format=absolute --git-common-dir`). A brain must contain `00_index.md`. If no brain exists, proceed under the skill's no-brain policy and mention `/brain-init` once; never treat a folder with unrelated documents as a brain.
+
+**Read every root `.md` file in the brain once per session, and again if that context was lost to compaction.** On a branch other than the index's `Main branch:`, also read `pending/<branch>.md` when it exists (`/` in branch names becomes `--`). Read relevant linked subfolder documents, specifications, ADRs, and plans when the task requires them. Do not send the full brain to subagents; give each only the task-relevant facts and source references it needs. Write new `.brain/` documents in the same located brain.
+
+The complete root read provides orientation, **not proof that every statement remains current**. Verify task-critical implementation facts against current source, tests, and configuration; check branch-specific and uncommitted changes. Keep source claims, approved decisions, and uncertain assumptions distinct.
+
 ## When consultation is required
 
 Consult **before implementing or recording as decided** a choice that would materially:
@@ -23,7 +31,7 @@ Consult **before implementing or recording as decided** a choice that would mate
 - Change public APIs, protocols, serialization, persistence, data migrations, concurrency guarantees, security boundaries, or external compatibility.
 - Override an approved architectural decision, ADR, or specification; or create significant operational cost or difficult-to-reverse commitments.
 
-These are significance tests, not blanket bans. A minor helper class with no new architectural ownership is not automatically a consequential decision. Conversely, a small diff can still change a consequential contract.
+These are significance tests, not blanket bans. A minor helper class with no new architectural ownership is not automatically a consequential decision. Conversely, a small diff can still change a consequential contract. Consultation is for a **genuinely unresolved** consequential choice: first apply approved requirements and established decisions. Routine engineering details do not become approval questions merely because they involve state, architecture, or errors.
 
 **Do not ask the user for facts that can be discovered.** Do not ask again for a choice the user already approved. Do not manufacture design questions, requirements, future extension points, or approvals merely to follow a process.
 
@@ -70,6 +78,6 @@ Rules:
 - `.brain/` is the project's single document store. `brain-init` creates it; after that, `brain-update` owns its root files and `adrs/`; other skills write only their own documents into its subfolders, then invoke `brain-update`.
 - Deliver review and diagnosis results in the conversation unless the user requests a saved record.
 - Record **approved** durable decisions through the project's existing documentation conventions when justified; do not turn unapproved recommendations into ADRs.
-- Impl plans in `.brain/impl_plans/` and the descriptive `.brain` root files (`01`–`08`, `state.md`) are **continuity aids** that summarize other sources. Verify them against current code and tests; they never override specifications, ADRs, or recorded decisions. `.brain/09_user_decisions.md` is itself an authority on intent, alongside specifications and ADRs, and `.brain/glossary.md` is the authority on terminology. Record approved consequential changes in the governing specification, ADR, or `09_user_decisions.md` first.
+- Impl plans in `.brain/impl_plans/` and the descriptive `.brain` root files (`01`–`08`, `state.md`) are **continuity aids** that summarize other sources. Verify them against current code and tests; they never override specifications, ADRs, or recorded decisions. `.brain/09_user_decisions.md` is itself an authority on intent, alongside specifications and ADRs, and `.brain/glossary.md` is the authority on terminology. Record approved consequential changes in the governing specification, ADR, or `09_user_decisions.md` first. If authoritative records disagree, first check whether a later approved decision explicitly supersedes an earlier one. Otherwise surface the conflict and consult rather than inventing precedence.
 
 If blocked by a consequential open question, finish safe independent work, clearly identify the decision and affected scope, and do not proceed through the blocked choice.

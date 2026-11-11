@@ -8,7 +8,7 @@ You are reviewing one task in `{repo_root}`.
 
 Base: `{base}`
 
-Pre-existing changes at task start (the user's, not this task's):
+Pre-existing changes at task start (paths plus baseline patches/content; the user's, not this task's):
 
 {preexisting}
 
@@ -27,8 +27,8 @@ Pre-existing changes at task start (the user's, not this task's):
 ## Rules
 
 - Read-only. Do not edit, stage, commit, or dispatch subagents.
-- Scope: `git diff {base}` plus untracked files from `git status --short`. Leave the pre-existing changes out of scope: never report them, and never propose deleting, reverting, or editing them. Any other change outside the task's scope is a finding.
-- Treat the implementer's report as unverified claims. Verify them against the diff and by running the targeted tests.
+- Scope: `git diff {base}` plus untracked files from `git status --short`. Compare with the supplied baseline to exclude **pre-existing hunks**, not whole files; inspect the task's new edits even in files that were already dirty. Never propose deleting, reverting, or overwriting the user's original work. If the baseline is insufficient to separate edits, mark the affected coverage `unclear` instead of approving it. Any other change outside the task's scope is a finding.
+- Treat the implementer's report as unverified claims. Verify them against the diff and by running applicable targeted tests or meaningful alternatives when automated tests are inapplicable; identify any behavior you could not verify.
 
 ## Output
 
@@ -41,9 +41,9 @@ Pre-existing changes at task start (the user's, not this task's):
 
 ## Re-review variant
 
-Used after a fix round. Nothing is committed between rounds, so review the cumulative `git diff {base}` plus untracked files. The pre-existing changes stay out of scope, as in Rules.
+Used after a fix round. Nothing is committed between rounds, so review the cumulative `git diff {base}` plus untracked files. Pre-existing **hunks** stay out of scope, but new edits to those files remain reviewable, as in Rules.
 
-Pre-existing changes at task start (the user's, not this task's):
+Pre-existing changes at task start (paths plus baseline patches/content; the user's, not this task's):
 
 {preexisting}
 

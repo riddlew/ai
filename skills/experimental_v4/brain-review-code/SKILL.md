@@ -5,9 +5,9 @@ description: Review a bounded Git change set for correctness, requirement fit, a
 
 # Code Review
 
-**Project brain:** If `.brain/00_index.md` exists (at this worktree's root, or in the main checkout when working in a linked git worktree) and you have not read its root files in this session (or they were lost to context compaction), read every root `.md` file in that `.brain/` now. On a branch other than the brain's `Main branch:`, also read `pending/<branch>.md` (a `/` in the branch name is written `--`) when it exists. Read subfolders only when a root file links to them or the task needs them. Do not load `.brain` into subagents wholesale; pass only what their task needs. Write any `.brain/` document into that same `.brain/`. If no brain exists, proceed without one and mention once that `/brain-init` can create it.
+**Project brain:** Follow `CLAUDE.local.md` §Project brain loading: read **all** root `.md` files once per session (again after compaction), plus the active branch's pending file when present. Inspect linked detail and verify task-critical facts against current source. Do not send the whole brain to subagents. If no brain exists, proceed and mention `/brain-init` once.
 
-Review a bounded change set in three assessments: **Correctness**, **Requirement fit**, and **Repository fit**. Follow `CLAUDE.local.md` for decision authority; a finding may recommend a change but does not authorize a redesign.
+Review a bounded change set in three assessments: **Correctness**, **Requirement fit**, and **Repository fit**. Follow `CLAUDE.local.md` for decision authority; a finding may recommend a change but does not authorize a redesign. **Read-only:** do not edit, stage, commit, push, or apply fixes. If targeted tests create temporary artifacts, ensure they do not overwrite existing work and disclose any residual changes.
 
 Format every finding as defined in `${CLAUDE_SKILL_DIR}/references/findings.md`.
 
@@ -30,7 +30,7 @@ git diff <base>...HEAD
 git log <base>..HEAD --oneline
 ```
 
-When the requested scope covers uncommitted work, include staged, unstaged, and relevant untracked files, and list them separately so nothing is omitted or counted twice. If the scope contains no changes, report that and stop.
+When the requested scope covers uncommitted work, inspect staged, unstaged, and relevant untracked **contents** (not only their names), and list them separately so nothing is omitted or counted twice. If the invoking workflow supplies a pre-existing dirty-tree baseline, exclude only changes demonstrated to predate the task, not entire paths that the task also edited. If the scope contains no changes, report that and stop.
 
 ## 2. Establish the requirement basis
 
@@ -85,7 +85,7 @@ Undocumented local implementation details are not unsupported behavior. Category
 
 Also build a coverage table: one row for each specification Example, and one for each acceptance criterion of the tickets in scope, plus one per Review Focus item (`RF<n>`) when provided. An unmet RF row is a finding graded by its effect, and the summary counts include RF rows. Mark a `blocked` RF item `unverifiable`, naming its pending decision. It is not a finding and never enters a fix pass. Mark each row:
 
-- **met** — cite the test that verifies it, or the file:line that implements it and "no test" when no test does;
+- **met** — cite the test that verifies it, or the file:line that implements it and "not executed" when no behavioral check ran; distinguish static code evidence from observed runtime behavior;
 - **unmet** — cite the finding that reports it (every unmet row has one);
 - **unverifiable** — say what evidence is missing.
 

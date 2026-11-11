@@ -57,7 +57,7 @@ Format: `Ruling: <decision> — <why> — <cost if wrong>`
 ## Rules
 
 - Record `Workspace:` and `Execution mode:` once; a resumed session reads them instead of asking.
-- Record a command as passed only if it actually passed. Include environment or commit context when a result would otherwise mislead.
+- Record a command as passed only if it actually passed. Include environment or commit context when a result would otherwise mislead; when automated tests are inapplicable, record the actual alternative verification and its limits.
 - Mark an item `[x]` only when the result is present and verified; if uncertain, leave it open and say why.
 - Keep the next actionable item, unresolved approvals, and validation status easy to find.
 - Track pre-existing failures separately from new failures when evidence permits.

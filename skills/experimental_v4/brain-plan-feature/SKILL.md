@@ -5,7 +5,7 @@ description: Manage large, multi-session feature planning with durable, dependen
 
 # Plan Feature
 
-**Project brain:** If `.brain/00_index.md` exists (at this worktree's root, or in the main checkout when working in a linked git worktree) and you have not read its root files in this session (or they were lost to context compaction), read every root `.md` file in that `.brain/` now. On a branch other than the brain's `Main branch:`, also read `pending/<branch>.md` (a `/` in the branch name is written `--`) when it exists. Read subfolders only when a root file links to them or the task needs them. Do not load `.brain` into subagents wholesale; pass only what their task needs. Write any `.brain/` document into that same `.brain/`. If no brain exists, proceed without one and mention once that `/brain-init` can create it.
+**Project brain:** Follow `CLAUDE.local.md` §Project brain loading: read **all** root `.md` files once per session (again after compaction), plus the active branch's pending file when present. Inspect linked detail and verify task-critical facts against current source. Do not send the whole brain to subagents. If no brain exists, proceed and mention `/brain-init` once.
 
 Track planning state for substantial or uncertain efforts across sessions. This skill owns planning scope, planning tickets and their dependencies, and cross-session continuation. It delegates interactive decisions to `brain-brainstorm` and implementation decomposition to `brain-write-tickets`. Follow `CLAUDE.local.md` for decision authority.
 
@@ -86,7 +86,7 @@ depends-on: []
 
 ## Resolve tickets
 
-Resolve **at most one non-research ticket per session**. Independent research tickets may run in parallel when dependencies permit; do not use parallel work to settle several user decisions, prototypes, or tasks.
+Default to **one non-research ticket per session** to keep decisions focused. Resolve more in a session only when the user explicitly asks and dependencies permit. Independent research tickets may run in parallel when appropriate; do not use parallel work to settle dependent user decisions or prototype approvals.
 
 - **Research:** investigate with repository files, tests, documentation, tools, and external evidence. Record findings, confidence, and planning implications. Research can eliminate options but cannot decide the user's priorities or approve a boundary.
 - **Consult:** invoke `brain-brainstorm` with only this ticket's decision space: the question and why it matters, applicable constraints and decisions, resolved dependencies and evidence, and an explicit boundary excluding other tickets. If a new consequential choice surfaces, resolve it within this ticket when it belongs to the same decision, or record a dependent `consult` ticket. The ticket is resolved only when the user explicitly approves the outcome.
@@ -109,7 +109,7 @@ Treat the planning directory as authoritative; do not reconstruct decisions from
 1. Read `INDEX.md`.
 2. Take the user's selected ticket, or else the lowest-numbered actionable ticket.
 3. Read that ticket and only the context its dependencies require.
-4. Resolve it by tag, within the one-non-research-ticket limit.
+4. Resolve it by tag, using the one-non-research-ticket default unless the user authorizes more.
 5. Update the ticket, `INDEX.md`, dependencies, and open areas.
 6. Create, change, exclude, or remove tickets only when new evidence or user decisions justify it.
 

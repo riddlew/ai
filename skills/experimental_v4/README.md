@@ -6,7 +6,7 @@ The skills are **tools to use when needed**, not a mandatory pipeline. Small cha
 
 ## Install
 
-Copy `CLAUDE.local.md` to the root of your project and copy each skill directory into the project's `.claude/skills/` directory:
+Copy each skill directory into the project's `.claude/skills/` directory, then run `/brain-init`. It installs `CLAUDE.local.md` from the template bundled with `brain-init` if missing, or merges missing policy instructions into the existing file:
 
 ```text
 project/
@@ -17,7 +17,7 @@ project/
         ├── brain-diagnose/
         ├── brain-distill-content/
         ├── brain-implement/             # SKILL.md + references/
-        ├── brain-init/
+        ├── brain-init/                 # SKILL.md + references/CLAUDE.local.md
         ├── brain-plan-feature/
         ├── brain-refine-backlog/        # SKILL.md + references/
         ├── brain-review-architecture/
@@ -30,7 +30,7 @@ project/
         └── brain-write-tickets/
 ```
 
-`CLAUDE.local.md` holds the brain skills' instructions, so the project's own `CLAUDE.md` stays about the project. It is your personal file: add `CLAUDE.local.md` to `.git/info/exclude` unless git already ignores it. If the project already has one, merge into it; `/brain-init` also saves its `Project brain:` line there. Claude Code loads it from the working directory and every folder above it, so worktrees inside the checkout, such as `.claude/worktrees/`, use it too.
+`CLAUDE.local.md` holds the shared decision authority and full-brain loading policy, so the project's own `CLAUDE.md` stays about the project. `/brain-init` installs it from `brain-init/references/CLAUDE.local.md` and preserves project-specific instructions when merging into an existing file; it asks before resolving conflicting instructions. It excludes an untracked file locally through Git's `info/exclude` (a tracked file remains tracked), and also saves a `Project brain:` line there when you specify an external brain. Claude Code loads it from the working directory and every folder above it, so worktrees inside the checkout, such as `.claude/worktrees/`, use it too. The top-level `CLAUDE.local.md` in this distribution is provided for inspection or manual installation; keep the bundled reference in sync if you edit that template.
 
 `brain-brainstorm/scripts/` is an optional browser companion for mockups. It needs Node.js, has no npm dependencies, and makes no network request beyond localhost. It is adapted from obra/superpowers (MIT; see `scripts/LICENSE` and `scripts/README.md`).
 
@@ -38,9 +38,9 @@ project/
 
 Skills labeled **manual** use `disable-model-invocation: true` and must be explicitly invoked (for example, `/brain-implement`). Other skills may be selected when relevant, and can also be invoked explicitly.
 
-`tests/` is not installed. It holds the behavior scenarios used to verify the skills (see [Verification](#verification)).
+`tests/` is not part of this archive. If you maintain scenario fixtures separately, keep them outside the installed skills and use `brain-test-skill` to run them (see [Verification](#verification)).
 
-Then run `/brain-init` once in the project to create its brain.
+`/brain-init` can also be rerun to install or reconcile the policy in a project whose brain already exists.
 
 ## The project brain
 
@@ -71,10 +71,10 @@ Then run `/brain-init` once in the project to create its brain.
 └── NN_<topic>/          Detail split out of root file NN_<topic>.md
 ```
 
-- **Reading:** every skill except `brain-init`, `brain-distill-content`, and `brain-test-skill` reads all root files once per session (again after context compaction), and reads subfolders only when linked or needed. Root files are kept under about 25,000 words in total; a root file over about 4,000 words moves its detail into a `NN_<topic>/` subfolder and keeps a summary.
+- **Reading:** every skill except `brain-init`, `brain-distill-content`, and `brain-test-skill` reads **all root files** once per session (again after context compaction), and reads subfolders only when linked or needed. This intentional full read minimizes missed cross-domain constraints; task-critical code facts must still be verified against current source. Root files are kept under about 25,000 words in total; a root file over about 4,000 words moves its detail into a `NN_<topic>/` subfolder and keeps a summary.
 - **Writing:** `brain-init` creates the brain; after that, `brain-update` owns the root files and `adrs/`. Other skills write only their own documents into the subfolders, then invoke `brain-update` to index them and propagate what changed. `brain-update` never runs your code, never commits, and never edits another skill's documents.
 - **Git:** `.brain` is untracked by default. The first run asks, and adds `.brain/` to the repository's local `info/exclude` unless you choose to track it. Inside a linked git worktree, an untracked brain is found in the main checkout, and a first run from a worktree creates an untracked brain there, so every worktree shares it.
-- **Brain elsewhere:** if a skill can't find your brain, run `/brain-init <path to .brain>`. It saves the location as a `Project brain:` line in `CLAUDE.local.md`, Claude Code's personal file for project instructions, and keeps that file out of git through `info/exclude`. Claude Code loads `CLAUDE.local.md` from the working directory and every folder above it. Saved from the main checkout, the line covers the worktrees inside it, such as `.claude/worktrees/`; saved from a linked worktree, it covers only that worktree.
+- **Brain elsewhere:** if a skill can't find your brain, run `/brain-init <path to .brain>`. It installs or merges the collaboration policy and saves the location as a `Project brain:` line in `CLAUDE.local.md`. It locally ignores an untracked file through `info/exclude`; a tracked file remains tracked. Claude Code loads `CLAUDE.local.md` from the working directory and every folder above it. Saved from the main checkout, the line covers the worktrees inside it, such as `.claude/worktrees/`; saved from a linked worktree, it covers only that worktree.
 - **Isolated worktree sessions:** Claude Code sessions isolated in a worktree (`claude --worktree`, `EnterWorktree`, and `brain-implement`'s worktree mode) can read a brain in the main checkout but can't edit it. If you work that way, keep the brain outside the repository (for example `~/brains/<project>/.brain`) and run `/brain-init <that path>` once from the main checkout. For a new project, run `/brain-init` in the main checkout first, then move the folder out.
 
 **Branches:** the root files describe the main branch (`Main branch:` in `00_index.md`), so one shared brain stays true in every worktree. Run `/brain-update` on another branch, and that branch's changes go to `.brain/pending/<branch>.md` instead, while decisions, glossary terms, and open questions still go straight into the root files. After a branch merges, run `/brain-update <branch> merged` on the main branch; it checks each pending entry against the merged code before applying it, and every run starts by listing the pending files, so none are forgotten.
@@ -98,7 +98,7 @@ Skills refer to a "standard tier" and a "strongest tier". [`CLAUDE.local.md`](CL
 
 | Skill | Purpose | Use when | Typical output |
 |---|---|---|---|
-| `brain-init` | Creates the project brain: investigates the code and interviews you. Given a path to an existing brain, saves its location instead. Stops if a brain already exists. | A project has no brain yet, or its brain lives somewhere skills don't look. | `.brain/` root files, or a `Project brain:` line in `CLAUDE.local.md`. |
+| `brain-init` | Installs or merges `CLAUDE.local.md`, then creates the project brain: investigates the code and interviews you. Given a path to an existing brain, saves its location instead. If a brain already exists, ensures the local policy is installed and stops. | A project has no brain yet, or its brain lives somewhere skills don't look. | `CLAUDE.local.md` plus `.brain/` root files, or a `Project brain:` line. |
 | `brain-update` | Keeps the project brain in sync with commits, decisions, and new documents. Stops and points you to `brain-init` if no brain exists. | Another skill finished work, or you want the brain synced. | Updated `.brain/` root files and ADRs. |
 | `brain-brainstorm` | Resolves open requirements and design decisions through a visible decision table, lens-guided options, and dependency-ordered questions. Every behavior you could observe is your decision. It keeps asking until you say to write up, and lists each change as current → new with the reason, plus what stays unchanged and any assumptions for you to confirm. For a decision you would look at, such as a page layout or a diagram, it offers a browser tab with mockups. | Behavior, constraints, or architectural direction is unclear. | A confirmed direction summary; decisions recorded through `brain-update`. |
 | `brain-diagnose` | Investigates failures using reproduction and discriminating hypotheses; applies a bounded fix only when authorized. Reproduces the failure before fixing, traces root causes to their source, stops and consults after three failed fixes, and uses a red-flags list. | A failure, regression, or intermittent issue needs explanation. | Diagnosis in conversation; `.brain/diagnoses/` only on request. |
@@ -140,7 +140,7 @@ Example: Add a share-link capability for notes.
 2. Use `brain-review-architecture` if ownership or another expensive-to-reverse decision needs focused evaluation. Approved hard-to-reverse decisions become ADRs through `brain-update`.
 3. Use `/brain-write-spec` to capture the established behavior, invariants, and concrete examples.
 4. Use `brain-write-tickets` **only if** the work benefits from multiple independently verifiable increments or separate sessions.
-5. Use `/brain-implement` to execute the spec or tickets, starting from the spec's examples as tests. It asks for the execution mode at startup and pauses after each task for you to commit. Substantial or consequential changes get a final review by a fresh strongest-tier reviewer, which runs `brain-review-code`; add `brain-review-security` if the design introduces authorization, trust, or sensitive-data boundaries.
+5. Use `/brain-implement` to execute the spec or tickets, starting from the spec's examples as tests. For tracked work it asks for execution mode only if no answer was recorded; small standalone tasks default to inline. It pauses after each task for you to commit. Substantial or consequential changes get a final review by a fresh strongest-tier reviewer, which runs `brain-review-code`; add `brain-review-security` if the design introduces authorization, trust, or sensitive-data boundaries.
 
 ### Large, multi-session planning effort
 
@@ -197,11 +197,11 @@ The impl plan header records the worktree and execution-mode answers, so a resum
 
 ## Verification
 
-Implementation uses focused test-first increments, starting from the specification's examples and covering stated invariants and failure paths beyond them. At completion, validation is proportional to scope and risk. `brain-review-code` runs for substantial or consequential changes, **not every trivial edit**; in subagent-driven mode each task also gets a task review with up to five fix rounds. `brain-review-security` is similarly risk-based. Review findings are handled by `brain-implement/references/review-feedback.md`: verify before acting, and push back with evidence. No task is marked done without a test run read in that session.
+Implementation uses focused test-first increments, starting from the specification's examples and covering stated invariants and failure paths beyond them. At completion, validation is proportional to scope and risk. `brain-review-code` runs for substantial or consequential changes, **not every trivial edit**; in subagent-driven mode each task also gets a task review with up to five fix rounds. `brain-review-security` is similarly risk-based. Review findings are handled by `brain-implement/references/review-feedback.md`: verify before acting, and push back with evidence. No task is marked done without meaningful verification inspected in that session; when automated tests are inapplicable, alternatives and their limitations must be recorded.
 
 All review skills share one severity scale (Critical / High / Medium / Low), a separate confidence rating, and common finding fields, defined in `brain-review-code/references/findings.md`.
 
-The skills themselves are verified with the scenarios in `tests/scenarios.md`: each runs a fresh agent against a throwaway sample project (`tests/fixture/`), first without the skill (baseline) and then with it, and checks the agent's replies and the resulting files and git state. `brain-test-skill` runs this method. Its own scenarios are in `tests/skill-test-scenarios.md`.
+`brain-test-skill` supports behavioral verification in fresh agents against throwaway repositories, comparing original and changed skills. The referenced scenario fixtures are **not included in this ZIP**; static checks alone do not prove agent behavior. Run behavioral tests before relying on a changed rule in production.
 
 ## Reviews
 

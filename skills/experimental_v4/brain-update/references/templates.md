@@ -58,6 +58,30 @@ Apply these to the root files when the branch merges, after checking each agains
 - **Remove:** <what the branch removes>.
 ```
 
+## Technical knowledge document (optional)
+
+Use when a subsystem or API needs durable detail beyond the root overview. Include only applicable sections; avoid function-by-function code duplication.
+
+```markdown
+# <Subsystem or API>
+
+## Sources
+- `src/path/to/owner`
+- `src/path/to/caller-or-test`
+
+## How it works
+<Behavior, ownership, flow, and important interactions.>
+
+## Contracts and invariants
+<Inputs, outputs, guarantees, edge cases, compatibility limits.>
+
+## Known pitfalls
+<Unexpected behavior and constraints worth preserving.>
+
+## Verification
+<What was checked, on which branch/revision; what remains uncertain.>
+```
+
 ## `09_user_decisions.md` entry
 
 ```markdown

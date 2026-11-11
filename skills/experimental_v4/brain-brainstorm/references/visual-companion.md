@@ -30,7 +30,7 @@ The script backgrounds the server and prints one line of JSON:
 - Session files live in the system temp directory, not the project. Don't pass `--project-dir`.
 - If it prints `{"error": …}`, say so in one line and continue in text.
 - **Windows (Git Bash):** the script runs in the foreground, which blocks the call. Start it with the Bash tool's `run_in_background: true`. Then find the `server-started` line in that task's output, or read the newest `/tmp/brainstorm-*/state/server-info`. Other environments that reap background processes need `--foreground` and their own background mechanism.
-- **Remote or container setups:** add `--host 0.0.0.0 --url-host localhost` if the URL can't be reached.
+- **Remote or container setups:** prefer a trusted localhost port-forward. Binding `--host 0.0.0.0` exposes the server on external interfaces even though it uses a session key; do that only with the user's explicit approval and appropriate network controls.
 
 ## The loop
 

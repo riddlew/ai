@@ -31,7 +31,7 @@ If the user gave a location, use it only if it is a brain, and tell them `/brain
 
 The root files describe the main branch, and `Last synced` is always a commit on it.
 
-**On another branch** (`git branch --show-current` isn't the main branch), write no code facts into the root files. Instead, bring `.brain/pending/<branch>.md` up to date, writing a `/` in the branch name as `--`, from the template in `${CLAUDE_SKILL_DIR}/references/templates.md`. It covers the branch's whole change since `git merge-base <main branch> HEAD`: one entry per root-file change, under that file's heading, starting **Add:**, **Change:**, or **Remove:**, with a link to the spec or impl plan when there is one. Remove entries the branch's code no longer supports. Still write the user's decisions, answers, glossary terms, open questions, and spikes straight into the root files (§3 steps 4–5). In `state.md`, list the branch's work as in progress on that branch, linking the pending file. In `00_index.md`, list the pending file and any new or changed `.brain` documents with their statuses. Leave `Last synced` alone. On a detached `HEAD`, ask which branch the work belongs to.
+**On another branch** (`git branch --show-current` isn't the main branch), write no code facts into the root files. Instead, bring `.brain/pending/<branch>.md` up to date, writing a `/` in the branch name as `--`, from the template in `${CLAUDE_SKILL_DIR}/references/templates.md`. It covers the branch's committed change since `git merge-base <main branch> HEAD`; inspect staged, unstaged, and relevant untracked edits too, but label their effects provisional and do not present them as merged or completed. Write one entry per committed root-file change, under that file's heading, starting **Add:**, **Change:**, or **Remove:**, with a link to the spec or impl plan when there is one. Remove entries the branch's code no longer supports. Before updating a pending file, check its `Branch:` header; if the `/` → `--` mapping collides with a different branch, stop and report the conflict rather than overwrite another branch's entries. Still write the user's decisions, answers, glossary terms, open questions, and spikes straight into the root files (§3 steps 4–5). In `state.md`, list the branch's work as in progress on that branch, linking the pending file. In `00_index.md`, list the pending file and any new or changed `.brain` documents with their statuses. Leave `Last synced` alone. On a detached `HEAD`, ask which branch the work belongs to.
 
 **The user says a branch merged.** Apply a merge only on the main branch; on another branch, say merges are applied from the main branch, and apply nothing. Check each entry in that branch's pending file against the current code, and apply the ones the code confirms to the root files. Report the rest, and ask whether to keep them pending (the branch may have more to merge) or drop them. Once no entry is left, delete the file, mark its `state.md` items done, remove it from `00_index.md`, and continue with §3. If none of its changes are in the code, say so, and keep the file.
 
@@ -43,20 +43,20 @@ The root files describe the main branch, and `Last synced` is always a commit on
 
 On the main branch:
 
-1. Read every root file, unless you already have this session.
+1. Read **every root file**, unless already loaded in this session and still in context; include the index. This full read is intentional so changes can be checked against the entire project model.
 2. Gather what changed since `Last synced`:
-   - the code: `git log --stat <sha>..HEAD` and `git diff <sha>..HEAD`, read in full; a commit message is not evidence of what changed;
-   - uncommitted work: `git status`;
+   - committed work: enumerate **all** paths and renames with `git log --stat <sha>..HEAD` and `git diff --name-status <sha> HEAD`, then inspect the actual diffs and surrounding source for every change that could affect project knowledge. Do not rely on commit messages or path names alone; avoid dumping unrelated large/generated diffs into context without inspecting their effects;
+   - uncommitted work: inspect `git status --short`, relevant staged changes (`git diff --cached`), unstaged changes (`git diff`), and relevant untracked files (`git ls-files --others --exclude-standard`). `git status` alone is not evidence of behavior;
    - decisions, answers, and discoveries in the current conversation;
    - new or changed documents in `.brain/` subfolders.
 
    If `<sha>` no longer exists (after a rebase, say), re-verify every root file against the current code instead of diffing, and say so.
 
    If `<sha>` exists but is not an ancestor of `HEAD`, follow §2 "Synced from another branch".
-3. Apply each change to every root file it affects. Add what is new, correct what changed, and remove what is no longer true. Root files describe the present, not history.
-4. Record each user decision in `09_user_decisions.md`, and write an ADR when one qualifies (§5). Move answered questions out of `open_questions.md` into `09` and the relevant root file. Resolve spikes (§4).
+3. Apply verified changes to **every root file they affect**. Add what is new, correct what changed, and remove what is no longer true. Do not rewrite unrelated facts. Root files describe the committed main-branch implementation, not a history of tentative edits.
+4. Record each **durable, project-relevant** user decision in `09_user_decisions.md`, and write an ADR when one qualifies (§5). Move answered questions out of `open_questions.md`: put verified factual answers in the relevant knowledge file, and approved durable choices in `09` as appropriate. Resolve spikes (§4).
 5. Add new terms to `glossary.md`, and use canonical terms in the root files you touch. Report term mismatches in subfolder documents rather than editing them.
-6. Update `state.md` and the statuses in `00_index.md`, and set `Last synced` to the full `HEAD` sha. Uncommitted work is in progress, never done.
+6. Update `state.md` and the statuses in `00_index.md`, and set `Last synced` to the full main-branch `HEAD` sha **only after verifying the committed changes it covers**. This SHA does not certify uncommitted changes. Mark uncommitted work in progress, not done; do not present implementation facts based only on uncommitted edits as settled main-branch facts. Report those facts as provisional for a later sync after commit.
 7. Split any root file over the size limit (§4).
 8. Report the files you changed. Then list everything that needs the user: contradictions, new open questions, new spikes, and stale documents owned by other skills.
 
@@ -87,13 +87,15 @@ On the main branch:
 
 A project-specific topic gets the next free number, for example `10_protocols.md`.
 
+**Knowledge quality:** include source file paths for implementation-specific facts and preserve behavioral contracts, ownership, invariants, non-obvious API details, and known pitfalls. Explain the system rather than duplicating code; do not discard details that would force repeated rediscovery. When a fact has not been verified on the current branch, mark the uncertainty and scope instead of asserting it as current.
+
 **Size:**
 - When a root file passes about 4,000 words, move its detail into `.brain/NN_<topic>/<subtopic>.md`, and keep a summary in the root file with links to the detail. Never drop content while splitting.
 - Keep all root files together under about 25,000 words. Past that, condense by moving detail out.
 
 **Spikes** resolve three ways:
 - **Confirmed:** move the fact into the relevant root file and remove the entry.
-- **Confirmed problem:** it becomes an open question, or a decision in `09`.
+- **Confirmed problem:** record the verified failure or constraint where relevant; create an open question only if a consequential choice remains, and a `09` entry only after a user-approved durable decision.
 - **Deferred:** keep the entry, with a note.
 
 **Glossary:** for each term, record what it means, what it includes and excludes, and how it differs from neighboring terms. Map UI labels to code and database names where they differ. Record aliases to avoid only when they prevent likely confusion. A new canonical term or a changed definition is a decision; confirm it with the user unless it is already established.

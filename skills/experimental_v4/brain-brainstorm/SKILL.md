@@ -5,7 +5,7 @@ description: Resolve consequential product and architecture decisions with the u
 
 # Brainstorm
 
-**Project brain:** If `.brain/00_index.md` exists (at this worktree's root, or in the main checkout when working in a linked git worktree) and you have not read its root files in this session (or they were lost to context compaction), read every root `.md` file in that `.brain/` now. On a branch other than the brain's `Main branch:`, also read `pending/<branch>.md` (a `/` in the branch name is written `--`) when it exists. Read subfolders only when a root file links to them or the task needs them. Do not load `.brain` into subagents wholesale; pass only what their task needs. Write any `.brain/` document into that same `.brain/`. If no brain exists, proceed without one and mention once that `/brain-init` can create it.
+**Project brain:** Follow `CLAUDE.local.md` §Project brain loading: read **all** root `.md` files once per session (again after compaction), plus the active branch's pending file when present. Inspect linked detail and verify task-critical facts against current source. Do not send the whole brain to subagents. If no brain exists, proceed and mention `/brain-init` once.
 
 Help the user settle a sound direction. Investigate facts yourself, recommend, and let the user decide consequential choices (`CLAUDE.local.md`). Do not implement or change production code while brainstorming.
 
@@ -44,17 +44,11 @@ A proposal to introduce a manager, service, layer, or other component that takes
 
 Mark internal method boundaries, code names, and local helpers as **Deferred**. Don't raise speculative extension points. Scope comes from the user: ask about a scope edge rather than stating a non-goal they didn't give.
 
-### Cover every behavior
+### Cover material behavior
 
-For each behavior the change adds or touches, put a row for each of these in the first table you publish, then settle each with the user:
+For every **new or materially changed observable behavior**, consider invocation and defaults, success results, applicable failures and unchanged state, boundaries (including empty, duplicates, and limits), and regressions in shared code. Record unresolved consequential choices in the decision table; group cases governed by the same decision instead of asking one question per edge case.
 
-- how it is invoked: names, arguments, options, defaults;
-- what it produces when it succeeds;
-- each failure: missing, invalid, or ambiguous input, and what is left unchanged when it fails;
-- boundaries: empty, one, many, duplicates, limits;
-- existing behavior that shares its code or data.
-
-The code tells you what is, never what should be. For behavior that exists today, state what it does and where (`file:line`), then ask whether to keep or change it.
+Use current code and tests (`file:line`) to establish existing behavior. Preserve behavior outside the authorized change unless the user chooses otherwise; do not ask the user to reapprove established or unaffected behavior. Flag any adjacent behavior that the proposed change would materially alter. The code establishes what is, not what should be.
 
 ## 3. Investigate facts yourself
 
@@ -133,7 +127,7 @@ Present the final summary in this format, which `brain-write-spec` consumes:
 
 - <behavior>: <current behavior with `file:line`, or "new"> → <new behavior>. Why: <the user's reason, or the requirement it serves>
 
-**Unchanged (confirm):** <existing behaviors the change touches or sits next to that stay as they are>
+**Unchanged (confirm only if affected):** <materially affected existing behaviors that the direction explicitly preserves, or "None">
 **Assumptions (confirm):** <everything in this direction the user didn't answer, or "None">
 
 ### Decisions
