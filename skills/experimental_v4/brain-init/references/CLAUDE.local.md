@@ -17,9 +17,15 @@ A feature request authorizes work within its agreed scope; it does not authorize
 
 When a skill needs project context, locate the brain from an explicitly supplied valid path, then the `Project brain:` line in loaded instructions, then `.brain/` at the current worktree root, then `.brain/` in the main checkout of a linked worktree (the parent of `git rev-parse --path-format=absolute --git-common-dir`). A brain must contain `00_index.md`. If no brain exists, proceed under the skill's no-brain policy and mention `/brain-init` once; never treat a folder with unrelated documents as a brain.
 
-**Read every root `.md` file in the brain once per session, and again if that context was lost to compaction.** On a branch other than the index's `Main branch:`, also read `pending/<branch>.md` when it exists (`/` in branch names becomes `--`). Read relevant linked subfolder documents, specifications, ADRs, and plans when the task requires them. Do not send the full brain to subagents; give each only the task-relevant facts and source references it needs. Write new `.brain/` documents in the same located brain.
+**Read every project-knowledge root `.md` file in the brain once per session, and again if that context was lost to compaction.** The bundled `.brain/USAGE.md` and `.brain/README.md` are workflow references, **not** project-knowledge root files: do not include them in the mandatory full-root read. On a branch other than the index's `Main branch:`, also read `pending/<branch>.md` when it exists (`/` in branch names becomes `--`). Read relevant linked subfolder documents, specifications, ADRs, and plans when the task requires them. Do not send the full brain to subagents; give each only the task-relevant facts and source references it needs. Write new `.brain/` documents in the same located brain.
 
 The complete root read provides orientation, **not proof that every statement remains current**. Verify task-critical implementation facts against current source, tests, and configuration; check branch-specific and uncommitted changes. Keep source claims, approved decisions, and uncertain assumptions distinct.
+
+## Development workflow references
+
+`brain-init` installs `USAGE.md` and `README.md` at the root of the selected project brain (normally `.brain/`). When choosing or coordinating a workflow, consult the **relevant sections** of `.brain/USAGE.md` for examples, selection of `brain-brainstorm` versus `brain-plan-feature`, blueprint collaboration, implementation checkpoints, and reviews. Consult `.brain/README.md` for the skill catalog and installation conventions when needed. If the brain is external, resolve both documents relative to its `Project brain:` path.
+
+These guides are examples and operational documentation, **not** binding project requirements or substitutes for skill instructions. Applicable `SKILL.md` procedures, this policy, approved specifications, ADRs, and recorded user decisions control actual behavior. Do not load either guide in full by default. The mandatory project-knowledge root read remains in effect.
 
 ## When consultation is required
 
@@ -82,19 +88,3 @@ Rules:
 - Impl plans in `.brain/impl_plans/` and the descriptive `.brain` root files (`01`–`08`, `state.md`) are **continuity aids** that summarize other sources. Verify them against current code and tests; they never override specifications, ADRs, or recorded decisions. `.brain/09_user_decisions.md` is itself an authority on intent, alongside specifications and ADRs, and `.brain/glossary.md` is the authority on terminology. Record approved consequential changes in the governing specification, ADR, or `09_user_decisions.md` first. If authoritative records disagree, first check whether a later approved decision explicitly supersedes an earlier one. Otherwise surface the conflict and consult rather than inventing precedence.
 
 If blocked by a consequential open question, finish safe independent work, clearly identify the decision and affected scope, and do not proceed through the blocked choice.
-
-## Development workflows
-
-`USAGE.md` documents the expected development workflows, including skill selection, architectural collaboration, implementation checkpoints, and code review.
-
-When selecting or coordinating a development workflow, consult the relevant sections of `USAGE.md`.
-
-Treat its examples as guidance, not rigid procedures.  The applicable skill instructions, approved specifications, ADRs, and established project decisions remain authoritative.
-
-Default to collaborative implementation:
-- Review code-level design before substantial implementation.
-- Implement in small, independently verifiable increments.
-- Present changes for user review before proceeding.
-- Preserve approved architecture and implementation constraints.
-
-Use only the workflow stages justified by the task.
