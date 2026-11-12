@@ -113,7 +113,7 @@ Include only essential boundaries not recoverable from those sources.>
 
 Omit Governing Decisions when the sources are unmistakable from context. Do not embed volatile source paths or implementation snippets unless an approved prototype fragment preserves a design contract. If a consequential decision is unresolved, do not write a ticket that assumes an answer; record the block and consult.
 
-Tickets are stable definitions; `brain-implement` tracks execution progress separately once work starts.
+Tickets are stable definitions; `brain-blueprint` may subsequently design the code-level implementation in the feature's one `.brain/impl_plans/` file, and `brain-implement` tracks execution there once work starts. Tickets must not silently establish class ownership or method signatures that contradict a confirmed design.
 
 Write only the ticket files into `.brain/`; leave the index, `state.md`, and other root files to `brain-update`. Then invoke `brain-update` with a one-line summary of what changed.
 

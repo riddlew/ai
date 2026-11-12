@@ -27,7 +27,7 @@ Classify everything as:
 1. **Approved decisions** — user-confirmed choices, applicable ADRs, and established contracts.
 2. **Repository facts** — what the code does today; evidence, not the desired design.
 3. **Open decisions** — choices requiring the user's judgment.
-4. **Implementation discretion** — routine details that do not belong in the spec.
+4. **Implementation discretion** — routine details that do not belong in the spec, unless the user deliberately approved them as constraints.
 
 A `brain-brainstorm` decision table maps directly: **Established** rows are approved decisions, **User decision** rows are open decisions, **Deferred** rows are implementation discretion, and **Investigate** rows must be investigated before writing or listed as open.
 
@@ -110,7 +110,7 @@ Relevant assumptions, caveats, or constraints. Omit if empty.
 
 ### Technical Decisions
 
-Record **approved** decisions about responsibility and ownership boundaries, lifecycle and state ownership, contracts that matter to the feature, persistence and schema changes, meaningful cross-component interactions, and intentional non-goals. Omit method-level details and source-file paths. Keep a small agreed prototype fragment (for example, a schema) only when essential to preserve a decision, and label it as prototype-derived. Do not present one possible implementation as required architecture.
+Record **approved** decisions about responsibility and ownership boundaries, lifecycle and state ownership, design patterns chosen or rejected, contracts, persistence and schema changes, meaningful cross-component interactions, and intentional non-goals. **Usually** omit method-level details and source-file paths. **Preserve them when the user explicitly approved them or omission would lose an agreed constraint.** Identify the source of each binding technical choice. Distinguish binding decisions from illustrative implementation suggestions or tentative preferences; do not turn a suggested method signature into a requirement by accident. Keep a small agreed prototype fragment (for example, a schema or exact interface) only when essential to preserve a decision, and label it as approved or prototype-derived as appropriate. Detailed implementation design belongs in `/brain-blueprint`, not a duplicated full blueprint here.
 
 ### Open Decisions
 
@@ -139,5 +139,6 @@ Report the created or updated path, whether open decisions block implementation,
 
 ## Boundaries
 
-- This skill writes the specification only. `brain-implement` creates its impl plan in `.brain/impl_plans/` when work begins.
-- When the user approves a consequential change to a feature under implementation, update this specification, not the impl plan.
+- This skill writes the specification only. `/brain-blueprint` can create or update the feature's **single** `.brain/impl_plans/<feature>.md` before implementation; otherwise `brain-implement` creates it when tracked work begins. A blueprint is optional for trivial changes.
+- When the user approves a consequential change to a feature under implementation, update this specification (and applicable ADR or durable decision) **before** updating the blueprint or implementation plan. A blueprint never silently overrides the spec.
+- After the spec, recommend `/brain-blueprint` when code structure, ownership, patterns, or important signatures merit the user's review before implementation.

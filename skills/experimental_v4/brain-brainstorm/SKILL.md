@@ -42,13 +42,17 @@ A question is a **User decision** when its answer could materially change:
 
 A proposal to introduce a manager, service, layer, or other component that takes over an existing responsibility is an architectural decision, not a routine detail.
 
-Mark internal method boundaries, code names, and local helpers as **Deferred**. Don't raise speculative extension points. Scope comes from the user: ask about a scope edge rather than stating a non-goal they didn't give.
+Normally mark internal method boundaries, code names, and local helpers as **Deferred**. **Exception:** when the user deliberately specifies a design pattern, component responsibility, interface, method signature, or code structure, investigate its fit and record the confirmed preference as **Established** rather than discarding it as an implementation detail. A user may also ask to jointly design these details; do not insist they are deferred. Don't raise speculative extension points. Scope comes from the user: ask about a scope edge rather than stating a non-goal they didn't give.
 
 ### Cover material behavior
 
 For every **new or materially changed observable behavior**, consider invocation and defaults, success results, applicable failures and unchanged state, boundaries (including empty, duplicates, and limits), and regressions in shared code. Record unresolved consequential choices in the decision table; group cases governed by the same decision instead of asking one question per edge case.
 
 Use current code and tests (`file:line`) to establish existing behavior. Preserve behavior outside the authorized change unless the user chooses otherwise; do not ask the user to reapprove established or unaffected behavior. Flag any adjacent behavior that the proposed change would materially alter. The code establishes what is, not what should be.
+
+### User-directed implementation design
+
+Give the user room to describe **how they want the code to work**: ownership, patterns to use or avoid, existing classes to extend, data flow, and important signatures or method outlines. Ask for these preferences when they materially affect the proposed architecture, but never require the user to specify details they do not care about. Start with the user's preferred design; assess it against actual code, requirements, correctness, and maintenance cost, and explain concrete concerns instead of silently replacing it. Distinguish **binding approved preferences** from tentative ideas and illustrative examples. More detailed code design may be explored later through `/brain-blueprint`.
 
 ## 3. Investigate facts yourself
 
@@ -138,9 +142,11 @@ Present the final summary in this format, which `brain-write-spec` consumes:
 
 **Relevant facts:** <existing responsibilities and constraints, with locations>
 **Blocking open decisions:** <User decision rows that block the next stage, or "None">
+**Approved design preferences:** <explicitly confirmed patterns, owners, interfaces, structures, or "None">
+**Tentative implementation ideas:** <ideas discussed but not approved, or "None">
 **Deferred to implementation:** <Deferred rows only, or "None"; anything observable the user didn't answer goes under Assumptions>
 ```
 
 Ask the user to confirm the direction, including each **Unchanged** and **Assumptions** line, before treating it as established. If it was already confirmed in the discussion, do not ask again. Do not begin implementation without authorization.
 
-Once the user confirms the direction, it is established. Then invoke `brain-update` with a one-line summary of what changed.
+Once the user confirms the direction, it is established. Preserve confirmed technical preferences in the summary for `brain-write-spec`, and suggest `/brain-blueprint` for a collaborative code-level design after the spec. A tentative signature or pattern is not approved merely because Claude proposed it. Then invoke `brain-update` with a one-line summary of what changed.

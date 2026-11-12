@@ -53,9 +53,9 @@ Skills refer to "standard tier" and "strongest tier"; this table is the only pla
 
 | Role | Tier | Model today |
 |---|---|---|
-| Task implementer, task reviewer, scoped re-review, spec, ticket-set, and impl plan builder reviews | standard | Sonnet |
+| Task implementer, task reviewer, scoped re-review, spec, ticket-set, blueprint, and impl plan builder reviews | standard | Sonnet |
 | Fix-round 4–5 implementer, final reviewer, final fix pass | strongest | Opus |
-| Main session: brainstorming, writing specs, architecture review | strongest | Opus |
+| Main session: brainstorming, writing specs, collaborative blueprints, architecture review | strongest | Opus |
 | Main session: coordinating subagent-driven mode | standard | Sonnet |
 | `brain-review-code` delegated assessment subagents | standard | Sonnet |
 | `brain-test-skill` test agents, unless the role under test is strongest tier | standard | Sonnet |
@@ -63,7 +63,7 @@ Skills refer to "standard tier" and "strongest tier"; this table is the only pla
 Rules:
 - Every subagent dispatch names its model explicitly, using this table.
 - When a `brain-` skill starts, suggest switching only on a clear mismatch, say so once, and continue either way:
-  - Sonnet while brainstorming, writing a spec, or reviewing architecture → suggest `/model opus`.
+  - Sonnet while brainstorming, writing a spec, collaboratively designing a blueprint, or reviewing architecture → suggest `/model opus`.
   - Opus while coordinating subagent-driven mode → suggest `/model sonnet`.
 - Inline implementation gets no suggestion (task difficulty varies); the inline final fix pass runs on the session model.
 - To change models later, edit only this table.
@@ -75,9 +75,10 @@ Rules:
 - Implement incrementally, verify observable behavior, and keep changes within scope. Do not introduce a new architecture merely to make a test convenient.
 - Treat reviews and research as evidence and proposals, not as authority to expand scope or change approved decisions.
 - Keep process proportional: routine changes may be implemented and verified directly; substantial features may need specs; long-running work may need planning and tickets.
-- `.brain/` is the project's single document store. `brain-init` creates it; after that, `brain-update` owns its root files and `adrs/`; other skills write only their own documents into its subfolders, then invoke `brain-update`.
+- `.brain/` is the project's single document store. `brain-init` creates it; after that, `brain-update` owns its root files and `adrs/`; other skills write only their own documents into its subfolders, then invoke `brain-update`. In `.brain/impl_plans/`, `brain-blueprint` owns the `Implementation Design` section and blueprint approval metadata; `brain-implement` owns mutable execution tracking. Neither overwrites the other's sections.
 - Deliver review and diagnosis results in the conversation unless the user requests a saved record.
 - Record **approved** durable decisions through the project's existing documentation conventions when justified; do not turn unapproved recommendations into ADRs.
+- Implementation blueprints are **execution guidance**, not independent authority over the governing spec, ADRs, or approved user decisions. A blueprint explicitly approved by the user controls agreed implementation structure; clearly labeled illustrative signatures and pseudocode may be refined. `brain-implement` defaults to **collaborative** mode: for substantial or design-sensitive work, obtain blueprint approval before coding; after each verified, coherent increment, show the diff and pause for the user's review. Guided and autonomous modes are opt-in; none waives approval of unresolved consequential choices. Collaboration mode (review checkpoints) is distinct from execution mode (inline or subagent-driven); collaborative execution defaults to inline. For trivial, well-defined fixes, a separate blueprint is optional.
 - Impl plans in `.brain/impl_plans/` and the descriptive `.brain` root files (`01`–`08`, `state.md`) are **continuity aids** that summarize other sources. Verify them against current code and tests; they never override specifications, ADRs, or recorded decisions. `.brain/09_user_decisions.md` is itself an authority on intent, alongside specifications and ADRs, and `.brain/glossary.md` is the authority on terminology. Record approved consequential changes in the governing specification, ADR, or `09_user_decisions.md` first. If authoritative records disagree, first check whether a later approved decision explicitly supersedes an earlier one. Otherwise surface the conflict and consult rather than inventing precedence.
 
 If blocked by a consequential open question, finish safe independent work, clearly identify the decision and affected scope, and do not proceed through the blocked choice.

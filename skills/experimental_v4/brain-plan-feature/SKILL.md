@@ -12,7 +12,7 @@ Track planning state for substantial or uncertain efforts across sessions. This 
 ## Boundaries
 
 - **Plan, do not implement.** Bounded investigations, prerequisite tasks, and minimal prototypes are permitted planning work. None of them, nor completed planning, authorizes implementing the final objective.
-- **Planning state is not implementation state.** Do not create `.brain/impl_plans/` entries or keep implementation checklists here. `brain-implement` tracks execution once authorized; the planning directory remains the record of planning decisions.
+- **Planning state is not implementation state.** Do not create `.brain/impl_plans/` entries or keep implementation checklists here. `brain-blueprint` owns the code-level design section in the per-feature impl plan when requested; `brain-implement` tracks execution once authorized. The planning directory remains the record of planning decisions.
 
 ## Start
 
@@ -125,3 +125,5 @@ Implementation tickets are not required by default; the user may implement direc
 
 1. Check whether any unresolved decision materially affects implementation or decomposition; if so, consult the user.
 2. Otherwise invoke `brain-write-tickets`, using the planning materials as the authoritative source of **approved** decisions.
+
+After the specification (and optional tickets) is established, offer `/brain-blueprint` for substantial or design-sensitive features so the user can approve code structure before `/brain-implement`. This planning skill does not author that blueprint or approve implementation.

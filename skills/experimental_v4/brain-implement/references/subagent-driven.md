@@ -5,7 +5,7 @@ For the coordinator (the main session). When filling any template, fill every sl
 Per task, in order:
 
 1. **Base.** Run `git rev-parse HEAD` and `git status --short`, then capture the **contents or patch** of pre-existing staged/unstaged modifications and any relevant untracked files before dispatch (outside the task's files or in the coordinator's context). Record the sha, pre-existing paths, and where the baseline evidence is held in the impl plan's work item. Path lists alone cannot distinguish a task's later edits to those same files. Shell variables do not persist. If the previous task was not committed, keep its base and pre-existing changes, and give the reviewer both tasks' briefs, Examples, and criteria.
-2. **Implementer.** Dispatch on the standard tier with `${CLAUDE_SKILL_DIR}/references/implementer-prompt.md`. Fill only the task text, Examples and criteria, relevant brain excerpts and code locations, and constraints. Never send the whole `.brain`. Keep its agent id for rounds 1-3. Handle its status:
+2. **Implementer.** Dispatch on the standard tier with `${CLAUDE_SKILL_DIR}/references/implementer-prompt.md`. Fill only the task text, Examples and criteria, **approved binding blueprint constraints plus task-relevant illustrative guidance**, relevant brain excerpts and code locations. Never send the whole `.brain`. Keep its agent id for rounds 1-3. Handle its status:
    - `NEEDS_CONTEXT`: answer and resume it.
    - `BLOCKED`: resolve it. If the choice is consequential under `CLAUDE.local.md`, or the implementer reports three failed fixes, consult the user.
 3. **Task reviewer.** Dispatch on the standard tier, read-only, with `${CLAUDE_SKILL_DIR}/references/task-reviewer-prompt.md`: the base sha, the pre-existing baseline (`{preexisting}` including patch/content evidence), the brief, and the implementer's report.
@@ -21,15 +21,15 @@ Per task, in order:
 
    Record each ruling under `## Rulings` as `Ruling: <decision> — <why> — <cost if wrong>`. Parked and deferred findings do not block done.
 6. **Proof before done.** Apply SKILL.md §5 step 6: (a) rerun the task's targeted tests or meaningful alternative verification when tests are inapplicable, and read the evidence; (b) verify each Example or criterion against observed output where feasible, not coverage-table claims alone; (c) use the task review plus `git diff --stat <base>`, `git diff --cached --stat`, and untracked-file checks to inspect scope; (d) record commands, results, and limits in the impl plan. Leave the task open if essential behavior is unverified. §7 step 1 decides whether the full suite runs.
-7. **Commit pause.** Apply SKILL.md's Commit pause unchanged. When the user confirms a commit, also check that `git status --short` shows no uncommitted changes in the task's files.
+7. **Collaboration checkpoint.** Apply SKILL.md §5's User review and optional commit: in collaborative or guided mode, show the verified task diff, tests, and design deviations **and wait for user approval before dispatching the next task**. Mark `verified, awaiting user review` until approval. In autonomous mode, continue after proof with no routine user pause. If the user explicitly requests a commit, check HEAD moved and inspect `git status --short` for remaining task edits; don't silently stage or commit user changes. If the user continues uncommitted, preserve the baseline evidence for cumulative review.
 
 ## Final review
 
-§7 step 3 decides whether a full review runs; per-task reviews and the execution mode do not make a change substantial. When it does run, it uses the impl plan header's `Review base`, not the per-task bases; its fix pass is one fresh strongest-tier implementer, using the implementer prompt's Fix round section with the final findings. Then run the full suite and the commit pause. Inline mode: the main session fixes, as §7 says.
+§7 step 3 decides whether a full review runs; per-task reviews and the execution mode do not make a change substantial. When it does run, it uses the impl plan header's `Review base`, not the per-task bases; its fix pass is one fresh strongest-tier implementer, using the implementer prompt's Fix round section with the final findings. Then run appropriate full/affected verification and the collaboration checkpoint when the mode requires it. Inline mode: the main session fixes, as §7 says.
 
 ## Rules
 
 - Never edit code in this mode, including fixes. Fixes go through implementers.
-- Pause only for commit pauses, consequential decisions, and blockers you cannot resolve.
+- Pause for **increment reviews** in collaborative/guided mode, unresolved consequential decisions, and blockers you cannot resolve. Commit only on explicit instruction; do not add commit pauses in autonomous mode.
 - Never dispatch two implementers at once.
 - If no subagent tool is available, say so once and switch to inline for the rest of the run. Record `Execution mode: inline (no subagent tool)` in the impl plan header.

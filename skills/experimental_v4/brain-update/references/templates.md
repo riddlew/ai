@@ -25,7 +25,7 @@ Main branch: main
 | `specs/01-<slug>.md` | <one line> | draft / approved / implemented / superseded |
 | `adrs/0001-<slug>.md` | <one line> | accepted / superseded |
 | `tickets/<feature>/` | <one line> | open / in progress / done |
-| `impl_plans/<feature>.md` | <one line> | open / in progress / done |
+| `impl_plans/<feature>.md` | Implementation design and progress | design draft / design approved / in progress / done |
 | `planning/<feature>/` | <one line> | active / done |
 | `diagnoses/01-<slug>.md` | <one line> | recorded |
 | `reviews/architecture/01-<slug>.md` | <one line> | recorded |
