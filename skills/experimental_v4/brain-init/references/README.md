@@ -98,9 +98,30 @@ See `USAGE.md` for example workflows and when to use `brain-brainstorm`, `brain-
 
 For example, a request to extend communication in an existing `Session` does not authorize silently moving connection ownership into a new `ConnectionManager`. Claude should explain the concrete reason for such a change, compare it with extending `Session`, and ask you which design to adopt.
 
-## Model tiers
+## Model tiers and recommended models
 
-Skills refer to a "standard tier" and a "strongest tier". `CLAUDE.local.md` maps tiers to models in one table, which is the only place to change them. At skill start, Claude suggests a `/model` switch once, and only on a clear mismatch.
+`CLAUDE.local.md` is the **authority for role-to-model assignments**: standard tier = Sonnet and strongest tier = Opus. The recommendations below are **starting points for the main session**, not hard requirements or overrides of the policy. Use the latest available model in each family; do not pin these recommendations to a version. Existing skill rules govern whether Claude suggests a `/model` switch, and delegated subagents continue to use the explicit assignments in `CLAUDE.local.md` (including Sonnet implementers/reviewers and Opus final review/fix roles).
+
+| Skill | Default main-session model | When to deviate |
+|---|---|---|
+| `brain-init` | **Sonnet** | **Opus** for a large or unfamiliar repository, contradictory legacy documentation, or tricky project/brain migration decisions. |
+| `brain-update` | **Sonnet** | **Opus** for complex rebases and branch reconciliation, conflicting authoritative records, or broad re-verification after history changes. |
+| `brain-brainstorm` | **Opus** | **Sonnet** if requirements and ownership are already settled and only a narrow, low-risk choice remains. |
+| `brain-diagnose` | **Sonnet** | **Opus** for intermittent concurrency bugs, distributed client/server failures, intricate lifecycle issues, or evidence supporting several competing root causes. |
+| `brain-distill-content` | **Sonnet** | **Opus** for lengthy, deeply interdependent technical or protocol material where losing a qualification could change the meaning. Check exact contractual wording regardless of model. |
+| `brain-blueprint` | **Opus** | **Sonnet** for a small, familiar change with established architecture and straightforward interfaces; use Opus for consequential ownership, API, or cross-service design. |
+| `brain-implement` | **Sonnet** | **Opus** for tightly coupled multi-system changes, byte-exact protocol work, concurrency/state-machine correctness, risky migrations, or repeated design/test failures. Merely changing many files does not itself require Opus. In **subagent-driven** execution, keep the main coordinator on Sonnet as the policy specifies; explicit subagent/final-review roles follow the policy table. |
+| `brain-plan-feature` | **Opus** | **Sonnet** when the architecture and requirements are settled and the work is primarily sequencing known tasks and maintaining planning state. |
+| `brain-refine-backlog` | **Sonnet** | **Opus** for ambiguous cross-service requirements, major compatibility constraints, or complex dependency and acceptance-criteria conflicts. |
+| `brain-review-architecture` | **Opus** | **Sonnet** for a narrow, well-understood module or interface assessment with few architectural tradeoffs. |
+| `brain-review-code` | **Sonnet** | **Opus** for broad, high-risk changes involving multiple interacting services, concurrency, security boundaries, exact wire contracts, or hard-to-trace regressions. Delegated assessment subagents remain Sonnet unless the central policy is changed. |
+| `brain-review-merge-request` | **Sonnet** | **Opus** for large, consequential MRs/PRs with substantial cross-module behavior, protocol/security impact, migration risk, or difficult requirement reconciliation. |
+| `brain-review-security` | **Opus** | **Sonnet** only for a narrowly scoped, well-understood check with explicit threat assumptions; retain Opus for consequential trust-boundary, authentication, authorization, or cryptographic decisions. |
+| `brain-test-skill` | **Sonnet** | **Opus** when designing subtle adversarial scenarios or interpreting ambiguous, high-impact behavior failures. Test agents should still run at the tier of the role being tested, as defined in the policy. |
+| `brain-write-spec` | **Opus** | **Sonnet** when transcribing fully settled, unambiguous requirements with no consequential decisions remaining. |
+| `brain-write-tickets` | **Sonnet** | **Opus** when dividing tightly coupled, multi-system work into safe increments requires difficult dependency or protocol reasoning. |
+
+**Selection rule:** Prefer Sonnet for bounded execution, mechanical documentation, and routine review; use Opus when a mistake is costly and success requires reconciling ambiguous requirements, architecture, or interacting subsystems. Escalate for **reasoning difficulty and consequence**, not just feature size or file count. For a fixed task, a stronger model does not replace exact specifications, golden-vector tests, appropriate tool checks, or independent review. Keep the skill's collaborative approval checkpoints regardless of model. See [Anthropic's model-selection guidance](https://platform.claude.com/docs/en/about-claude/models/choosing-a-model) for current model capabilities.
 
 ## Skills
 
