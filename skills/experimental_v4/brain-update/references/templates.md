@@ -22,6 +22,8 @@ Main branch: main
 
 | Path | Purpose | Status |
 |---|---|---|
+| `USAGE.md` | Brain Skills workflow examples and selection guide | reference |
+| `README.md` | Brain Skills catalog and installation reference | reference |
 | `specs/01-<slug>.md` | <one line> | draft / approved / implemented / superseded |
 | `adrs/0001-<slug>.md` | <one line> | accepted / superseded |
 | `tickets/<feature>/` | <one line> | open / in progress / done |

@@ -5,7 +5,7 @@ description: Use when another skill finishes work that changed project knowledge
 
 # Brain Update
 
-`.brain/` is the project's central memory: what the project is, how it is built, what the user decided, what is open, and what is done. `brain-init` creates it. After that, this skill is the only writer of the root files and `adrs/`. Other skills write their own documents into `.brain/` subfolders, then invoke this skill. Follow `CLAUDE.local.md` for decision authority.
+`.brain/` is the project's central memory: what the project is, how it is built, what the user decided, what is open, and what is done. `brain-init` creates it. After that, this skill is the only writer of the root project-knowledge files and `adrs/` (except that `brain-init` may register its two bundled guides in `00_index.md`). Other skills write their own documents into `.brain/` subfolders, then invoke this skill. Follow `CLAUDE.local.md` for decision authority.
 
 **Always:**
 
@@ -43,7 +43,7 @@ The root files describe the main branch, and `Last synced` is always a commit on
 
 On the main branch:
 
-1. Read **every root file**, unless already loaded in this session and still in context; include the index. This full read is intentional so changes can be checked against the entire project model.
+1. Read **every project-knowledge root file**, unless already loaded in this session and still in context; include the index. This full read is intentional so changes can be checked against the entire project model. Exclude only the `USAGE.md` and `README.md` workflow guides installed by `brain-init`; consult relevant guide sections when needed.
 2. Gather what changed since `Last synced`:
    - committed work: enumerate **all** paths and renames with `git log --stat <sha>..HEAD` and `git diff --name-status <sha> HEAD`, then inspect the actual diffs and surrounding source for every change that could affect project knowledge. Do not rely on commit messages or path names alone; avoid dumping unrelated large/generated diffs into context without inspecting their effects;
    - uncommitted work: inspect `git status --short`, relevant staged changes (`git diff --cached`), unstaged changes (`git diff`), and relevant untracked files (`git ls-files --others --exclude-standard`). `git status` alone is not evidence of behavior;
@@ -70,7 +70,7 @@ On the main branch:
 
 | File | Holds |
 |---|---|
-| `00_index.md` | `Last synced`, `Git`, and `Main branch` header lines; every `.brain` document with purpose and status, including `pending/` files |
+| `00_index.md` | `Last synced`, `Git`, and `Main branch` header lines; every `.brain` document with purpose and status, including `pending/` files and the two workflow guides |
 | `01_about.md` | Purpose, users, core concepts, how it works |
 | `02_features.md` | What each feature does, by module (progress lives in `state.md`) |
 | `03_architecture.md` | Stack, runtime, platforms, components and what each owns, dependency direction, domain boundaries |
@@ -88,6 +88,8 @@ On the main branch:
 A project-specific topic gets the next free number, for example `10_protocols.md`.
 
 **Knowledge quality:** include source file paths for implementation-specific facts and preserve behavioral contracts, ownership, invariants, non-obvious API details, and known pitfalls. Explain the system rather than duplicating code; do not discard details that would force repeated rediscovery. When a fact has not been verified on the current branch, mark the uncertainty and scope instead of asserting it as current.
+
+**Workflow guides:** `README.md` and `USAGE.md` are read-only snapshots installed by `brain-init` and registered as `reference` in the index. Do not treat them as project facts, rewrite them during sync, or count their size toward the project-knowledge root limits.
 
 **Size:**
 - When a root file passes about 4,000 words, move its detail into `.brain/NN_<topic>/<subtopic>.md`, and keep a summary in the root file with links to the detail. Never drop content while splitting.
