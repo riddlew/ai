@@ -33,6 +33,8 @@ Main branch: main
 | `reviews/architecture/01-<slug>.md` | <one line> | recorded |
 | `docs/adr/0002-<slug>.md` | Left in place at the user's request | accepted |
 | `pending/<branch>.md` | Changes waiting for `<branch>` to merge | pending |
+| `sources/<source-slug>.md` | Source map, exact references, and coverage for an authoritative document | indexed / partial / stale |
+| `knowledge/<domain>/<topic>.md` | Detailed technical knowledge with source references | current / partial / stale |
 ```
 
 `Git:` is `ignored` or `tracked`. `Main branch:` names the branch the root files describe.
@@ -83,6 +85,70 @@ Use when a subsystem or API needs durable detail beyond the root overview. Inclu
 ## Verification
 <What was checked, on which branch/revision; what remains uncertain.>
 ```
+
+## `sources/<source-slug>.md` (authoritative source map)
+
+Use one source map per designated authoritative document. Do not claim the full document was indexed unless all relevant sections were actually inspected.
+
+```markdown
+# <Document title> — Source Map
+
+Authoritative source: `docs/<path-to-original.pdf>`
+Authority established by: <user instruction or applicable approved project record>
+Version / revision: <version or "unknown">
+Content fingerprint: <SHA-256 or "not available">
+Checked: <YYYY-MM-DD>
+Coverage: indexed / partial / unverified / stale
+
+## Scope
+<Which systems, protocols, and versions the source governs.>
+
+## Section map
+| Source section / page / table | Technical topic | Brain knowledge | Coverage |
+|---|---|---|---|
+| §3.1, pp. 14–16, Table 2 | Frame header | `knowledge/protocols/tcp-framing.md` | indexed |
+| §3.2, p. 17 | Error handling | `knowledge/protocols/errors.md` | partial |
+
+## Missing or uncertain coverage
+<Unreviewed sections, unreadable diagrams, ambiguous source locations.>
+
+## Source changes
+<Meaningful changes since the previous verified version and affected knowledge paths.>
+```
+
+Use exact references found in the original; the values above are illustrative.
+
+## `knowledge/<domain>/<topic>.md` (source-derived technical knowledge)
+
+Keep documents topic-specific. Include only applicable sections; use precise references for each important contract, especially message formats and state-machine transitions.
+
+```markdown
+# <Technical topic>
+
+## Provenance
+- Governing source: `docs/<path-to-original.pdf>` (version <...>)
+- Source map: `sources/<source-slug>.md`
+- Relevant sections: <actual section IDs, pages, tables, figures>
+- Checked: <YYYY-MM-DD>; coverage: current / partial / stale
+
+## How it works
+<Useful technical model: responsibilities, flow, and interactions.>
+
+## Explicit source requirements
+- <Behavior, field layout, ranges, failure semantics, or timing rules.>
+  Source: <exact section/page/table/requirement ID>.
+
+## Contracts and pitfalls
+<Important invariants, edge cases, version limits, and common mistakes.>
+
+## Current implementation (if verified)
+- <Code path and observed behavior, or "not yet implemented".>
+
+## Uncertainty and verification
+<Missing evidence, disagreements with code, checks needed against the original.>
+```
+
+The original source remains authoritative. Do not copy entire documents, invent details for uninspected sections, or record source requirements as user-approved decisions.
 
 ## `09_user_decisions.md` entry
 
