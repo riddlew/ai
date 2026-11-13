@@ -76,7 +76,7 @@ Take these steps in order.
    | `docs/implementation/<f>/guidance.md` | its content into the relevant root files, then delete |
    | `docs/planning/*` | `.brain/planning/` |
    | `docs/diagnoses/*` | `.brain/diagnoses/` |
-   | `docs/reviews/architecture/*`, `docs/security/*` | `.brain/reviews/architecture/`, `.brain/reviews/security/` |
+   | `docs/reviews/architecture/*`, `docs/security/*` | `.brain/reviews/architecture/<NN>-<slug>/review.md`, `.brain/reviews/security/<NN>-<slug>/review.md` (one folder per report; preserve any supporting files in the same folder) |
    | `CONTEXT.md` | entries in `glossary.md`, then delete |
    | `CONTEXT-MAP.md` | domain-boundaries section of `03_architecture.md`, then delete |
 

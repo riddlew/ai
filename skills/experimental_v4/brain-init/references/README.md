@@ -25,7 +25,7 @@ project/
         ├── brain-plan-feature/
         ├── brain-refine-backlog/        # SKILL.md + references/
         ├── brain-review-architecture/
-        ├── brain-review-code/           # SKILL.md + references/findings.md
+        ├── brain-review-code/           # SKILL.md + references/{findings.md,report-storage.md}
         ├── brain-review-merge-request/
         ├── brain-review-security/
         ├── brain-test-skill/            # SKILL.md + references/scenario-format.md
@@ -38,11 +38,11 @@ project/
 
 `brain-brainstorm/scripts/` is an optional browser companion for mockups. It needs Node.js, has no npm dependencies, and makes no network request beyond localhost. It is adapted from obra/superpowers (MIT; see `scripts/LICENSE` and `scripts/README.md`).
 
-`brain-review-architecture`, `brain-review-security`, and `brain-review-merge-request` read the shared finding format from `brain-review-code/references/findings.md`, so install them together with `brain-review-code`. Likewise, `brain-init` uses `brain-update`'s root-file rules and templates, so install the two together.
+`brain-review-architecture`, `brain-review-security`, and `brain-review-merge-request` read the shared finding format and review-storage rules from `brain-review-code/references/{findings.md,report-storage.md}`, so install them together with `brain-review-code`. Likewise, `brain-init` uses `brain-update`'s root-file rules and templates, so install the two together.
 
 Skills labeled **manual** use `disable-model-invocation: true` and must be explicitly invoked (for example, `/brain-implement`). Other skills may be selected when relevant, and can also be invoked explicitly.
 
-`tests/` is not part of this archive. If you maintain scenario fixtures separately, keep them outside the installed skills and use `brain-test-skill` to run them (see [Verification](#verification)).
+`tests/` contains development fixtures and scenarios; it is not an installed Claude Code skill. Copy only the `brain-*` directories into `.claude/skills/`. Use `brain-test-skill` for behavioral verification (see [Verification](#verification)).
 
 See `USAGE.md` for example workflows and when to use `brain-brainstorm`, `brain-plan-feature`, and `brain-blueprint`. `/brain-init` can also be rerun to install or reconcile the policy and missing guides in a project whose brain already exists. It never overwrites a changed `.brain/USAGE.md` or `.brain/README.md` without permission. The guides are referenced selectively rather than loaded automatically.
 
@@ -73,6 +73,7 @@ See `USAGE.md` for example workflows and when to use `brain-brainstorm`, `brain-
 ├── tickets/             <feature-slug>/NN-<slug>.md
 ├── impl_plans/          <feature>.md: approved blueprint + execution tracking
 ├── planning/            <feature>/INDEX.md and NNN-<slug>.md
+├── reviews/             <type>/<NN>-<slug>/review.md (one folder per saved review)
 ├── diagnoses/           NN-<slug>.md
 ├── reviews/             architecture/NN-<slug>.md, security/NN-<slug>.md
 ├── pending/             <branch>.md: changes waiting for a branch to merge
@@ -140,10 +141,10 @@ For example, a request to extend communication in an existing `Session` does not
 | `brain-implement` **(manual)** | Implements approved work in small verified behavioral increments. **Collaborative is default**: review the actual diff and tests, then approve each increment before the next. Guided uses larger increments; autonomous skips routine approval pauses. Inline/subagent execution is independent (collaborative defaults inline). Proposes commits but commits only if explicitly asked. Performs proportionate final review. | You are ready to change code, with or without a formal spec; substantial/design-sensitive work normally starts with an approved blueprint. | Code, checks, and mutable execution tracking in the **same** `.brain/impl_plans/<feature>.md`. |
 | `brain-plan-feature` | Tracks multi-session planning with dependency-aware research, consult, prototype, and task tickets. | An initiative has many interdependent decisions and spans days or sessions. | `.brain/planning/<feature>/INDEX.md` and planning tickets. |
 | `brain-refine-backlog` | Reviews Jira stories for refinement readiness without changing them. | Preparing for backlog refinement. | Suggested gaps, draft acceptance criteria, and questions. |
-| `brain-review-architecture` | Discovers architectural friction **or** assesses a selected boundary, using concrete evidence. | You want improvement candidates or a focused design evaluation. | Findings in conversation; `.brain/reviews/architecture/` only on request. |
-| `brain-review-code` | Assesses a bounded change set for correctness, requirement fit, and repository fit, delegating to subagents for larger changes. | A substantive change needs review, or you request one. | Three-section findings report, with a coverage table marking each spec Example and ticket acceptance criterion met, unmet, or unverifiable. |
-| `brain-review-merge-request` **(manual)** | Reviews an MR/PR against Jira acceptance criteria using `brain-review-code`, adding coverage, tests, performance, and a merge recommendation. Read-only. | You want an advisory merge assessment. | Consolidated findings and Approve / Request changes. |
-| `brain-review-security` | Examines realistic threats, trust boundaries, access control, credentials, and sensitive-data flows. | Work changes a security boundary or you request an audit. | Findings in conversation; `.brain/reviews/security/` only on request. |
+| `brain-review-architecture` | Discovers architectural friction **or** assesses a selected boundary, checks relevant previous reviews, and records coverage and finding dispositions. | You want improvement candidates or a focused design evaluation. | Findings in conversation; standalone reviews save `.brain/reviews/architecture/<NN>-<slug>/review.md` by default when a brain is writable. |
+| `brain-review-code` | Assesses a bounded change set for correctness, requirement fit, and repository fit, delegating to subagents for larger changes. | A substantive change needs review, or you request one. | Three-section findings report and requirements coverage table; optional `.brain/reviews/code/<NN>-<slug>/review.md`. |
+| `brain-review-merge-request` **(manual)** | Reviews an MR/PR against Jira acceptance criteria using `brain-review-code`, adding coverage, tests, performance, and a merge recommendation. Read-only except requested report export. | You want an advisory merge assessment. | Consolidated findings and Approve / Request changes; optional `.brain/reviews/merge-request/<NN>-<slug>/review.md`. |
+| `brain-review-security` | Examines realistic threats, trust boundaries, access control, credentials, and sensitive-data flows. | Work changes a security boundary or you request an audit. | Findings in conversation; optional `.brain/reviews/security/<NN>-<slug>/review.md`. |
 | `brain-test-skill` | Tests whether a skill changes what an agent does by running it in fresh agents on throwaway fixtures, before and after a change, with pressure scenarios for rules an agent may skip. It reports pass or fail per criterion with verbatim quotes, and never reports a reading of the skill as a test result. | You want to know whether a skill's rule holds, or you are creating a skill or changing what one does. | Per-criterion results in conversation, also recorded in the project's scenarios file when a skill changed. |
 | `brain-write-spec` **(manual)** | Records established requirements, invariants, concrete examples, and decisions without inventing missing choices; each spec is self-checked and read by a fresh builder reviewer. | A substantial feature needs a stable implementation contract. | `.brain/specs/<NN>-<slug>.md`. |
 | `brain-write-tickets` | Decomposes approved work into verifiable increments whose acceptance criteria reference spec examples, with your approval of the set; the set comes with a coverage table and a builder review before you approve it. | Work benefits from independent tickets or staged delivery. | `.brain/tickets/<feature>/<NN>-<slug>.md`. |
@@ -249,9 +250,9 @@ The impl plan header records blueprint status, **collaboration mode** (`collabor
 
 Implementation uses focused test-first increments, starting from the specification's examples and covering stated invariants and failure paths beyond them. In collaborative/guided mode, **technically verified is not finished until you review the increment**. A user may revise code between increments; Claude compares the actual diff and reruns impacted checks rather than undoing user edits. At completion, validation is proportional to scope and risk. `brain-review-code` runs for substantial or consequential changes, **not every trivial edit**; in subagent-driven mode each task also gets a task review with up to five fix rounds. `brain-review-security` is similarly risk-based. Review findings are handled by `brain-implement/references/review-feedback.md`: verify before acting, and push back with evidence. No task is marked done without meaningful verification inspected in that session; when automated tests are inapplicable, alternatives and their limitations must be recorded.
 
-All review skills share one severity scale (Critical / High / Medium / Low), a separate confidence rating, and common finding fields, defined in `brain-review-code/references/findings.md`.
+All four `brain-review-*` skills share the severity, confidence, and finding format in `brain-review-code/references/findings.md`, plus the per-review folder layout in `brain-review-code/references/report-storage.md`. New reports always use `.brain/reviews/<type>/<NN>-<slug>/review.md`; legacy flat reports remain readable. Standalone architecture reviews save by default when a brain is writable; other review skills save only when requested or needed by an invoking workflow.
 
-`brain-test-skill` supports behavioral verification in fresh agents against throwaway repositories, comparing original and changed skills. The referenced scenario fixtures are **not included in this ZIP**; static checks alone do not prove agent behavior. Run behavioral tests before relying on a changed rule in production.
+`brain-test-skill` supports behavioral verification in fresh agents against throwaway repositories, comparing original and changed skills. The development fixtures and scenarios are included in the source archive, but are not part of the installed skills; static checks alone do not prove agent behavior. Run behavioral tests before relying on a changed rule in production.
 
 ## Reviews
 
@@ -279,7 +280,7 @@ Questions only you can answer come in one message, and anything left unanswered 
 
 - Every skill is renamed with a `brain-` prefix (`brainstorm` → `brain-brainstorm`, and so on).
 - New `brain-init` and `brain-update` skills and `.brain/` project store: `brain-init` creates the brain, and `brain-update` keeps it in sync. Every skill except `brain-init`, `brain-distill-content`, and `brain-test-skill` reads the brain's root files once per session.
-- All generated documents move into `.brain/`: `docs/specs/` → `.brain/specs/`, `docs/adr/` → `.brain/adrs/`, `docs/tickets/<f>/issues/` → `.brain/tickets/<f>/`, `docs/implementation/<f>/todo.md` → `.brain/impl_plans/<f>.md`, `docs/planning/` → `.brain/planning/`, `docs/diagnoses/` → `.brain/diagnoses/`, `docs/reviews/architecture/` and `docs/security/` → `.brain/reviews/`.
+- All generated documents move into `.brain/`: `docs/specs/` → `.brain/specs/`, `docs/adr/` → `.brain/adrs/`, `docs/tickets/<f>/issues/` → `.brain/tickets/<f>/`, `docs/implementation/<f>/todo.md` → `.brain/impl_plans/<f>.md`, `docs/planning/` → `.brain/planning/`, `docs/diagnoses/` → `.brain/diagnoses/`, `docs/reviews/architecture/` and `docs/security/` → individual `.brain/reviews/<type>/<NN>-<slug>/review.md` files.
 - `domain-modeling` is removed: `CONTEXT.md` becomes `.brain/glossary.md`, `CONTEXT-MAP.md` becomes the domain-boundaries section of `.brain/03_architecture.md`, and ADR writing moves into `brain-update`.
 - `handoff` is removed: `state.md`, `open_questions.md`, and impl plans cover continuation.
 - `implement`'s `guidance.md` is removed; discoveries go into the brain's root files.

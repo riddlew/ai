@@ -12,7 +12,7 @@ Produce one advisory assessment of the **current proposed change**. The analysis
 
 ## Read-only
 
-Do not edit project code or documentation, commit, push, post comments, change merge-request state, or approve or request changes on the hosting platform. The recommendation is advisory.
+Do not edit reviewed code or existing documentation, commit, push, post comments, change merge-request state, or approve or request changes on the hosting platform. A new review report may be written only when explicitly requested or needed by the invoking workflow (§7). The recommendation is advisory.
 
 Deeper verification may use a disposable checkout or isolated temporary worktree; never change reviewed files. A temporary worktree changes Git administrative state until removed: clean it up safely after review and verify it is gone, or do not create it if cleanup is uncertain. Before executing code from an untrusted contribution, assess its side effects and exposure to credentials, networks, and production resources. Do not run destructive operations, intrusive security tests, or commands against production without separate explicit authorization. Never expose secrets in findings.
 
@@ -96,3 +96,7 @@ Conclude with:
 4. **Recommendation: Approve** or **Recommendation: Request changes**, reasoned from blocking findings and unresolved risk. If critical evidence is missing, say why the recommendation is provisional and what would resolve it.
 
 If no material findings are supported, state: **No material issues found within the reviewed scope and available evidence.** Do not claim the change is bug-free, secure, or fully verified.
+
+## 7. Optional durable report
+
+Deliver findings in the conversation by default. When the user requests a saved review or the invoking workflow explicitly needs a durable record, follow `${CLAUDE_SKILL_DIR}/../brain-review-code/references/report-storage.md` and write `.brain/reviews/merge-request/<NN>-<short-slug>/review.md`. Include the target/source refs and reviewed head SHA, requirements coverage, findings, CI and verification limits, prior-review dispositions when applicable, and advisory recommendation. For a re-review, also check matching saved reports as well as platform review threads; verify prior findings against the current head. Do not edit existing documentation or previous reports. The new report is the only review-owned file written unless supporting artifacts were explicitly requested; invoke `brain-update` to index it. Report the saved path, or explain why it could not be saved.

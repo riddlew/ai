@@ -1142,6 +1142,45 @@ The tester stops each run when the agent presents its direction (`brain-brainsto
 
 ---
 
+## S64: Architecture review carries forward verified findings in a new folder (not yet run)
+
+- **Fixture:** synced (includes legacy `.brain/reviews/architecture/01-store-layering.md`).
+- **Skill:** `brain-review-architecture`, standalone discovery review.
+- **Trigger:** The user says: "/brain-review-architecture review the storage architecture again; do not change code."
+
+**Pass criteria**
+
+1. The existing flat report is read as a historical baseline, but each prior finding is rechecked against current source rather than copied uncritically.
+2. The response distinguishes prior findings that remain supported, were resolved, are no longer applicable, or cannot be verified, plus newly discovered issues; it records a bounded coverage summary and limitations.
+3. A new `.brain/reviews/architecture/02-<slug>/review.md` exists with the reviewed Git revision, evidence, prior-finding dispositions, and coverage; no new loose report is created under `.brain/reviews/architecture/`.
+4. `.brain/reviews/architecture/01-store-layering.md` is unchanged; `brain-update` indexes the new nested report without recording unapproved recommendations as accepted decisions or ADRs.
+5. No production code changes.
+
+## S65: All review skills save to separate folders (not yet run)
+
+- **Fixture:** separate fresh synced fixtures for each of `brain-review-code`, `brain-review-merge-request`, and `brain-review-security`. Provide suitable bounded scopes and existing requirements. Explicitly request a saved review; the architecture case is covered by S64.
+- **Trigger:** Invoke each skill with a valid review task and "Save the review report to the project brain." For the merge-request case, use a local branch with a verified base and provide acceptance criteria.
+
+**Pass criteria**
+
+1. Code writes `.brain/reviews/code/01-<slug>/review.md`; merge-request writes `.brain/reviews/merge-request/01-<slug>/review.md`; security writes `.brain/reviews/security/01-<slug>/review.md`.
+2. None writes loose `.md` review files immediately under its type directory or modifies reviewed code.
+3. Each report records source revision, scope, findings or their absence, and relevant uncertainty; each is indexed through `brain-update`.
+4. On a repeat review with an existing saved report, previous findings are checked against current evidence rather than presumed correct.
+
+## S66: Specialist architecture review does not create an unsolicited report (not yet run)
+
+- **Fixture:** synced.
+- **Skill:** `brain-review-merge-request` invoking `brain-review-architecture` for a bounded structural concern.
+- **Trigger:** The user says: "/brain-review-merge-request review this local change against the provided acceptance criteria. I want the findings in conversation only."
+
+**Pass criteria**
+
+1. Neither the merge-request skill nor its architecture specialist writes anything under `.brain/reviews/`.
+2. The specialist's architecture findings contribute to the merge review without being saved as a standalone architecture review.
+3. No code, existing documentation, or approval state changes.
+
+
 ## Results
 
 ### Baseline (brief only), 2026-11-03

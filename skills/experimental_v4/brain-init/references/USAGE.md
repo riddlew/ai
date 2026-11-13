@@ -417,6 +417,8 @@ For an isolated one-line defect with a strong regression test, proportional self
 
 ## Step 1: `/brain-review-architecture` — Discover evidence
 
+Standalone architecture reviews save a revision-specific report under `.brain/reviews/architecture/<NN>-<slug>/review.md` when a writable brain exists. Subsequent reviews validate prior findings against current code rather than assuming they remain correct.
+
 **Example prompt:**
 
 > `/brain-review-architecture`

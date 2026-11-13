@@ -30,7 +30,7 @@ Main branch: main
 | `impl_plans/<feature>.md` | Implementation design and progress | design draft / design approved / in progress / done |
 | `planning/<feature>/` | <one line> | active / done |
 | `diagnoses/01-<slug>.md` | <one line> | recorded |
-| `reviews/architecture/01-<slug>.md` | <one line> | recorded |
+| `reviews/architecture/01-<slug>/review.md` | <one line> | recorded |
 | `docs/adr/0002-<slug>.md` | Left in place at the user's request | accepted |
 | `pending/<branch>.md` | Changes waiting for `<branch>` to merge | pending |
 | `sources/<source-slug>.md` | Source map, exact references, and coverage for an authoritative document | indexed / partial / stale |

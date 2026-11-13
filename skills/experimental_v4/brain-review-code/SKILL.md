@@ -7,7 +7,7 @@ description: Review a bounded Git change set for correctness, requirement fit, a
 
 **Project brain:** Follow `CLAUDE.local.md` §Project brain loading: read **all** root `.md` files once per session (again after compaction), plus the active branch's pending file when present. Inspect linked detail and verify task-critical facts against current source. Do not send the whole brain to subagents. If no brain exists, proceed and mention `/brain-init` once.
 
-Review a bounded change set in three assessments: **Correctness**, **Requirement fit**, and **Repository fit**. Follow `CLAUDE.local.md` for decision authority; a finding may recommend a change but does not authorize a redesign. **Read-only:** do not edit, stage, commit, push, or apply fixes. If targeted tests create temporary artifacts, ensure they do not overwrite existing work and disclose any residual changes.
+Review a bounded change set in three assessments: **Correctness**, **Requirement fit**, and **Repository fit**. Follow `CLAUDE.local.md` for decision authority; a finding may recommend a change but does not authorize a redesign. **Read-only with respect to the reviewed code and existing project documentation:** do not edit, stage, commit, push, or apply fixes. A new durable review report is permitted only when explicitly requested or required by the invoking workflow (§7). If targeted tests create temporary artifacts, ensure they do not overwrite existing work and disclose any residual changes.
 
 Format every finding as defined in `${CLAUDE_SKILL_DIR}/references/findings.md`.
 
@@ -146,3 +146,7 @@ Repository fit: <N> findings
 ```
 
 Do not derive an overall pass/fail verdict. If a correction requires a consequential choice, name the decision to take back to the user.
+
+## 7. Optional durable report
+
+Deliver findings in the conversation by default. When the user requests a saved review or the invoking workflow explicitly needs a durable record, follow `${CLAUDE_SKILL_DIR}/references/report-storage.md` and write `.brain/reviews/code/<NN>-<short-slug>/review.md`. Include the base and reviewed revision, change-set scope, three assessments and coverage table, verification limits, and findings. For a repeat review, reconcile relevant prior saved findings against the current code before concluding. Do not edit reviewed code or previous review reports. The new report is the only review-owned file written unless supporting artifacts were explicitly requested; invoke `brain-update` to index it. Report the saved path, or explain why it could not be saved.

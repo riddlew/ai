@@ -26,6 +26,14 @@ Favor present problems over theoretical elegance: duplicated ownership, broken i
 
 Test each candidate first against the **smallest improvement within existing responsibilities**. Consider a larger boundary or abstraction only when it remedies a concrete limitation at justified cost. Future use cases may inform reversibility analysis but are not requirements.
 
+## Coverage and previous reviews
+
+For a standalone review, first identify the current branch and `HEAD` SHA, relevant uncommitted changes, and the bounded review scope. Inspect the relevant code independently; do not let earlier reports substitute for current evidence.
+
+Inventory relevant saved architecture reviews under `.brain/reviews/architecture/`, including legacy flat reports. Read the most recent matching review and any earlier review needed to understand outstanding findings. Check each prior finding against the current implementation and classify it as **still supported**, **resolved**, **no longer applicable**, or **unverified**. Keep newly discovered issues separate from issues newly introduced by code changes; on unchanged code, a new finding is a discovery, not a regression. If no usable prior report exists, state that this review establishes the baseline.
+
+For the selected scope, record a compact **coverage summary** of the boundaries, responsibilities, lifecycle or contracts inspected, the evidence examined, and any unexamined areas. Do not imply that inspected areas are defect-free. In the conclusion, reconcile prior findings with current findings and identify any coverage gaps; do not infer the cause of a previous omission without evidence. Include the coverage summary and prior-finding dispositions in the conversation report, not just the saved file.
+
 ## Mode A — Discovery
 
 1. Center the search on the user's concern or change-cost pattern. Build a minimal picture of major modules, dependency direction, responsibility owners, and test interfaces.
@@ -64,10 +72,10 @@ Do not implement, adopt, or document a proposed architecture as settled until th
 
 ## Output
 
-Deliver the review in the conversation. Write a durable report only when the user requests one or a workflow needs it for continuation (for example, a `brain-plan-feature` research ticket).
+Deliver the review in the conversation. **For a standalone architecture review, also save a durable report by default when a writable project brain exists**, so later reviews have a baseline. When invoked solely as a specialist inside another review, return findings to the invoking workflow without saving unless requested. If the user explicitly requests a conversation-only review, do not save.
 
-A durable report goes in `.brain/reviews/architecture/<NN>-<short-slug>.md`: increment the highest existing number, matching its padding (two digits by default). Never overwrite an earlier review. Include the scope, cited evidence, findings, the three concluding sections, and unresolved questions. A later approval leads to an ADR, not to a rewrite of the old review.
+Follow `${CLAUDE_SKILL_DIR}/../brain-review-code/references/report-storage.md`: save new reports at `.brain/reviews/architecture/<NN>-<short-slug>/review.md`. Include the scope and source revision, cited evidence, coverage summary and limitations, findings, reconciliation with previous reports (or "first baseline"), the three concluding sections, and unresolved questions. Preserve older reports even if their findings are later resolved. A later approval leads to an ADR, not a rewrite of the old review.
 
-When you save a durable report, it is the only file you write. Then invoke `brain-update` with a one-line summary of what changed.
+When saving, create the report early and update its substantive sections as the review progresses; distinguish tentative observations from verified findings. The report is the only review-owned file you write unless supporting artifacts were explicitly requested. Then invoke `brain-update` with a one-line summary of the new review; do not record unapproved recommendations as decisions.
 
-Report the conclusion and any file path created.
+Report the conclusion and any file path created, or disclose if no report was saved.
