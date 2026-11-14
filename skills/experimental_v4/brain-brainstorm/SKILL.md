@@ -115,6 +115,8 @@ Update the table: an answer may resolve or eliminate decisions, add new ones, or
 
 Publish the decision table **at most once per response**, and only when something changed since the last published table. Show the rows that changed.
 
+Before treating the decision table as complete, recheck the objective, established decisions, and in-scope behavior for overlooked consequential downstream decisions, ambiguous domain terms, contradictions, and failure cases. Add any new questions to the table and continue in dependency order. Do not expand into speculative requirements or routine implementation details.
+
 When every row is **Established** or **Deferred**, ask: "Is there anything else about how this should behave, or should I write up the direction?" Keep asking until the user says to write it up. If the user tells you to stop earlier, stop: each unanswered question stays an open decision, never a default. Don't settle **Deferred** details or hypothetical future requirements.
 
 ## 7. Confirm the direction
