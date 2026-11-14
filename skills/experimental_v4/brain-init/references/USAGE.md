@@ -46,6 +46,10 @@ If both are true, use both. **`brain-plan` is not a substitute for `brain-bluepr
 
 ---
 
+## Hierarchical feature documentation (current architecture)
+
+For new feature work the canonical document structure is `.brain/features/<feature-slug>/01-brief/`, `02-specifications/`, `03-components/`, `04-implementation-plans/`, and `05-tasks/`, with mutable execution state in `execution.md`. The hierarchy is optional when work is trivial or already fully settled; never create placeholder documents. `brain-decompose` maps behavior to functional components. `brain-write-tasks` replaces `brain-write-tasks` and produces executable actions from approved implementation plans. There is no legacy feature-document layout support. The normative contracts and templates ship in `brain-init/references/feature-document-contract.md` and `feature-document-templates.md`.
+
 ## Understand changes after implementation
 
 Run `/brain-explain-changes` to walk through the working-tree changes (or the latest commit if the tree is clean). Pass a file, symbol, or commit range to focus it, for example `/brain-explain-changes connection_manager`. Claude starts with a plain-language overview, traces actual application calls in small steps, and pauses for questions rather than giving a full code review. This skill reads files but does not edit them or create reports.
@@ -160,7 +164,7 @@ Also spell out stream behavior: one TCP receive call may return part of a frame,
 
 **Approval checkpoint:** Approve expected behavior, conformance examples, error handling, and binding architectural constraints.
 
-**Optional coordination:** If the feature spans many modules or sessions, use `brain-plan` to organize phases and dependencies. Use `brain-write-tickets` when independently verifiable work items are valuable. Neither replaces the specification or code-level blueprint.
+**Optional coordination:** If the feature spans many modules or sessions, use `brain-plan` to organize phases and dependencies. Use `brain-write-tasks` when independently verifiable work items are valuable. Neither replaces the specification or code-level blueprint.
 
 ## Step 3: `/brain-blueprint` — Agree on the actual code design
 
@@ -684,7 +688,7 @@ Claude checks the new MR head, relevant verification, and the entire resulting c
 
 | Situation | Typical skill sequence | Your involvement |
 |---|---|---|
-| Large feature, rigid protocol | `brain-brainstorm` → `brain-write-spec` → optional `brain-plan` / `brain-write-tickets` → `brain-blueprint` → `brain-implement` → `brain-review-code` | Approve architecture, spec, blueprint, and implementation increments. |
+| Large feature, rigid protocol | `brain-brainstorm` → `brain-write-spec` → optional `brain-plan` / `brain-write-tasks` → `brain-blueprint` → `brain-implement` → `brain-review-code` | Approve architecture, spec, blueprint, and implementation increments. |
 | Small, settled feature | `brain-implement` | Review the focused change and verification. |
 | Isolated protocol bug | `brain-diagnose` → focused fix → optional `brain-review-code` | Review the diagnosis and correction. |
 | Architecture cleanup | `brain-review-architecture` → `brain-brainstorm` → `brain-write-spec` → `brain-blueprint` → `brain-implement` → `brain-review-code` | Choose improvements and shape the exact design. |
