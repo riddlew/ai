@@ -1,6 +1,6 @@
 # Brain Skills — Usage Guide
 
-This guide explains when to use `brain-brainstorm` versus `brain-plan`, then demonstrates five end-to-end workflows using hypothetical client and server applications that communicate over TCP and UDP.
+This guide explains when to use `brain-brainstorm` versus `brain-plan`, then demonstrates six example workflows: five involving existing TCP/UDP client and server applications, and one multi-session project building a ZPL printer library and YAML-driven CLI.
 
 The prompts, file names, code examples, review findings, and test results are **illustrative**, not results from a real repository. Adapt them to your codebase and the capabilities of your installed skills.
 
@@ -44,6 +44,8 @@ You want to display the most recent UDP heartbeat timestamp, and the necessary s
 
 If both are true, use both. **`brain-plan` is not a substitute for `brain-blueprint`:** planning decides work breakdown and sequencing; blueprinting defines the code-level implementation. You do not need every skill for every feature. Use the smallest workflow that resolves the actual uncertainty and complexity.
 
+For a brand-new, multi-session project, see [Scenario 6: ZPL printer library and YAML CLI](#scenario-6--build-a-zpl-printer-library-and-yaml-cli-across-multiple-sessions) for an example of project-level brainstorming followed by repeated feature cycles.
+
 ---
 
 For a complete traceability example including ADR references, negative-path requirements, component ownership, technical plans, and executable task mappings, read `${CLAUDE_SKILL_DIR}/../brain-init/references/start-machine-example.md`. This is a planning example, not an implemented TCP feature.
@@ -58,7 +60,7 @@ Run `/brain-explain-changes` to walk through the working-tree changes (or the la
 
 ---
 
-# Shared example project
+# Shared client/server example project (Scenarios 1–5)
 
 Assume a repository contains two applications:
 
@@ -694,6 +696,576 @@ Claude checks the new MR head, relevant verification, and the entire resulting c
 
 ---
 
+# Scenario 6 — Build a ZPL printer library and YAML CLI across multiple sessions
+
+This example walks through developing a new project with two components:
+
+1. **A reusable ZPL library** that constructs and renders labels and sends ZPL to compatible printers over TCP, USB, or other approved transports.
+2. **A CLI application** that reads YAML label definitions, validates them, renders ZPL using the library, and optionally sends jobs to a printer.
+
+The goal is to build the project over **multiple Claude sessions** while retaining architectural decisions in `.brain/`, reviewing important implementation choices before code is written, and approving small increments of working code.
+
+> **Example assumptions:** The language is Python; initial platforms and printer models are to be decided. API names, file layouts, YAML schemas, and commands shown below are proposals, not established requirements. Confirm them during brainstorming and specification. A transport successfully sending bytes is not proof that the physical label printed.
+
+## Choosing the development workflow
+
+For a project like this, **default to a project-level brainstorm followed by repeated feature-level cycles**. Use `brain-plan` when there are several interdependent unknowns to research or decisions to coordinate across sessions; it is not required simply because the overall project is large.
+
+| Situation | Start with | Why |
+|---|---|---|
+| The product goals or architecture are undecided | `brain-brainstorm` | Decide *what to build* and key boundaries |
+| Multiple technical investigations must be completed before decisions can be made | `brain-plan` | Track research, dependencies, and unresolved questions |
+| A feature's requirements are established | `brain-write-spec` or `brain-blueprint` | Avoid unnecessary preliminary stages |
+| The public behavior and code design are already settled | `brain-implement` | Deliver the smallest verified change |
+
+The recurring feature workflow is:
+
+```text
+brain-brainstorm (when needed)
+        ↓
+brain-write-spec
+        ↓
+brain-write-tickets (for substantial features, when useful)
+        ↓
+brain-blueprint
+        ↓
+brain-implement (collaborative by default)
+        ↓
+brain-review-code / brain-review-security (as warranted)
+        ↓
+brain-update
+```
+
+Each skill must respect established specifications, ADRs, and approved decisions. A blueprint does not supersede a specification, and a review finding does not authorize an unapproved redesign.
+
+---
+
+## Session 1 — Initialize the project
+
+**Skill:** `brain-init`  
+**Suggested model:** Sonnet
+
+Create the repository and an initial Git commit, then initialize `.brain/`.
+
+**Example prompt**
+
+```text
+/brain-init
+
+I'm starting a project with two components:
+- A reusable ZPL library for generating labels and communicating
+  with compatible printers.
+- A CLI application that reads YAML label definitions and uses
+  the library to render or print labels.
+
+The project will be developed incrementally across multiple sessions.
+I want collaborative approval of architecture and code-level design,
+with small implementation checkpoints.
+```
+
+At this stage, distinguish **planned capabilities** from **implemented facts**. Record the project's purpose, users, initial scope, terminology, known constraints, and unresolved questions. Do not invent settled printer compatibility or transport guarantees.
+
+**Checkpoint:** The project has an initialized brain and collaboration policy; no architecture has been implemented merely because it was discussed.
+
+## Session 2 — Brainstorm the project-level direction
+
+**Skill:** `brain-brainstorm`  
+**Suggested model:** Opus
+
+Define the broad architecture and first usable release without trying to specify every feature.
+
+**Example prompt**
+
+```text
+/brain-brainstorm
+
+Help me establish the architecture and MVP for a ZPL printing library
+and a YAML-based CLI.
+
+My preferences:
+- The core library must not depend on the CLI or YAML parsing.
+- Label rendering must work without a connected printer.
+- Transport implementations should deliver ZPL, not generate it.
+- Prefer explicit, maintainable APIs over plugin frameworks.
+- I want to design and implement one feature at a time.
+
+Investigate any existing code and project decisions. Challenge my
+preferences if they cause concrete correctness or maintenance problems.
+Don't design every internal method yet.
+```
+
+Topics to settle or record as open questions:
+
+- Supported printers, platforms, and ZPL capabilities for the first release.
+- Whether label data is immutable, mutable, or builder-based.
+- Whether rendering returns `str` or encoded `bytes`, and where encoding is defined.
+- How the CLI depends on the library's public APIs.
+- How printing errors and unknown delivery outcomes are represented.
+- Which features belong in the MVP versus later releases.
+
+**Possible approved direction (illustrative):**
+
+```text
+YAML CLI ────────> Public library API
+                        ├── Label model
+                        ├── ZPL renderer
+                        └── Printer transports
+                                  ├── TCP (MVP)
+                                  └── USB (later)
+```
+
+**Checkpoint:** Approve architectural boundaries and MVP scope. Record durable decisions in `.brain/` without prematurely committing to private helper names.
+
+## Optional Session 3 — Plan investigations with `brain-plan`
+
+**Skill:** `brain-plan`  
+**Suggested model:** Opus
+
+**Use this only when needed.** For example, if USB printing across Windows, Linux, and macOS is in scope but the supported printer interfaces, driver requirements, permissions, and reliability guarantees are unclear, create a multi-session investigation plan.
+
+**Example prompt**
+
+```text
+/brain-plan
+
+Plan the investigations needed for cross-platform USB printing.
+Research the supported printer models, OS print queues, direct USB
+access, drivers, permissions, printer status reporting, and transport
+failure semantics.
+
+Identify dependencies and decisions that must be resolved before an
+implementation design is approved. Don't create a generic backlog or
+start implementing USB support.
+```
+
+Example planning topics:
+
+```text
+.brain/planning/usb-printing/
+├── INDEX.md
+├── 001-printer-and-os-matrix.md
+├── 002-connection-mechanisms.md
+├── 003-permissions-and-drivers.md
+├── 004-status-and-failure-semantics.md
+└── 005-test-hardware.md
+```
+
+The planning artifacts organize **research and decisions**. They are not a substitute for feature specifications, implementation tickets, or blueprints. After research, return to `brain-brainstorm` for remaining architectural choices.
+
+**Checkpoint:** Investigations have evidence and identified unresolved decisions; no unverified assumption has been recorded as a requirement.
+
+---
+
+## Feature cycle 1 — Render a basic text label
+
+### A. Brainstorm the feature
+
+**Skill:** `brain-brainstorm` · **Model:** Opus
+
+```text
+/brain-brainstorm
+
+Let's implement the first vertical slice: construct a label in Python
+and render correct ZPL for a text element.
+
+Help me decide the public Label API, element representation, units,
+validation, and where encoding belongs. Respect our approved rule
+that rendering cannot depend on a printer or the CLI.
+```
+
+For example, decide whether label positions are represented in **printer dots**. Supporting millimeters later would require explicit DPI-dependent conversion and rounding behavior.
+
+### B. Write the specification
+
+**Skill:** `brain-write-spec` · **Model:** Opus
+
+```text
+/brain-write-spec
+
+Write the spec for constructing and rendering a text label.
+Capture the approved API constraints, supported commands, limits,
+invalid inputs, and exact expected ZPL examples.
+Do not add barcodes, YAML, or printing to this feature's scope.
+```
+
+An example golden output for a simple label:
+
+```zpl
+^XA
+^PW600
+^LL400
+^FO20,30
+^A0N,30,30
+^FDHello World^FS
+^XZ
+```
+
+This is an **illustrative test vector** until checked against the approved renderer behavior and target printer requirements. Tests should compare expected command output, not merely check that rendering returns a nonempty string.
+
+### C. Approve a code-level blueprint
+
+**Skill:** `brain-blueprint` · **Model:** Opus
+
+```text
+/brain-blueprint
+
+Design the minimal code structure for the approved label-rendering spec.
+Show the package layout, public API, element types, important method
+signatures, validation flow, and tests.
+
+I want to review and adjust the interfaces before implementation.
+Distinguish binding design decisions from illustrative private helpers.
+```
+
+An illustrative blueprint might propose:
+
+```python
+@dataclass(frozen=True)
+class Label:
+    width_dots: int
+    height_dots: int
+    elements: tuple[LabelElement, ...]
+
+
+def render_zpl(label: Label) -> bytes:
+    """Serialize a validated label into ZPL bytes."""
+```
+
+You might instead request `Label.render()` or a builder API. Claude should evaluate the alternatives and **revise the blueprint before coding**. The approved design belongs in the feature's `.brain/impl_plans/` document.
+
+### D. Implement collaboratively
+
+**Skill:** `brain-implement` · **Model:** Sonnet normally; Opus for unusually difficult design or encoding concerns
+
+```text
+/brain-implement
+
+Implement the approved basic label-rendering blueprint in
+collaborative mode. Write targeted specification-derived tests first.
+After each small, working increment, present the diff and test results
+and wait for my approval before proceeding. Preserve any manual edits.
+```
+
+Possible increments:
+
+1. Label model and validation.
+2. Text field rendering with exact expected ZPL.
+3. Unsupported or malformed input handling.
+
+**Checkpoint:** The library can render a label correctly without YAML or a printer. Review the resulting API *before* building other features on it.
+
+---
+
+## Feature cycle 2 — Read and validate YAML labels
+
+**Skills:** `brain-brainstorm` → `brain-write-spec` → `brain-blueprint` → `brain-implement`  
+**Suggested models:** Opus for design/spec/blueprint; Sonnet for bounded implementation
+
+The YAML schema is a **public contract**. Decide its shape deliberately rather than letting the CLI parser invent one while coding.
+
+**Brainstorm prompt**
+
+```text
+/brain-brainstorm
+
+Design a versioned, human-readable YAML label format that maps to
+our existing library models. Start with text elements; allow a future
+barcode type without unnecessary abstraction.
+
+Discuss required fields, defaults, unknown properties, validation,
+error messages, and how text containing ZPL control characters is
+handled safely. Do not change the existing library API without approval.
+```
+
+**Illustrative YAML**
+
+```yaml
+version: 1
+label:
+  width_dots: 600
+  height_dots: 400
+  elements:
+    - type: text
+      x: 20
+      y: 30
+      value: "Hello World"
+      font_size: 30
+```
+
+**Spec prompt**
+
+```text
+/brain-write-spec
+
+Write a focused specification for YAML v1 parsing and validation.
+Include valid examples, malformed YAML, missing required fields,
+unknown elements, invalid values, and expected error semantics.
+```
+
+**Blueprint prompt**
+
+```text
+/brain-blueprint
+
+Design the smallest YAML loader that converts validated input into
+existing public library models. The library must not import YAML or
+CLI modules. Show functions, errors, and tests before coding.
+```
+
+**Implementation prompt**
+
+```text
+/brain-implement
+
+Implement YAML validation and conversion in collaborative increments.
+First cover parsing and validation with tests, then the render CLI
+command. Show each verified diff and stop for review.
+```
+
+Proposed CLI commands (subject to approval):
+
+```bash
+zplcli validate label.yaml
+zplcli render label.yaml --output label.zpl
+```
+
+**Checkpoint:** The CLI can validate and render from YAML without interacting with hardware. Input cannot inject unintended ZPL commands via unsafely interpolated text.
+
+---
+
+## Feature cycle 3 — Add TCP printing
+
+**Skills:** `brain-brainstorm` (if needed) → `brain-write-spec` → `brain-blueprint` → `brain-implement`  
+**Suggested models:** Opus for architecture/blueprint; Sonnet for implementation unless concurrency or failure semantics are unusually complex
+
+**Feature prompt**
+
+```text
+/brain-brainstorm
+
+Add TCP delivery for rendered ZPL. Keep socket ownership inside the
+transport and keep rendering independent of network I/O.
+
+Help decide the transport API, timeouts, partial-send behavior,
+exceptions, retry policy, and what counts as successful delivery.
+Don't claim a physical print succeeded without printer confirmation.
+```
+
+The specification must make failure behavior testable. The blueprint should show the transport's public API, connection lifetime, resource cleanup, and how the CLI invokes it.
+
+**Illustrative interface**
+
+```python
+class TcpPrinter:
+    def __init__(self, host: str, port: int = 9100) -> None:
+        ...
+
+    def send(self, zpl: bytes) -> None:
+        """Transmit ZPL completely or report a delivery error."""
+```
+
+The port is a common default for raw TCP printing, not a universal printer guarantee. The exact transport contract remains subject to approved requirements.
+
+**Implementation prompt**
+
+```text
+/brain-implement
+
+Implement the approved TCP transport and CLI print command.
+Use a local fake-printer TCP endpoint in tests. Verify exact bytes,
+connection errors, timeouts, interrupted/partial sends, and resource
+cleanup. Do not print to real hardware during automated tests.
+
+Work in collaborative mode and stop after each verified increment.
+```
+
+Proposed CLI command:
+
+```bash
+zplcli print label.yaml --tcp 192.168.1.50:9100
+```
+
+**Checkpoint:** A fake printer receives the expected exact bytes, and a controlled test with a real compatible printer is completed where hardware is available. Hardware-dependent claims remain explicitly unverified otherwise.
+
+---
+
+## Feature cycle 4 — Add barcodes and richer layout
+
+**Skills:** Feature-level brainstorm/spec/blueprint/implement as needed
+
+```text
+/brain-brainstorm
+
+Extend the library and YAML v1 format to support Code 128 barcodes.
+Use the established label model and renderer architecture. Identify
+barcode-specific constraints, field encoding rules, validation, and
+printer compatibility without changing existing text behavior.
+```
+
+Example YAML element to discuss:
+
+```yaml
+- type: code128
+  x: 20
+  y: 100
+  value: "123456789"
+  height: 80
+```
+
+Produce golden ZPL tests for the supported barcode behavior and regression tests proving existing text labels remain unchanged. Use the blueprint to approve any necessary changes to the element model before implementation.
+
+**Checkpoint:** The renderer and YAML schema remain coherent and backward compatible with the approved v1 behavior.
+
+---
+
+## Feature cycle 5 — Add USB printing
+
+**Skills:** `brain-plan` if USB feasibility is unresolved; then `brain-brainstorm` → `brain-write-spec` → `brain-blueprint` → `brain-implement`  
+**Suggested model:** Opus initially for platform and transport design
+
+USB is not simply TCP with a different address. Supported printer interfaces, OS queues, permissions, drivers, and bidirectional status capabilities may differ.
+
+**Design prompt**
+
+```text
+/brain-blueprint
+
+Design USB printing for the approved printer/OS support matrix and
+connection mechanism. Reuse the existing rendering and print-job path.
+
+Evaluate whether adding a shared transport contract is now justified
+by two real implementations. Show public APIs, lifecycle, failure
+semantics, permissions, and tests. Do not assume direct USB access is
+available on every target platform.
+```
+
+Only implement after you approve the design. Where actual supported hardware or OS environments are unavailable, distinguish simulated tests from real-device verification.
+
+**Checkpoint:** USB support is verified on each platform and printer model the project claims to support, or those claims are narrowed accordingly.
+
+---
+
+## Session — Independent code and security reviews
+
+**Skills:** `brain-review-code`, optionally `brain-review-security` and `brain-review-architecture`  
+**Suggested model:** Sonnet for standard code-review roles; Opus for difficult cross-module or security reasoning, subject to the project's model-tier policy
+
+Run a full review at meaningful release milestones, even if individual increments were already tested and reviewed.
+
+**Code-review prompt**
+
+```text
+/brain-review-code
+
+Review the ZPL library and CLI against their approved specifications,
+blueprints, and current source code. Include relevant callers and
+integration paths, not only changed lines.
+
+Focus on ZPL correctness, escaping and encoding, YAML validation,
+resource cleanup, TCP/USB failures, public API stability, test gaps,
+architectural boundaries, and unsupported hardware claims.
+
+Report evidence-backed, actionable findings. Do not silently expand
+scope or implement unapproved redesigns.
+```
+
+**Security-review prompt**
+
+```text
+/brain-review-security
+
+Assess untrusted YAML input, ZPL command injection, user-supplied
+printer destinations, network and filesystem access, dependency risk,
+and safe CLI failure handling. Identify concrete risks and feasible
+mitigations without speculative redesign.
+```
+
+Claude should distinguish **blocking bugs**, **unverified risks**, and **optional improvements**. Fix blocking defects in reviewable increments and re-review the corrected code.
+
+---
+
+## Final session — Package, document, and release
+
+**Skills:** `brain-implement`, `brain-update`  
+**Suggested model:** Sonnet
+
+```text
+/brain-implement
+
+Finish packaging the approved ZPL library and CLI for release.
+Verify installation in a clean environment, public imports, console
+entry points, sample YAML files, CLI usage, exit codes, and the
+supported printer/platform matrix.
+
+Use collaborative checkpoints for meaningful changes. Do not claim
+hardware verification that wasn't performed.
+```
+
+Illustrative end-user workflow:
+
+```bash
+pip install zplkit
+zplcli validate label.yaml
+zplcli render label.yaml --output label.zpl
+zplcli print label.yaml --tcp 192.168.1.50:9100
+```
+
+These are proposed distribution and command names, not real package-installation instructions until the project adopts and publishes them.
+
+Run `brain-update` to record verified current architecture, API behavior, supported transports, implementation status, and durable decisions. Preserve source references where detailed ZPL or platform behavior comes from authoritative documentation.
+
+**Release criteria:** Approved specifications are covered, automated checks pass, blocking review findings are resolved, packaging works from a clean environment, and remaining limitations are explicit.
+
+---
+
+## Resuming the work in a new Claude session
+
+Each session should consult the project brain, relevant specifications, the approved blueprint, the current implementation plan, and Git state. Progress notes are continuity aids, not proof that code is current or tested.
+
+**Continuation prompt**
+
+```text
+Continue the ZPL toolkit from the current `.brain` state.
+
+Identify the next approved, actionable feature or increment. Read the
+relevant decision records, specification, and blueprint, then verify
+that prior progress still matches the current code and Git state.
+Preserve any manual changes I made since the previous session.
+
+Use collaborative implementation: deliver one coherent, tested
+increment, show the diff and verification, and stop for my approval.
+Don't reopen established decisions without concrete new evidence.
+```
+
+### Where each kind of information lives
+
+| Location | Responsibility |
+|---|---|
+| `.brain/` root knowledge | Project purpose, current architecture, APIs, terminology, decisions, feature state |
+| `.brain/planning/` | Optional multi-session investigations and unresolved dependencies |
+| `.brain/specs/` | Approved, testable feature requirements |
+| `.brain/tickets/` | Implementation deliverables, when tickets are useful |
+| `.brain/impl_plans/` | Approved code-level blueprint and execution checkpoints |
+| `.brain/adrs/` | Durable architectural decisions and their rationale |
+| Original technical sources | Exact ZPL commands, supported device behavior, platform contracts, and other authoritative details |
+
+### Recommended first milestone
+
+Complete **an end-to-end TCP label-printing path** before pursuing broad printer compatibility:
+
+- Construct and render a text label with the public library API.
+- Validate and render versioned YAML via the CLI.
+- Print through raw TCP with clear failure semantics.
+- Add Code 128 and other label elements as specifically approved.
+- Verify exact generated ZPL and bytes sent to a fake printer.
+- Perform a controlled real-printer test where possible.
+
+Defer USB, discovery, detailed printer status, advanced layout, and more transports until the core API has been exercised and validated.
+
+**Guiding principle:** Let the project brainstorm establish the architectural foundation, then iterate feature by feature through specification, approved blueprint, collaborative implementation, and independent review. Bring in `brain-plan` only when the path to a decision genuinely requires coordinated investigation.
+
+---
+
 # Quick workflow reference
 
 | Situation | Typical skill sequence | Your involvement |
@@ -703,6 +1275,7 @@ Claude checks the new MR head, relevant verification, and the entire resulting c
 | Isolated protocol bug | `brain-diagnose` → focused fix → optional `brain-review-code` | Review the diagnosis and correction. |
 | Architecture cleanup | `brain-review-architecture` → `brain-brainstorm` → `brain-write-spec` → `brain-blueprint` → `brain-implement` → `brain-review-code` | Choose improvements and shape the exact design. |
 | Third-party merge request | `brain-review-merge-request` (uses `brain-review-code`) | Evaluate findings and advisory merge recommendation. |
+| New multi-session project (ZPL library + YAML CLI) | `brain-init` → project `brain-brainstorm` → feature-level `brain-write-spec` → `brain-blueprint` → `brain-implement` → reviews; use `brain-plan` when research needs coordination | Approve core architecture, then review each feature and its code increments. |
 
 ## How to communicate an intended design
 
