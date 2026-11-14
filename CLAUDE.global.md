@@ -1,0 +1,29 @@
+<!-- Copy to ~/.claude/CLAUDE.md -->
+
+# Code Naming Conventions
+Use clear, conventional, intention-revealing names consistent with professionally maintained codebases. Follow established language idioms, domain terminology, and existing naming conventions. Prefer specific, recognizable names that communicate actual behavior and side effects, especially I/O, mutations, and network operations. Avoid vague, metaphorical, or generic verbs unless conventional in context. Keep names concise without sacrificing clarity, using unnecessary abbreviations, or repeating surrounding context.
+
+Examples:
+- `pump()` → `readMessagesFromQueue()`
+- `drain()` → `flushPendingWrites()`
+- `deliver()` → `sendNotification()`
+
+Examples illustrate clarity, not mandatory naming patterns. Review newly introduced identifiers for these qualities before finalizing code.
+
+# Incremental Integration
+Develop features in small, working increments. Integrate new functionality into the application's actual execution paths as soon as it becomes usable, updating necessary production code, entry points, configuration, and call sites alongside implementation and tests. Verify each increment through real application behavior, not just isolated tests. Avoid leaving components disconnected until the end.
+
+# Simplicity and Abstraction
+Prefer the simplest correct, maintainable solution that meets current requirements. Start with straightforward implementations and introduce abstractions, interfaces, or additional layers only when they provide a concrete benefit. Avoid over-engineering, unnecessary indirection, speculative flexibility, and premature generalization. Let complexity emerge from actual requirements, refactoring incrementally as needed without sacrificing correctness or testability.
+
+# Self-Documenting Code and Comments
+Favor self-documenting code through clear naming, simple structure, and readable logic. Use comments sparingly, only when they add meaningful context not evident from the code, such as rationale, non-obvious behavior, important constraints, workarounds, known bugs, or TODOs. Prefer concise docstrings where appropriate, especially for public APIs and complex behavior. Write comments in the natural, direct, technically precise style of an experienced developer, avoiding tutorial-like narration, verbose explanations, and unnecessary formality. Never comment on what the code already makes obvious.
+
+# External References
+Do not add ticket, issue, or documentation references to code comments or docstrings by default. Keep tracking information in commits and pull requests. Include references only when they provide meaningful maintenance context, such as non-obvious requirements, compatibility constraints, known bugs, or workarounds. Place them near the relevant code, explain the underlying technical reason, and never invent identifiers or citations.
+
+# Incremental Documentation
+Create documentation files early and write substantive content incrementally as work progresses, rather than waiting until the end. Record findings, decisions, and completed sections as they become available, including when following skills or structured workflows. Save updates directly to the files throughout the process, revising earlier content as understanding evolves. Keep documentation accurate and synchronized with the work without prematurely presenting tentative findings as conclusions.
+
+# Scope Discipline
+Keep changes focused on the requested task. Avoid unrelated refactoring, speculative improvements, unnecessary dependencies, and changes to working code without clear justification. Preserve existing behavior outside the intended scope. Make adjacent changes when necessary for correctness, integration, or maintainability, but do not expand the task without a concrete need.
