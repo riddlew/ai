@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 **Project brain:** Follow `CLAUDE.local.md` §Project brain loading: read **all** root `.md` files once per session (again after compaction), plus the active branch's pending file when present. Inspect linked detail and verify task-critical facts against current source. Do not send the whole brain to subagents. If no brain exists, proceed and mention `/brain-init` once.
 
-Record established requirements and approved decisions as a stable implementation contract. Small, well-understood changes can proceed without a spec. Follow `CLAUDE.local.md` for decision authority.
+Record established requirements and approved decisions as a stable implementation contract. For new features, use `.brain/features/<feature-slug>/02-specifications/` and the contract/templates under `../brain-init/references/`. Link to a governing brief when it exists; otherwise allow a direct, sufficiently settled specification. Small, well-understood changes can proceed without a spec. Follow `CLAUDE.local.md` for decision authority.
 
 Do not conduct a new requirements interview (the bounded builder-review questions in §5 are the only exception) or reopen settled choices. If a consequential gap remains, record it under Open Decisions; do not decide it to make the spec look complete.
 
@@ -18,6 +18,7 @@ Use, as relevant:
 
 - the current conversation and referenced material, including a `brain-brainstorm` final summary;
 - existing implementation, callers, and tests;
+- the approved feature brief under `01-brief/` when it exists;
 - `.brain/glossary.md` and `.brain/03_architecture.md`;
 - applicable ADRs under `.brain/adrs/`;
 - established public system boundaries.
@@ -37,7 +38,7 @@ Do not introduce a new manager, service, ownership boundary, or lifecycle model 
 
 State the **general rules** first: invariants, constraints, limits, ordering, and guarantees that hold for all inputs.
 
-Then write **concrete examples** for each required behavior: a specific starting state or input and the exact expected outcome. Cover the main path and the key failure paths that apply (invalid input, missing or denied access, conflicts, partial failure, limits).
+Give each normative requirement or invariant a stable ID (`REQ-001`, `REQ-002`, ...), preserving IDs across revisions. Then write **concrete examples** for each required behavior: a specific starting state or input and the exact expected outcome. Cover the main path and the key failure paths that apply (invalid input, missing or denied access, conflicts, partial failure, limits).
 
 - Derive each expected outcome independently from the approved requirements. Do not copy what the current code happens to do unless the requirements say current behavior is preserved.
 - Examples illustrate; they are not exhaustive. The general rules define behavior between examples.
@@ -50,63 +51,35 @@ Prefer existing high-level test boundaries and patterns. Add a new boundary only
 
 ## 4. Write the file
 
-Store specifications in `.brain/specs/<NN>-<short-slug>.md`:
+Store specifications in `.brain/features/<feature-slug>/02-specifications/<spec-slug>.md`, one file per coherent behavior area. Use unused stable `SPEC-<NNN>` IDs and the feature-document metadata contract:
 
-1. Inspect existing numbered specs and increment the highest valid prefix.
-2. Match existing zero-padding, or use two digits.
-3. Create the directory only when needed.
-4. Update an existing file only when the user is revising that same specification.
+```yaml
+---
+id: SPEC-001
+kind: specification
+status: draft
+parents: [BRF-001]
+requirements: []
+depends_on: []
+---
+```
+
+When there is no brief, `parents: []` is valid. Requirements declared here live in the document body; `requirements` metadata lists externally governing requirements, otherwise `[]`. Reuse a document's ID when revising the same approved behavior. Follow this structure while preserving all existing spec quality checks:
 
 ```markdown
-# <Feature Name>
-
-## Problem
-
-The user-facing problem and current limitation.
-
-## Desired Outcome
-
-What should become possible.
-
-## User Stories
-
-1. As a <role>, I want <capability>, so that <benefit>.
-
-## Behavior and Invariants
-
-Rules that hold for all inputs: invariants, constraints, limits,
-ordering, and guarantees.
-
+# <Feature Area>: Specification
+## Problem and desired outcome
+## Requirements and invariants
+- REQ-001: <normative behavior>
 ## Examples
-
-### <Behavior>
-
-- **E1:** Given <state or input>, when <action>, then <exact outcome>.
-- **E2 (failure):** Given <state or input>, when <action>, then <exact outcome>.
-
+- E1: Given <state>, when <action>, then <expected outcome>.
 ## Technical Decisions
-
-Approved architectural and technical decisions, with relevant existing
-contracts clearly distinguished from approved changes.
-
 ## Verification Strategy
-
-Test boundaries, relevant existing tests, and which examples each
-boundary verifies.
-
 ## Open Decisions
-
-Unresolved consequential choices that prevent unambiguous
-implementation. Omit when none remain.
-
 ## Exclusions
-
-Explicitly out-of-scope behavior. Omit if empty.
-
-## Additional Context
-
-Relevant assumptions, caveats, or constraints. Omit if empty.
 ```
+
+Do not mark a spec approved until its contents and binding choices have actually been approved; unsettled scope remains draft or blocked. Maintain complete example and verification coverage. Applicable ADRs and decisions are references, not fabricated parent IDs.
 
 ### Technical Decisions
 
@@ -133,12 +106,10 @@ Do these in order, after the file is written.
 
 ## 6. Finish
 
-Write only the spec file into `.brain/`; leave the index, `state.md`, and other root files to `brain-update`. After §5 is complete, invoke `brain-update` with a one-line summary of what changed.
+Write only the spec file into `02-specifications/`; leave the index, `state.md`, and other root files to `brain-update`. After §5 is complete, invoke `brain-update` with a one-line summary of what changed.
 
 Report the created or updated path, whether open decisions block implementation, and the `Builder review:` line.
 
 ## Boundaries
 
-- This skill writes the specification only. `/brain-blueprint` can create or update the feature's **single** `.brain/impl_plans/<feature>.md` before implementation; otherwise `brain-implement` creates it when tracked work begins. A blueprint is optional for trivial changes.
-- When the user approves a consequential change to a feature under implementation, update this specification (and applicable ADR or durable decision) **before** updating the blueprint or implementation plan. A blueprint never silently overrides the spec.
-- After the spec, recommend `/brain-blueprint` when code structure, ownership, patterns, or important signatures merit the user's review before implementation.
+This skill owns only specifications. `brain-decompose` owns functional component documents; `brain-blueprint` owns technical implementation plans; `brain-write-tasks` owns executable tasks; `brain-implement` owns mutable `execution.md`. After a specification is approved, recommend `brain-decompose` for a feature with meaningful functional subdivisions, or `brain-blueprint` directly for smaller well-defined scope. A consequential change under implementation updates the governing spec and applicable ADR/decision before affected plans or tasks are revised. Never invent authorization to implement.
