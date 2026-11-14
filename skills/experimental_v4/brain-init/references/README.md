@@ -1,6 +1,6 @@
 # Claude Code Skills
 
-An opinionated set of **16 Claude Code skills** for collaborative software development, built around a **project brain**: a `.brain/` folder that holds what the project is, how it is built, what you decided, what is open, and what is done. A new session reads the brain instead of re-reading the codebase. The goal is to produce straightforward, maintainable changes while keeping consequential product and architectural decisions under your control.
+An opinionated set of **17 Claude Code skills** for collaborative software development, built around a **project brain**: a `.brain/` folder that holds what the project is, how it is built, what you decided, what is open, and what is done. A new session reads the brain instead of re-reading the codebase. The goal is to produce straightforward, maintainable changes while keeping consequential product and architectural decisions under your control.
 
 The skills are **tools to use when needed**, not a mandatory pipeline. Small changes should stay small; complex or multi-session work can use more structure.
 
@@ -20,6 +20,7 @@ project/
         ├── brain-blueprint/             # SKILL.md + references/blueprint-template.md
         ├── brain-diagnose/
         ├── brain-distill-content/
+        ├── brain-explain-changes/         # SKILL.md (manual, read-only)
         ├── brain-implement/             # SKILL.md + references/
         ├── brain-init/                 # SKILL.md + references/{CLAUDE.local.md,USAGE.md,README.md}
         ├── brain-plan-feature/
@@ -115,6 +116,7 @@ For example, a request to extend communication in an existing `Session` does not
 | `brain-diagnose` | **Sonnet** | **Opus** for intermittent concurrency bugs, distributed client/server failures, intricate lifecycle issues, or evidence supporting several competing root causes. |
 | `brain-distill-content` | **Sonnet** | **Opus** for lengthy, deeply interdependent technical or protocol material where losing a qualification could change the meaning. Check exact contractual wording regardless of model. |
 | `brain-blueprint` | **Opus** | **Sonnet** for a small, familiar change with established architecture and straightforward interfaces; use Opus for consequential ownership, API, or cross-service design. |
+| `brain-explain-changes` | **Sonnet** | **Opus** only for unusually intricate execution paths or complex concurrency; the explanation should remain simple regardless of model. |
 | `brain-implement` | **Sonnet** | **Opus** for tightly coupled multi-system changes, byte-exact protocol work, concurrency/state-machine correctness, risky migrations, or repeated design/test failures. Merely changing many files does not itself require Opus. In **subagent-driven** execution, keep the main coordinator on Sonnet as the policy specifies; explicit subagent/final-review roles follow the policy table. |
 | `brain-plan-feature` | **Opus** | **Sonnet** when the architecture and requirements are settled and the work is primarily sequencing known tasks and maintaining planning state. |
 | `brain-refine-backlog` | **Sonnet** | **Opus** for ambiguous cross-service requirements, major compatibility constraints, or complex dependency and acceptance-criteria conflicts. |
@@ -138,6 +140,7 @@ For example, a request to extend communication in an existing `Session` does not
 | `brain-diagnose` | Investigates failures using reproduction and discriminating hypotheses; applies a bounded fix only when authorized. Reproduces the failure before fixing, traces root causes to their source, stops and consults after three failed fixes, and uses a red-flags list. | A failure, regression, or intermittent issue needs explanation. | Diagnosis in conversation; `.brain/diagnoses/` only on request. |
 | `brain-distill-content` **(manual)** | Removes verbosity from technical documents while preserving all material information and accuracy, reorganizing where that reads more clearly. | AI-generated docs, MR descriptions, or RFCs are padded. | The distilled document. |
 | `brain-blueprint` **(manual)** | Investigates the real code, then collaborates with you on files, ownership, call flow, important signatures, method outlines, unchanged boundaries, testable increments, and design approval. Writes no production code; distinguishes binding constraints from illustrative sketches. | A substantial feature or code structure you want to influence before implementation. | The `Implementation Design` section and approval metadata in `.brain/impl_plans/<feature>.md`. |
+| `brain-explain-changes` **(manual)** | Walks through recent changes or a selected component in plain language, tracing actual application behavior one step at a time. Not a code review; pauses for questions and never modifies files. | You want to understand code Claude wrote or how a change fits into the running app. | Read-only walkthrough in conversation. |
 | `brain-implement` **(manual)** | Implements approved work in small verified behavioral increments. **Collaborative is default**: review the actual diff and tests, then approve each increment before the next. Guided uses larger increments; autonomous skips routine approval pauses. Inline/subagent execution is independent (collaborative defaults inline). Proposes commits but commits only if explicitly asked. Performs proportionate final review. | You are ready to change code, with or without a formal spec; substantial/design-sensitive work normally starts with an approved blueprint. | Code, checks, and mutable execution tracking in the **same** `.brain/impl_plans/<feature>.md`. |
 | `brain-plan-feature` | Tracks multi-session planning with dependency-aware research, consult, prototype, and task tickets. | An initiative has many interdependent decisions and spans days or sessions. | `.brain/planning/<feature>/INDEX.md` and planning tickets. |
 | `brain-refine-backlog` | Reviews Jira stories for refinement readiness without changing them. | Preparing for backlog refinement. | Suggested gaps, draft acceptance criteria, and questions. |
@@ -165,6 +168,7 @@ Example: Add a `--json` option to an existing export command.
 1. Run `/brain-implement` directly from the request; a specification, tickets, and a separate blueprint are optional for this small settled change.
 2. Claude makes the smallest coherent change and runs targeted verification.
 3. In default **collaborative** mode, review the actual diff and tests; request edits or approve the increment. You do **not** need to commit to continue. The final check is `brain-implement`'s own diff inspection; full `brain-review-code` runs when consequential or requested.
+4. To learn how the changed code works, run `/brain-explain-changes` (or give a file, symbol, or commit range). It traces real call paths in short, plain-language steps without making code changes.
 4. Update relevant existing documentation if user-facing behavior changed. `brain-update` records the verified knowledge.
 
 ### Substantial feature

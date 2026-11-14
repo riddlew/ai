@@ -46,6 +46,12 @@ If both are true, use both. **`brain-plan-feature` is not a substitute for `brai
 
 ---
 
+## Understand changes after implementation
+
+Run `/brain-explain-changes` to walk through the working-tree changes (or the latest commit if the tree is clean). Pass a file, symbol, or commit range to focus it, for example `/brain-explain-changes connection_manager`. Claude starts with a plain-language overview, traces actual application calls in small steps, and pauses for questions rather than giving a full code review. This skill reads files but does not edit them or create reports.
+
+---
+
 # Shared example project
 
 Assume a repository contains two applications:
