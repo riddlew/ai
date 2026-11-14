@@ -1,46 +1,49 @@
 ---
 name: brain-blueprint
-description: Collaboratively design and approve the concrete code changes for an established feature before implementation. Use when architecture, interfaces, ownership, call flow, or implementation structure should be reviewed with the user first.
+description: Collaboratively design and approve concrete code-level implementation plans for approved feature components before implementation.
 disable-model-invocation: true
 ---
 
-# Blueprint
+# Blueprint — Implementation Plans
 
-**Project brain:** Follow `CLAUDE.local.md` §Project brain loading: read **all** root `.md` files once per session (again after compaction), plus the active branch's pending file when present. Inspect linked detail and verify task-critical facts against current source. Do not send the whole brain to subagents. If no brain exists, proceed and mention `/brain-init` once.
+**Project brain:** Follow `CLAUDE.local.md` project-brain loading, branch context, decision authority, and source verification rules. Read the shared feature-document contract and templates from the sibling `brain-init/references/` directory.
 
-Collaboratively design **how** to implement approved behavior, without implementing it. A blueprint is recommended for substantial features and when the user cares about exact code structure, but unnecessary for a small, well-defined fix. This skill writes **only** the `## Implementation Design` section and its blueprint metadata in the feature's existing `.brain/impl_plans/<feature>.md`; it must not create a competing document. Follow `CLAUDE.local.md` for decision authority.
+Define **how** approved functional components will be implemented in the inspected codebase. Preserve approved requirements, architecture, and explicit design preferences. This skill owns only `.brain/features/<feature-slug>/04-implementation-plans/`. `brain-implement` owns mutable `execution.md`; do not record task completion or execution status here. For small settled changes, a separate blueprint is optional.
 
 ## 1. Establish the boundary
 
-1. Read the approved spec, tickets if any, the confirmed brainstorm direction, applicable ADRs, and any existing impl plan. Determine which requirements and technical choices are **binding**, which are merely proposed, and which consequential questions remain unresolved.
-2. Inspect the actual code: owners, callers, interfaces, persistence, lifecycle, tests, and nearby conventions. Check `git status`, current branch, relevant staged/unstaged edits and untracked code. Treat the brain as orientation, not proof that the code is unchanged.
-3. Capture the full `HEAD` SHA as `Design inspected at:` and note material uncommitted or branch-specific assumptions in the design. Never use this SHA as the implementation's `Review base`; `brain-implement` records that immediately before editing code.
-4. Ask what code structure the user wants **only where preferences have not already been expressed**. Invite, but do not require, proposed patterns, class boundaries, key signatures, method outlines, pseudocode, and an explicit "keep unchanged" list. Investigate factual questions yourself.
-5. If a requested design conflicts with an established requirement or creates a demonstrable correctness problem, explain the evidence and smallest viable adjustment. Do not quietly redesign it. New consequential choices require approval and recording in the governing spec, ADR, or `09_user_decisions.md` through the appropriate workflow **before** they are labeled binding here.
+1. Read approved component documents, their governing specifications and examples, the brief when present, applicable ADRs, confirmed user decisions, and existing implementation plans. For a simpler workflow without components, use the directly governing approved specification or request.
+2. Classify binding requirements, approved architectural and technical decisions, illustrative ideas, and unresolved consequential questions. A suggested method signature is not automatically binding.
+3. Inspect current source: owners, callers, interfaces, data flow, lifecycle, integration points, tests, and conventions. Check branch and git status, including relevant uncommitted work.
+4. Record `Design inspected at: <full HEAD SHA>` and relevant dirty-worktree assumptions. This is **not** `Review base`; `brain-implement` records that separately before editing production code.
+5. Ask for user code-design preferences only when they remain open and matter. Investigate repository facts yourself.
 
-## 2. Propose the smallest viable design
+## 2. Define smallest viable design
 
-Prepare a blueprint using `${CLAUDE_SKILL_DIR}/references/blueprint-template.md`:
+Use the sibling `references/blueprint-template.md` and feature document schema. Prefer one implementation plan per meaningful component, but permit one plan to cover several small related components or multiple plans for a genuinely large component. Never create files just to satisfy a one-to-one rule.
 
-- Identify concrete existing files/components, their current responsibilities and intended changes; explicitly say what **will not change**.
-- Describe ownership, key call/data flow, relevant failure paths, compatibility, and any migrations. Prefer extending existing owners rather than introducing speculative abstractions.
-- Show important interfaces or method signatures **when they expose a design choice**; use pseudocode or detailed comments when the user requests them or ambiguity warrants it. Do not mechanically specify every private helper.
-- Distinguish **Binding** (approved constraint), **Proposed** (awaiting approval), and **Illustrative** (Claude may refine without changing the constraint). Name the source of binding decisions. Approval of the blueprint makes its explicitly identified, non-conflicting design constraints binding for this implementation; illustrative snippets remain illustrative.
-- Plan **small end-to-end, independently testable behavioral increments**, not a batch for each architectural layer. Tie each increment to governing Example IDs, ticket criteria, or numbered requirements, and name verification that could demonstrate it works.
-- Flag unresolved consequential choices as blockers; do not fill gaps with assumptions or claim a blocker is approved.
+Describe:
 
-## 3. Review the design with the user
+- Intended change and explicitly unchanged behavior/ownership.
+- Existing files and verified responsibilities; proposed changes and rationale.
+- Important interfaces, signatures, control/data flow, state and failure paths.
+- Compatibility, migration, verification strategy, and test boundaries where applicable.
+- Binding design constraints and their approvals/sources versus illustrative or proposed details.
+- Small coherent testable increments and governing qualified requirement/example IDs.
+- Genuine dependencies, assumptions, and blockers.
 
-1. Present the affected files, ownership and data flow, key signatures, binding vs illustrative choices, unchanged boundaries, increment order, and genuine tradeoffs. Invite edits to class/method outlines and design patterns. **Do not modify production code, tests, or configuration.**
-2. Iterate the design with the user. A proposed signature is not automatically binding merely because it appears in a code block; clarify which details the user actually wants fixed.
-3. Check the final draft against current code, governing requirements, and the selected design. Run the builder review in `${CLAUDE_SKILL_DIR}/../brain-review-code/references/builder-review.md`, with `blueprint` as `{artifact_kind}` and the governing spec/tickets and source paths as `{sources}`. Resolve factual questions yourself; ask only consequential questions the user must decide. If unavailable, perform the reported weaker self-read.
-4. Ask explicitly for approval of the **revised blueprint**. If approval is absent or partial, save it as `draft` or `needs revision` and report precisely what blocks implementation. A feature request or approval of the spec does **not** count as blueprint approval.
-5. After explicit approval, set `Blueprint status: approved`, record when/where approval occurred, and state which design constraints are binding. Do not begin implementation; hand off to `/brain-implement` only when separately authorized.
+Favor extending existing owners over unapproved services, new layers, premature abstraction, or speculative generality. Do not decide product semantics here. If existing architecture cannot satisfy the spec, explain the conflict and obtain approval before establishing a new binding design.
+
+## 3. Review with the user
+
+Present the affected files/owners, call flow, key signatures, unchanged boundaries, testable increments, and real tradeoffs. Invite design corrections. Review the complete plan against code and governing requirements, following the builder review in the sibling `brain-review-code/references/builder-review.md` (`artifact_kind: blueprint`, `sources: component/specification and inspected paths`). If no independent reviewer exists, label it as a weaker self-review.
+
+Ask explicitly for approval of the revised **binding technical design**. Without approval keep `status: draft` or `needs-revision`; do not implement. A specification approval or feature request is not blueprint approval. On approval set `status: approved`, record when/where approval occurred, and distinguish illustrative implementation suggestions from binding constraints.
 
 ## 4. Persist and hand off
 
-Use **one plan per feature**: with a spec, `.brain/impl_plans/<spec-file-stem>.md`; with tickets only, use their feature slug; otherwise use a stable request slug. Reuse an existing plan and preserve **all** execution history, verification, reviews, and user edits. Create only a minimal shell if none exists. Edit only blueprint metadata and `## Implementation Design`; never reset execution tasks or their status. Keep the blueprint in the same located brain that other skills use.
+Store the design at `.brain/features/<feature-slug>/04-implementation-plans/<plan-slug>.md`, using stable `PLAN-<NNN>` IDs, valid `parents` pointing to component IDs (or an earlier governing level if skipped), qualified `requirements`, and genuine same-level `depends_on`. Reuse a plan for the same technical responsibility; do not create duplicates.
 
-Record `Design inspected at: <full SHA>` and relevant dirty-worktree assumptions. Statuses: `draft`, `approved`, `needs revision`. If an approved blueprint is revised, mark it `needs revision` until the user approves changed **binding** design. Routine, explicitly illustrative refinements need no new approval; have `brain-implement` record meaningful deviations in its separate `## Design Deviations` execution section instead.
+Do not write `execution.md`, rewrite component/spec files, or reset task status. If an approved binding design is revised, mark affected plans `needs-revision` until reapproved, and flag descendant tasks for revalidation by their owner. Routine illustrative refinements can be recorded in the execution deviation log.
 
-Invoke `brain-update` after creating or materially revising a blueprint, **including a draft**, with a one-line summary so `00_index.md` reflects its current status. Report the path, status, approval or open decisions, affected files, and the next authorized step. Approval to design does not authorize editing code.
+Invoke `brain-update` after writing or materially revising plans; it may index and report but not rewrite producer-owned documents. Report plan paths and IDs, approval state, blockers, and next authorized step. Recommend `brain-write-tasks` for a substantial plan; direct `brain-implement` may be appropriate for a small, settled change.
