@@ -18,7 +18,8 @@ Track planning state for substantial or uncertain efforts across sessions. This 
 
 1. Establish the **final objective** and known exclusions.
 2. Inspect project context as needed to separate known facts from open decisions.
-3. Decide whether the effort warrants multi-session planning. If it can be resolved in one session, do not create a planning directory; use `brain-brainstorm` or `brain-write-spec` instead, without interrupting a straightforward authorized task to ask.
+3. Before creating planning tickets, survey the major in-scope uncertainties breadth-first: consequential user decisions, facts to investigate, prototype questions, and prerequisites. Capture questions that can be stated precisely as tickets and less-defined areas under Open Areas. Do not deeply resolve each question during this initial survey.
+4. Decide whether the effort warrants multi-session planning. If it can be resolved in one session, do not create a planning directory; use `brain-brainstorm` or `brain-write-spec` instead, without interrupting a straightforward authorized task to ask.
 
 Otherwise create `.brain/planning/<feature-stub>/` with a concise, stable stub:
 
@@ -120,6 +121,8 @@ Move an open area into tickets once it can be stated as a meaningful ticket, and
 For a ticket outside the objective: mark it `excluded`, record it under **Out of Scope**, update dependent tickets, and do not count it as an approved resolution.
 
 ## Hand off to implementation
+
+Before handoff, review all unresolved tickets and Open Areas for consequential decisions still needed to produce an unambiguous specification. Resolve blocking questions rather than silently treating unexplored areas as complete. When planning is sufficiently settled, recommend `/brain-write-spec` using the resolved planning decisions as source material, before any optional implementation tickets or blueprint.
 
 Implementation tickets are not required by default; the user may implement directly from a completed specification. When implementation tickets are requested:
 
