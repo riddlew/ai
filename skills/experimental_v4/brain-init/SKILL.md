@@ -5,12 +5,12 @@ description: Use when setting up or locating a project brain, or installing its 
 
 # Brain Init
 
-Sets up a project's `.brain/`, or connects the project to an existing one. Installs the shared `CLAUDE.local.md` policy and the bundled workflow guides (`USAGE.md` and `README.md`) without replacing project-specific instructions. `brain-update` maintains the brain afterward. For what goes where, read §4 (root files) and §5 (ADRs) of `${CLAUDE_SKILL_DIR}/../brain-update/SKILL.md`; read the file, don't invoke that skill. The templates are in `${CLAUDE_SKILL_DIR}/../brain-update/references/templates.md`. Follow `CLAUDE.local.md` for decision authority.
+Sets up a project's `.brain/`, or connects the project to an existing one. For new feature work, use the five-level structure described in `${CLAUDE_SKILL_DIR}/references/feature-document-contract.md` and the matching templates in `feature-document-templates.md`. No legacy feature-document migration or compatibility is required. Installs the shared `CLAUDE.local.md` policy and the bundled workflow guides (`USAGE.md` and `README.md`) without replacing project-specific instructions. `brain-update` maintains the brain afterward. For what goes where, read §4 (root files) and §5 (ADRs) of `${CLAUDE_SKILL_DIR}/../brain-update/SKILL.md`; read the file, don't invoke that skill. The templates are in `${CLAUDE_SKILL_DIR}/../brain-update/references/templates.md`. Follow `CLAUDE.local.md` for decision authority.
 
 **Always:**
 
-- Write only inside `.brain/`, plus the repository's `CLAUDE.local.md` and Git `info/exclude` (§0–1), and the approved moves in §2 step 3, including deleting originals and fixing links to them anywhere. Learn facts by reading code and git history. Never run the project's code, tests, or build; a fact that needs an experiment goes in `spikes.md`.
-- Never edit documents other skills own (`specs/`, `tickets/`, `impl_plans/`, `planning/`, `diagnoses/`, `reviews/`) beyond moving them in §2 step 3 and fixing links to moved files.
+- Write only inside `.brain/`, plus the repository's `CLAUDE.local.md` and Git `info/exclude` (§0–1), without moving or rewriting existing feature-document layouts. Learn facts by reading code and git history. Never run the project's code, tests, or build; a fact that needs an experiment goes in `spikes.md`.
+- Never edit producer-owned documents under `features/`, or documents in `planning/`, `diagnoses/`, or `reviews/`. Feature producers own their respective numbered levels and `execution.md`; `brain-init` only establishes the project brain and its shared policy.
 - Never stage, commit, or push.
 - Never dispatch subagents unless the user asks.
 - Ask the user one question per message.
@@ -65,20 +65,7 @@ Take these steps in order.
 
 1. **Investigate.** Read the README and docs, manifests and dependencies, entry points, module layout, tests, configuration, and recent `git log`. Never ask the user what the repository answers: language, frameworks, commands, settings, schema.
 2. **Ask about git tracking. This is the first first-run question unless §0 required resolving a policy conflict.** Ask whether `.brain` should be tracked in git, saying the default is **not tracked**: local to this machine. Recommend the default unless told otherwise. If the answer is no or no preference, ensure `.brain/` appears once in `info/exclude` under `git rev-parse --git-common-dir`. If yes, leave `.brain` visible to git. Either way, you never commit.
-3. **Propose moving the documents `.brain` replaces.** List each one found, with its destination from the table below, and wait for approval. If `.brain` is untracked and any of them are tracked, say that moving them takes them out of git for everyone else, and offer to leave those in place, indexed by their current path. Once the user approves, move them. Do not copy, and do not ask again. Use a plain filesystem move, **not `git mv`**, which stages changes and violates the no-stage rule. With tracked documents, Git will show deletions and untracked destinations until the user stages them. Do not overwrite existing destinations; resolve name collisions before moving. Update links to moved files everywhere, including the repository README (not the bundled `.brain/README.md` guide). Check `git diff --cached` before and after to ensure this skill did not stage anything.
-
-   | From | To |
-   |---|---|
-   | `docs/specs/*` | `.brain/specs/` |
-   | `docs/adr/*` (root and context-local) | `.brain/adrs/`, renumbered if numbers collide |
-   | `docs/tickets/<f>/issues/*` | `.brain/tickets/<f>/` |
-   | `docs/implementation/<f>/todo.md` | `.brain/impl_plans/<f>.md` |
-   | `docs/implementation/<f>/guidance.md` | its content into the relevant root files, then delete |
-   | `docs/planning/*` | `.brain/planning/` |
-   | `docs/diagnoses/*` | `.brain/diagnoses/` |
-   | `docs/reviews/architecture/*`, `docs/security/*` | `.brain/reviews/architecture/<NN>-<slug>/review.md`, `.brain/reviews/security/<NN>-<slug>/review.md` (one folder per report; preserve any supporting files in the same folder) |
-   | `CONTEXT.md` | entries in `glossary.md`, then delete |
-   | `CONTEXT-MAP.md` | domain-boundaries section of `03_architecture.md`, then delete |
+3. **Establish the canonical feature-document structure.** New features use `.brain/features/<feature-slug>/01-brief/` through `05-tasks/`, with a separate `execution.md`, according to `references/feature-document-contract.md`. Do not generate empty feature folders as placeholders. The contract and templates ship with this skill and are referenced by the producer skills. Do not move, import, or translate legacy feature documents: this revision is a clean break. Keep existing general project knowledge and applicable ADRs in their established root locations.
 
 4. **Interview the user. This step is required.** Never fill it from defaults, recommendations, or guesses. Ask one question per message about what the code cannot show:
    - purpose;
@@ -89,6 +76,6 @@ Take these steps in order.
    - decisions already made.
 
    Keep asking until every applicable root file can be written without guessing. When the user doesn't know, record the question in `open_questions.md` and move on. Never ask process questions this skill answers: the file layout, where something is recorded, or how `.brain` is ignored.
-5. **Write the brain.** Create the applicable root files (`brain-update` §4) from the templates. Leave out a root file that doesn't apply, and list it in `00_index.md` as "not applicable: <reason>"; never write a placeholder file. Record decisions the user already made in `09_user_decisions.md`, with an ADR only when one qualifies (`brain-update` §5). Planned integrations whose behavior is unverified (file formats, SDKs, OS APIs) go in `spikes.md`. Set `Last synced` to the full 40-character `HEAD` sha, and `Main branch:` to the main branch.
+5. **Write the brain.** Create the applicable root files (`brain-update` §4) from the templates. Register `features/` in the index when feature documents exist; create feature subdirectories lazily when a producer first writes one. Leave out a root file that doesn't apply, and list it in `00_index.md` as "not applicable: <reason>"; never write a placeholder file. Record decisions the user already made in `09_user_decisions.md`, with an ADR only when one qualifies (`brain-update` §5). Planned integrations whose behavior is unverified (file formats, SDKs, OS APIs) go in `spikes.md`. Set `Last synced` to the full 40-character `HEAD` sha, and `Main branch:` to the main branch.
 5a. **Install the workflow guides (§0a).** Copy the bundled `USAGE.md` and `README.md` into the brain and register them in `00_index.md`. The guides are not part of the root project-knowledge read.
-6. **Report** what you created and moved, then list the open questions and unverified assumptions.
+6. **Report** what you created and the canonical feature-document conventions, then list the open questions and unverified assumptions.

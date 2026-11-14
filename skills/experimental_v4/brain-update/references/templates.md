@@ -24,10 +24,13 @@ Main branch: main
 |---|---|---|
 | `USAGE.md` | Brain Skills workflow examples and selection guide | reference |
 | `README.md` | Brain Skills catalog and installation reference | reference |
-| `specs/01-<slug>.md` | <one line> | draft / approved / implemented / superseded |
+| `features/<slug>/01-brief/brief.md` | Desired outcome and success criteria | draft / approved / needs-revision |
+| `features/<slug>/02-specifications/<name>.md` | Normative behavior and examples | draft / approved / needs-revision |
+| `features/<slug>/03-components/<name>.md` | Functional decomposition and coverage | draft / approved / needs-revision |
 | `adrs/0001-<slug>.md` | <one line> | accepted / superseded |
-| `tickets/<feature>/` | <one line> | open / in progress / done |
-| `impl_plans/<feature>.md` | Implementation design and progress | design draft / design approved / in progress / done |
+| `features/<slug>/04-implementation-plans/<name>.md` | Codebase-aware technical design | draft / approved / needs-revision |
+| `features/<slug>/05-tasks/<name>.md` | Executable implementation task | draft / approved / needs-revision |
+| `features/<slug>/execution.md` | Observed progress and verification | in progress / blocked / done |
 | `planning/<feature>/` | <one line> | active / done |
 | `diagnoses/01-<slug>.md` | <one line> | recorded |
 | `reviews/architecture/01-<slug>/review.md` | <one line> | recorded |
@@ -54,7 +57,7 @@ Apply these to the root files when the branch merges, after checking each agains
 
 ## 02_features.md
 
-- **Add:** <what the branch adds>. Source: `specs/NN-<slug>.md`.
+- **Add:** <what the branch adds>. Source: `features/<slug>/02-specifications/<name>.md`.
 - **Change:** <old description> → <new description>.
 
 ## 04_data_model.md
@@ -185,7 +188,7 @@ When the project has several domains, use one section and table per domain.
 ```markdown
 | Feature | Status | Links |
 |---|---|---|
-| <Feature> | planned / in progress / done | `specs/NN-<slug>.md`, `impl_plans/<feature>.md` |
+| <Feature> | planned / in progress / done | `features/<slug>/02-specifications/<name>.md`, `features/<slug>/execution.md` |
 ```
 
 ## ADR
