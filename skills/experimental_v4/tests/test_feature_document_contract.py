@@ -1,0 +1,98 @@
+"""Static hierarchy-contract tests; no agent behavior is asserted."""
+import importlib.util
+import tempfile
+import unittest
+from pathlib import Path
+
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "validate_feature_docs.py"
+spec = importlib.util.spec_from_file_location("feature_validator", SCRIPT)
+validator = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(validator)
+
+LEVELS = {
+    "brief": "01-brief",
+    "specification": "02-specifications",
+    "component": "03-components",
+    "implementation-plan": "04-implementation-plans",
+    "task": "05-tasks",
+}
+
+
+class FeatureDocumentContract(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.feature = Path(self.temp.name) / "features" / "start-machine"
+        self.feature.mkdir(parents=True)
+        self.write("BRF-001", "brief")
+        self.write("SPEC-001", "specification", parents=["BRF-001"],
+                   body="# Spec\n\n## Requirements\n- REQ-001: StartMachine is accepted\n- REQ-002: Invalid requests are rejected")
+        self.write("CMP-001", "component", parents=["SPEC-001"],
+                   requirements=["SPEC-001#REQ-001", "SPEC-001#REQ-002"])
+        self.write("PLAN-001", "implementation-plan", parents=["CMP-001"],
+                   requirements=["SPEC-001#REQ-001", "SPEC-001#REQ-002"])
+        self.write("TASK-001", "task", parents=["PLAN-001"],
+                   requirements=["SPEC-001#REQ-001", "SPEC-001#REQ-002"])
+
+    def write(self, doc_id, kind, parents=None, requirements=None, depends_on=None,
+              status="approved", body="# Example"):
+        def yaml_list(values):
+            return "[" + ", ".join(values or []) + "]"
+        content = (f"---\nid: {doc_id}\nkind: {kind}\nstatus: {status}\n"
+                   f"parents: {yaml_list(parents)}\n"
+                   f"requirements: {yaml_list(requirements)}\n"
+                   f"depends_on: {yaml_list(depends_on)}\n---\n{body}\n")
+        directory = self.feature / LEVELS[kind]
+        directory.mkdir(parents=True, exist_ok=True)
+        path = directory / f"{doc_id}.md"
+        path.write_text(content, encoding="utf-8")
+        return path
+
+    def test_valid_full_hierarchy_and_coverage(self):
+        self.assertEqual([], validator.validate_feature(self.feature, True))
+
+    def test_broken_parent_is_rejected(self):
+        self.write("TASK-002", "task", parents=["PLAN-999"])
+        self.assertIn("unknown parent PLAN-999", "\n".join(validator.validate_feature(self.feature)))
+
+    def test_wrong_level_parent_is_rejected(self):
+        self.write("TASK-002", "task", parents=["TASK-001"])
+        self.assertIn("must be from an earlier level",
+                      "\n".join(validator.validate_feature(self.feature)))
+
+    def test_dependency_cycle_is_rejected(self):
+        self.write("TASK-001", "task", parents=["PLAN-001"], depends_on=["TASK-002"])
+        self.write("TASK-002", "task", parents=["PLAN-001"], depends_on=["TASK-001"])
+        self.assertIn("dependency cycle", "\n".join(validator.validate_feature(self.feature)))
+
+    def test_unknown_requirement_is_rejected(self):
+        self.write("TASK-002", "task", parents=["PLAN-001"],
+                   requirements=["SPEC-001#REQ-999"])
+        self.assertIn("unknown requirement SPEC-001#REQ-999",
+                      "\n".join(validator.validate_feature(self.feature)))
+
+    def test_uncovered_requirement_is_rejected_when_checking_coverage(self):
+        self.write("TASK-001", "task", parents=["PLAN-001"],
+                   requirements=["SPEC-001#REQ-001"])
+        self.assertIn("no approved document covers SPEC-001#REQ-002",
+                      "\n".join(validator.validate_feature(self.feature, True)))
+        self.assertEqual([], validator.validate_feature(self.feature, False))
+
+    def test_skipped_middle_levels_are_allowed(self):
+        for level in ("03-components", "04-implementation-plans"):
+            for path in (self.feature / level).glob("*.md"):
+                path.unlink()
+        self.write("TASK-001", "task", parents=["SPEC-001"],
+                   requirements=["SPEC-001#REQ-001", "SPEC-001#REQ-002"])
+        self.assertEqual([], validator.validate_feature(self.feature, True))
+
+    def test_block_yaml_list_is_supported(self):
+        path = self.feature / "05-tasks" / "TASK-001.md"
+        content = path.read_text().replace("parents: [PLAN-001]",
+                                             "parents:\n  - PLAN-001")
+        path.write_text(content)
+        self.assertEqual([], validator.validate_feature(self.feature))
+
+
+if __name__ == "__main__":
+    unittest.main()

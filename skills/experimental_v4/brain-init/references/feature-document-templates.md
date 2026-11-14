@@ -1,10 +1,10 @@
 # Feature document templates
 
-Use the smallest relevant template. Keep YAML metadata consistent with \`feature-document-contract.md\`; IDs in this file are **illustrative**, not reservations.
+Use the smallest relevant template. Keep YAML metadata consistent with `feature-document-contract.md`; IDs in this file are **illustrative**, not reservations.
 
-## 01 — Brief (\`01-brief/brief.md\`)
+## 01 — Brief (`01-brief/brief.md`)
 
-\`\`\`markdown
+```markdown
 ---
 id: BRF-001
 kind: brief
@@ -21,11 +21,11 @@ depends_on: []
 ## Known constraints and approved decisions
 ## Success criteria
 ## Open decisions
-\`\`\`
+```
 
-## 02 — Specification (\`02-specifications/<slug>.md\`)
+## 02 — Specification (`02-specifications/<slug>.md`)
 
-\`\`\`markdown
+```markdown
 ---
 id: SPEC-001
 kind: specification
@@ -48,13 +48,13 @@ depends_on: []
 ## Contracts and affected systems
 ## Verification strategy
 ## Open decisions and exclusions
-\`\`\`
+```
 
-The specification *declares* its own requirements in the body; the \`requirements\` metadata lists externally governing requirements only when appropriate, otherwise \`[]\`.
+The specification *declares* its own requirements in the body; the `requirements` metadata lists externally governing requirements only when appropriate, otherwise `[]`.
 
-## 03 — Component (\`03-components/<slug>.md\`)
+## 03 — Component (`03-components/<slug>.md`)
 
-\`\`\`markdown
+```markdown
 ---
 id: CMP-001
 kind: component
@@ -71,13 +71,13 @@ depends_on: []
 ## Interactions with other components
 ## Unresolved decisions
 ## Component acceptance / verification
-\`\`\`
+```
 
 A component is a **behavioral boundary**, not necessarily a class, module, service, or framework component.
 
-## 04 — Implementation plan (\`04-implementation-plans/<slug>.md\`)
+## 04 — Implementation plan (`04-implementation-plans/<slug>.md`)
 
-\`\`\`markdown
+```markdown
 ---
 id: PLAN-001
 kind: implementation-plan
@@ -98,13 +98,13 @@ Approval: pending
 ## Failure paths, compatibility, and risks
 ## Verification strategy
 ## Assumptions and blockers
-\`\`\`
+```
 
 Keep binding vs illustrative implementation choices distinct. Do not store mutable execution progress here.
 
-## 05 — Task (\`05-tasks/TASK-001-<slug>.md\`)
+## 05 — Task (`05-tasks/TASK-001-<slug>.md`)
 
-\`\`\`markdown
+```markdown
 ---
 id: TASK-001
 kind: task
@@ -120,13 +120,13 @@ depends_on: []
 ## Applicable design constraints
 ## Acceptance criteria and examples
 ## Verification
-\`\`\`
+```
 
 Small task does **not** mean a separate file per method or test assertion. Prefer a coherent independently verifiable increment.
 
-## Execution (\`execution.md\`)
+## Execution (`execution.md`)
 
-\`\`\`markdown
+```markdown
 # <Feature>: Execution
 
 Review base: <commit before any feature code edits>
@@ -144,6 +144,6 @@ Execution mode: inline
 ## Verification evidence (command, outcome, revision)
 ## Rulings and deferred issues
 ## Review focus and checkpoint history
-\`\`\`
+```
 
 Execution status does not alter a task's approved definition. Revalidate the repository on every resumed session.
