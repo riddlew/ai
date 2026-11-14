@@ -23,7 +23,7 @@ The complete root read provides orientation, **not proof that every statement re
 
 ## Development workflow references
 
-`brain-init` installs `USAGE.md` and `README.md` at the root of the selected project brain (normally `.brain/`). When choosing or coordinating a workflow, consult the **relevant sections** of `.brain/USAGE.md` for examples, selection of `brain-brainstorm` versus `brain-plan-feature`, blueprint collaboration, implementation checkpoints, and reviews. Consult `.brain/README.md` for the skill catalog and installation conventions when needed. If the brain is external, resolve both documents relative to its `Project brain:` path.
+`brain-init` installs `USAGE.md` and `README.md` at the root of the selected project brain (normally `.brain/`). When choosing or coordinating a workflow, consult the **relevant sections** of `.brain/USAGE.md` for examples, selection of `brain-brainstorm` versus `brain-plan`, blueprint collaboration, implementation checkpoints, and reviews. Consult `.brain/README.md` for the skill catalog and installation conventions when needed. If the brain is external, resolve both documents relative to its `Project brain:` path.
 
 These guides are examples and operational documentation, **not** binding project requirements or substitutes for skill instructions. Applicable `SKILL.md` procedures, this policy, approved specifications, ADRs, and recorded user decisions control actual behavior. Do not load either guide in full by default. The mandatory project-knowledge root read remains in effect.
 

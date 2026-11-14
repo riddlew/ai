@@ -1,17 +1,17 @@
 # Brain Skills — Usage Guide
 
-This guide explains when to use `brain-brainstorm` versus `brain-plan-feature`, then demonstrates five end-to-end workflows using hypothetical client and server applications that communicate over TCP and UDP.
+This guide explains when to use `brain-brainstorm` versus `brain-plan`, then demonstrates five end-to-end workflows using hypothetical client and server applications that communicate over TCP and UDP.
 
 The prompts, file names, code examples, review findings, and test results are **illustrative**, not results from a real repository. Adapt them to your codebase and the capabilities of your installed skills.
 
 ---
 
-# Choosing `brain-brainstorm` vs. `brain-plan-feature`
+# Choosing `brain-brainstorm` vs. `brain-plan`
 
 The distinction is **what you're trying to resolve**:
 
 - **`brain-brainstorm`** — Use when you haven't fully decided *what to build or how it should work*.
-- **`brain-plan-feature`** — Use when you know what you want, but need to organize *how to get from the current codebase to that result*.
+- **`brain-plan`** — Use when you know what you want, but need to organize *how to get from the current codebase to that result*.
 
 They're complementary, not necessarily sequential.
 
@@ -20,29 +20,29 @@ They're complementary, not necessarily sequential.
 | Exploring several possible architectures | `brain-brainstorm` |
 | Deciding component ownership or design patterns | `brain-brainstorm` |
 | Clarifying ambiguous requirements or behavior | `brain-brainstorm` |
-| Understanding dependencies across several modules | `brain-plan-feature` |
-| Organizing a large feature into stages and deliverables | `brain-plan-feature` |
-| Coordinating work over multiple sessions | `brain-plan-feature` |
+| Understanding dependencies across several modules | `brain-plan` |
+| Organizing a large feature into stages and deliverables | `brain-plan` |
+| Coordinating work over multiple sessions | `brain-plan` |
 | Designing exact classes, APIs, and method signatures | `brain-blueprint` |
 
 ## Example: TCP messaging with unsettled architecture
 
-You know the exact wire format but haven't decided where serialization, buffering, and message dispatch should live. Start with **`brain-brainstorm`** to settle those architectural decisions. Use `brain-plan-feature` if implementation then requires coordinating multiple modules, milestones, or investigations. Use `brain-write-spec` and `brain-blueprint` as appropriate to record binding requirements and agree on the code-level design.
+You know the exact wire format but haven't decided where serialization, buffering, and message dispatch should live. Start with **`brain-brainstorm`** to settle those architectural decisions. Use `brain-plan` if implementation then requires coordinating multiple modules, milestones, or investigations. Use `brain-write-spec` and `brain-blueprint` as appropriate to record binding requirements and agree on the code-level design.
 
 ## Example: Large feature with settled architecture
 
-You already know the protocol, component ownership, requirements, and implementation approach. **Skip brainstorming.** Use `brain-plan-feature` to organize work across the client, server, shared library, and integration tests. Then create the specification or blueprint needed by the project and implement it.
+You already know the protocol, component ownership, requirements, and implementation approach. **Skip brainstorming.** Use `brain-plan` to organize work across the client, server, shared library, and integration tests. Then create the specification or blueprint needed by the project and implement it.
 
 ## Example: Small feature
 
-You want to display the most recent UDP heartbeat timestamp, and the necessary state already exists. **Skip both** `brain-brainstorm` and `brain-plan-feature`; go straight to `brain-implement`.
+You want to display the most recent UDP heartbeat timestamp, and the necessary state already exists. **Skip both** `brain-brainstorm` and `brain-plan`; go straight to `brain-implement`.
 
 ## Decision rule
 
 1. **Are there unresolved product or architectural choices?** If yes, use `brain-brainstorm`.
-2. **Is the work large enough to require coordinated stages, dependencies, or multiple sessions?** If yes, use `brain-plan-feature`.
+2. **Is the work large enough to require coordinated stages, dependencies, or multiple sessions?** If yes, use `brain-plan`.
 
-If both are true, use both. **`brain-plan-feature` is not a substitute for `brain-blueprint`:** planning decides work breakdown and sequencing; blueprinting defines the code-level implementation. You do not need every skill for every feature. Use the smallest workflow that resolves the actual uncertainty and complexity.
+If both are true, use both. **`brain-plan` is not a substitute for `brain-blueprint`:** planning decides work breakdown and sequencing; blueprinting defines the code-level implementation. You do not need every skill for every feature. Use the smallest workflow that resolves the actual uncertainty and complexity.
 
 ---
 
@@ -160,7 +160,7 @@ Also spell out stream behavior: one TCP receive call may return part of a frame,
 
 **Approval checkpoint:** Approve expected behavior, conformance examples, error handling, and binding architectural constraints.
 
-**Optional coordination:** If the feature spans many modules or sessions, use `brain-plan-feature` to organize phases and dependencies. Use `brain-write-tickets` when independently verifiable work items are valuable. Neither replaces the specification or code-level blueprint.
+**Optional coordination:** If the feature spans many modules or sessions, use `brain-plan` to organize phases and dependencies. Use `brain-write-tickets` when independently verifiable work items are valuable. Neither replaces the specification or code-level blueprint.
 
 ## Step 3: `/brain-blueprint` — Agree on the actual code design
 
@@ -684,7 +684,7 @@ Claude checks the new MR head, relevant verification, and the entire resulting c
 
 | Situation | Typical skill sequence | Your involvement |
 |---|---|---|
-| Large feature, rigid protocol | `brain-brainstorm` → `brain-write-spec` → optional `brain-plan-feature` / `brain-write-tickets` → `brain-blueprint` → `brain-implement` → `brain-review-code` | Approve architecture, spec, blueprint, and implementation increments. |
+| Large feature, rigid protocol | `brain-brainstorm` → `brain-write-spec` → optional `brain-plan` / `brain-write-tickets` → `brain-blueprint` → `brain-implement` → `brain-review-code` | Approve architecture, spec, blueprint, and implementation increments. |
 | Small, settled feature | `brain-implement` | Review the focused change and verification. |
 | Isolated protocol bug | `brain-diagnose` → focused fix → optional `brain-review-code` | Review the diagnosis and correction. |
 | Architecture cleanup | `brain-review-architecture` → `brain-brainstorm` → `brain-write-spec` → `brain-blueprint` → `brain-implement` → `brain-review-code` | Choose improvements and shape the exact design. |

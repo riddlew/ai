@@ -1,6 +1,6 @@
 ---
-name: brain-plan-feature
-description: Manage large, multi-session feature planning with durable, dependency-aware planning tickets under .brain/planning/. Use when an initiative has many interdependent decisions, research questions, or prototypes and will span several sessions or days; not for work that can be planned in one session.
+name: brain-plan
+description: Manage complex, multi-session planning efforts using durable, dependency-aware tickets under `.brain/planning/`. Use when an effort involves interdependent decisions, research, prototypes, or prerequisites that require multiple sessions. Not for single-session planning or implementation.
 ---
 
 # Plan Feature

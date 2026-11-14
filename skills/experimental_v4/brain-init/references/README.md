@@ -23,7 +23,7 @@ project/
         ├── brain-explain-changes/         # SKILL.md (manual, read-only)
         ├── brain-implement/             # SKILL.md + references/
         ├── brain-init/                 # SKILL.md + references/{CLAUDE.local.md,USAGE.md,README.md}
-        ├── brain-plan-feature/
+        ├── brain-plan/
         ├── brain-refine-backlog/        # SKILL.md + references/
         ├── brain-review-architecture/
         ├── brain-review-code/           # SKILL.md + references/{findings.md,report-storage.md}
@@ -45,7 +45,7 @@ Skills labeled **manual** use `disable-model-invocation: true` and must be expli
 
 `tests/` contains development fixtures and scenarios; it is not an installed Claude Code skill. Copy only the `brain-*` directories into `.claude/skills/`. Use `brain-test-skill` for behavioral verification (see [Verification](#verification)).
 
-See `USAGE.md` for example workflows and when to use `brain-brainstorm`, `brain-plan-feature`, and `brain-blueprint`. `/brain-init` can also be rerun to install or reconcile the policy and missing guides in a project whose brain already exists. It never overwrites a changed `.brain/USAGE.md` or `.brain/README.md` without permission. The guides are referenced selectively rather than loaded automatically.
+See `USAGE.md` for example workflows and when to use `brain-brainstorm`, `brain-plan`, and `brain-blueprint`. `/brain-init` can also be rerun to install or reconcile the policy and missing guides in a project whose brain already exists. It never overwrites a changed `.brain/USAGE.md` or `.brain/README.md` without permission. The guides are referenced selectively rather than loaded automatically.
 
 ## The project brain
 
@@ -118,7 +118,7 @@ For example, a request to extend communication in an existing `Session` does not
 | `brain-blueprint` | **Opus** | **Sonnet** for a small, familiar change with established architecture and straightforward interfaces; use Opus for consequential ownership, API, or cross-service design. |
 | `brain-explain-changes` | **Sonnet** | **Opus** only for unusually intricate execution paths or complex concurrency; the explanation should remain simple regardless of model. |
 | `brain-implement` | **Sonnet** | **Opus** for tightly coupled multi-system changes, byte-exact protocol work, concurrency/state-machine correctness, risky migrations, or repeated design/test failures. Merely changing many files does not itself require Opus. In **subagent-driven** execution, keep the main coordinator on Sonnet as the policy specifies; explicit subagent/final-review roles follow the policy table. |
-| `brain-plan-feature` | **Opus** | **Sonnet** when the architecture and requirements are settled and the work is primarily sequencing known tasks and maintaining planning state. |
+| `brain-plan` | **Opus** | **Sonnet** when the architecture and requirements are settled and the work is primarily sequencing known tasks and maintaining planning state. |
 | `brain-refine-backlog` | **Sonnet** | **Opus** for ambiguous cross-service requirements, major compatibility constraints, or complex dependency and acceptance-criteria conflicts. |
 | `brain-review-architecture` | **Opus** | **Sonnet** for a narrow, well-understood module or interface assessment with few architectural tradeoffs. |
 | `brain-review-code` | **Sonnet** | **Opus** for broad, high-risk changes involving multiple interacting services, concurrency, security boundaries, exact wire contracts, or hard-to-trace regressions. Delegated assessment subagents remain Sonnet unless the central policy is changed. |
@@ -142,7 +142,7 @@ For example, a request to extend communication in an existing `Session` does not
 | `brain-blueprint` **(manual)** | Investigates the real code, then collaborates with you on files, ownership, call flow, important signatures, method outlines, unchanged boundaries, testable increments, and design approval. Writes no production code; distinguishes binding constraints from illustrative sketches. | A substantial feature or code structure you want to influence before implementation. | The `Implementation Design` section and approval metadata in `.brain/impl_plans/<feature>.md`. |
 | `brain-explain-changes` **(manual)** | Walks through recent changes or a selected component in plain language, tracing actual application behavior one step at a time. Not a code review; pauses for questions and never modifies files. | You want to understand code Claude wrote or how a change fits into the running app. | Read-only walkthrough in conversation. |
 | `brain-implement` **(manual)** | Implements approved work in small verified behavioral increments. **Collaborative is default**: review the actual diff and tests, then approve each increment before the next. Guided uses larger increments; autonomous skips routine approval pauses. Inline/subagent execution is independent (collaborative defaults inline). Proposes commits but commits only if explicitly asked. Performs proportionate final review. | You are ready to change code, with or without a formal spec; substantial/design-sensitive work normally starts with an approved blueprint. | Code, checks, and mutable execution tracking in the **same** `.brain/impl_plans/<feature>.md`. |
-| `brain-plan-feature` | Tracks multi-session planning with dependency-aware research, consult, prototype, and task tickets. | An initiative has many interdependent decisions and spans days or sessions. | `.brain/planning/<feature>/INDEX.md` and planning tickets. |
+| `brain-plan` | Tracks multi-session planning with dependency-aware research, consult, prototype, and task tickets. | An initiative has many interdependent decisions and spans days or sessions. | `.brain/planning/<feature>/INDEX.md` and planning tickets. |
 | `brain-refine-backlog` | Reviews Jira stories for refinement readiness without changing them. | Preparing for backlog refinement. | Suggested gaps, draft acceptance criteria, and questions. |
 | `brain-review-architecture` | Discovers architectural friction **or** assesses a selected boundary, checks relevant previous reviews, and records coverage and finding dispositions. | You want improvement candidates or a focused design evaluation. | Findings in conversation; standalone reviews save `.brain/reviews/architecture/<NN>-<slug>/review.md` by default when a brain is writable. |
 | `brain-review-code` | Assesses a bounded change set for correctness, requirement fit, and repository fit, delegating to subagents for larger changes. | A substantive change needs review, or you request one. | Three-section findings report and requirements coverage table; optional `.brain/reviews/code/<NN>-<slug>/review.md`. |
@@ -184,13 +184,13 @@ Example: Add a share-link capability for notes.
 
 ### Large, multi-session planning effort
 
-1. Use `brain-plan-feature` to establish the objective, open areas, planning tickets, and dependencies under `.brain/planning/<feature>/`.
+1. Use `brain-plan` to establish the objective, open areas, planning tickets, and dependencies under `.brain/planning/<feature>/`.
 2. Resolve research and consult tickets one session at a time; `brain-brainstorm` handles the interactive decisions.
 3. Once consequential choices are settled, use `/brain-write-spec` and optionally `brain-write-tickets`.
 4. Use `/brain-blueprint` to approve the code-level design in `.brain/impl_plans/<feature>.md`.
 5. Use `/brain-implement` to execute and review increments, adding execution tracking to that **same** impl plan.
 
-`brain-plan-feature` tracks **planning state**; it does not substitute for the impl plan.
+`brain-plan` tracks **planning state**; it does not substitute for the impl plan.
 
 ### Diagnose and fix a failure
 
@@ -265,7 +265,7 @@ Every spec, ticket set, blueprint, and newly constructed impl-plan execution che
 | Skill | Review |
 |---|---|
 | `brain-brainstorm` | None |
-| `brain-plan-feature` | None of its own; tickets go through `brain-write-tickets` |
+| `brain-plan` | None of its own; tickets go through `brain-write-tickets` |
 | `brain-write-spec` | Write the spec → self-check → fresh reviewer |
 | `brain-write-tickets` | Draft the set → self-check (coverage table) → fresh reviewer → you approve → write the files |
 | `brain-blueprint` | Investigate code → propose/revise design → self-check → fresh reviewer → **your explicit blueprint approval**; no production edits |
@@ -288,5 +288,5 @@ Questions only you can answer come in one message, and anything left unanswered 
 - `domain-modeling` is removed: `CONTEXT.md` becomes `.brain/glossary.md`, `CONTEXT-MAP.md` becomes the domain-boundaries section of `.brain/03_architecture.md`, and ADR writing moves into `brain-update`.
 - `handoff` is removed: `state.md`, `open_questions.md`, and impl plans cover continuation.
 - `implement`'s `guidance.md` is removed; discoveries go into the brain's root files.
-- Skills that write documents invoke `brain-update` afterward: `brain-brainstorm` (confirmed direction), `brain-write-spec`, `brain-blueprint` (approved or materially revised design), `brain-write-tickets`, `brain-plan-feature` (resolved ticket), `brain-implement` (on completion, and at session end unless nothing has changed since its last `brain-update`), `brain-diagnose` (verified fix), and the review skills when a record is saved.
+- Skills that write documents invoke `brain-update` afterward: `brain-brainstorm` (confirmed direction), `brain-write-spec`, `brain-blueprint` (approved or materially revised design), `brain-write-tickets`, `brain-plan` (resolved ticket), `brain-implement` (on completion, and at session end unless nothing has changed since its last `brain-update`), `brain-diagnose` (verified fix), and the review skills when a record is saved.
 - `tests/` adds behavior scenarios and a sample project for verifying the skills.
