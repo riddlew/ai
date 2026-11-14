@@ -1,6 +1,6 @@
 # Hierarchical Brain redesign — implementation plan
 
-Status: **In progress** (branch `feature/hierarchical-brain`)
+Status: **Phase 1 authored, validation pending; Phase 2 started** (branch `feature/hierarchical-brain`)
 
 ## Objective
 
@@ -31,28 +31,32 @@ Detailed contracts and templates live in:
 - `brain-init/references/feature-document-contract.md`
 - `brain-init/references/feature-document-templates.md`
 
+Initial structural checks are implemented in `scripts/validate_feature_docs.py` and `tests/test_feature_document_contract.py`. They have **not yet been executed** in an agent sandbox.
+
 A document's `id` is stable within a feature, regardless of filename; requirement and example IDs are qualified by their specification. A child references the relevant parents and requirements. ADRs remain independent authorities under `.brain/adrs/`. `execution.md` records mutable progress, not intended design.
 
 ## Implementation phases
 
 ### P1 — Document model and templates
-**Status: In progress**
+**Status: Authored; verification pending**
 
-- [ ] Establish canonical paths and stable document identifiers.
-- [ ] Establish per-level schemas, authoring rules, and readiness/approval states.
-- [ ] Establish ownership, traceability, stale-descendant handling, and scope-proportional skipping.
-- [ ] Provide templates and an explicit example.
-- [ ] Add initial structure/contract tests.
+- [x] Establish canonical paths and stable document identifiers.
+- [x] Establish per-level schemas, authoring rules, and readiness/approval states.
+- [x] Establish ownership, traceability, stale-descendant handling, and scope-proportional skipping.
+- [x] Provide templates and an explicit example.
+- [x] Add initial structural validator and contract-test source.
+- [ ] Run and review the contract tests; correct any failures.
 
 **Gate:** A brief, specification, component, plan, task, and execution record can be authored consistently without duplicating authority.
 
 ### P2 — Core brain infrastructure and validation
-**Status: Not started**
+**Status: Started (initial validator added)**
 
 - [ ] Update `brain-init` to use the feature hierarchy for new projects.
 - [ ] Update `brain-update` to index features and verify links without editing producer-owned content.
 - [ ] Update `brain-init/references/CLAUDE.local.md` with document authority, write ownership, and approval rules.
-- [ ] Implement deterministic validation of IDs, document references, cycles, dependency edges, and requirement coverage.
+- [x] Author initial dependency/reference validator and unit tests (execution not yet verified).
+- [ ] Run validator tests and integrate structural checks into skill handoffs.
 - [ ] Preserve existing main-branch, worktree, and context-loading safeguards. Load feature details on demand.
 
 **Gate:** New-brain setup, indexing, structural checks, and branch-aware updates work with the canonical feature layout.

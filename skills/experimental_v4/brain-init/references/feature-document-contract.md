@@ -83,3 +83,14 @@ A review should be able to trace a verified task back through its plan, componen
 ## Proportionality
 
 Do not generate filler documents or insist on passing through all five folders. For a small, settled change, direct implementation is valid. For a modest feature, spec → implementation plan → task can be valid. If a level is omitted, links point to the actual governing documents rather than fabricated placeholders. Avoid decomposition into individual lines of code; tasks should be coherent, independently verifiable actions.
+
+## Structural validation (initial implementation)
+
+Run from the repository root with Python 3.10+:
+
+```bash
+python skills/experimental_v4/scripts/validate_feature_docs.py .brain/features --check-coverage
+python -m unittest discover -s skills/experimental_v4/tests -p 'test_feature_document_contract.py'
+```
+
+The validator checks required metadata, document kinds, stable IDs, parent level ordering, same-level dependencies, cycles, and qualified requirement references. With `--check-coverage`, every *populated* downstream stage must cover all requirements declared by approved specifications via approved documents. Skipped stages are permitted. These are structural checks only; human/agent review remains necessary for semantic coverage and correctness. The tests are authored but have not yet been executed in the new branch.
