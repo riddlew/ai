@@ -23,7 +23,7 @@ If the user gave a location, use it only if it is a brain, and tell them `/brain
 
 **No brain.** If none of these is a brain, change nothing and do nothing else: tell the user no brain was found and that they should run `/brain-init` first, then stop. This holds whether the user or another skill invoked you; a skill that invoked you continues without a brain. If a `Project brain:` line points to a folder that isn't a brain, say so too, and that `/brain-init <path>` points it at the right folder.
 
-**Write access.** Follow `CLAUDE.local.md` §Worktrees and brain writes. If a write to the brain is denied, stop, say what could not be updated, and ask how to proceed; never route around the denial or write the brain anywhere else.
+**Write access.** Follow `CLAUDE.local.md` §Worktrees and brain writes. If a write to the brain is denied or outside the session's authorized boundaries, stop, say what could not be updated, and ask how to proceed; never route around the restriction or write the brain anywhere else.
 
 **Main branch and reminder.** Read the `Main branch:` line in `00_index.md`. If it is missing, or names a branch that doesn't exist (`git rev-parse --verify --quiet refs/heads/<name>` fails), detect the branch with `git symbolic-ref --short refs/remotes/origin/HEAD`, dropping the `origin/` prefix. If that fails, use a local `main` or `master` branch. If neither exists, ask the user which branch the root files describe. Write the line after `Git:`, replacing a stale one, and say so. Begin your reply with a list of the files in `.brain/pending/`: each one's branch, number of entries, and `Updated:` date. Mark a file "branch not found" when `git rev-parse --verify --quiet refs/heads/<branch>` fails. If `pending/` is empty or missing, list nothing.
 

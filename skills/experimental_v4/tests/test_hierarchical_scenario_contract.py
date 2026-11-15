@@ -116,12 +116,17 @@ class HierarchicalScenarioContract(unittest.TestCase):
         corrected = scenarios.builder.build(self.root / "corrected", "tasks")
         self.assertEqual(0, validate(corrected / ".brain/features").returncode)
 
-    def test_h10_isolated_worktree_keeps_brain_in_main_checkout(self):
+    def test_h10_restricted_worktree_states_its_write_scope(self):
         for name in ("H10A", "H10B"):
             with self.subTest(name=name):
                 prepared = self.prepare(name)
                 self.assertEqual(prepared.repo / ".claude/worktrees/h10", prepared.cwd)
-                self.assertEqual("h10", prepared.worktree)
+                self.assertIsNone(prepared.worktree, "scope must not depend on environment enforcement")
+                self.assertEqual(prepared.cwd, prepared.launch)
+                self.assertEqual([], prepared.add_dirs)
+                self.assertIn(f"authorized writes inside {prepared.cwd} and nowhere else", prepared.context)
+                self.assertIn(f"main checkout at {prepared.repo} is outside this session's authorized "
+                              "write scope", prepared.context)
                 self.assertFalse((prepared.cwd / ".brain").exists())
                 self.assertTrue((prepared.repo / FEATURE / "execution.md").is_file())
                 self.assertEqual("agent-h10", scenarios.builder.git(

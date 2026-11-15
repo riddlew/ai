@@ -55,7 +55,7 @@ A brain is a folder that has `00_index.md`: the folder a `Project brain:` line o
 
 **Where the first run creates it.** From a linked git worktree, an untracked brain goes in the main checkout, so every worktree shares it. If the user chooses to track it, or you are not in a linked worktree, it goes at the current worktree root.
 
-**Write access.** Follow `${CLAUDE_SKILL_DIR}/references/CLAUDE.local.md` §Worktrees and brain writes. If creating or writing the brain is denied, stop, say what could not be written, and ask how to proceed; never route around the denial or create the brain anywhere else.
+**Write access.** Follow `${CLAUDE_SKILL_DIR}/references/CLAUDE.local.md` §Worktrees and brain writes. If creating or writing the brain is denied or outside the session's authorized boundaries, stop, say what could not be written, and ask how to proceed; never route around the restriction or create the brain anywhere else.
 
 A `.brain/` folder without `00_index.md` (for example, one holding a spec another skill saved) is not a brain; keep its files and index them during the first run.
 
