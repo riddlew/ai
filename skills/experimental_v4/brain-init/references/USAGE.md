@@ -46,9 +46,9 @@ If both are true, use both. **`brain-plan` is not a substitute for `brain-bluepr
 
 ---
 
-## Hierarchical feature documentation (current architecture)
+## Hierarchical feature workflow
 
-For new feature work the canonical document structure is `.brain/features/<feature-slug>/01-brief/`, `02-specifications/`, `03-components/`, `04-implementation-plans/`, and `05-tasks/`, with mutable execution state in `execution.md`. The hierarchy is optional when work is trivial or already fully settled; never create placeholder documents. `brain-decompose` maps behavior to functional components. `brain-write-tasks` replaces the former ticket-writing skill and produces executable actions from approved implementation plans. There is no legacy feature-document layout support. The normative contracts and templates ship in `brain-init/references/feature-document-contract.md` and `feature-document-templates.md`.
+For nontrivial features, use `.brain/features/<slug>/01-brief/` → `02-specifications/` → `03-components/` → `04-implementation-plans/` → `05-tasks/`. `brain-brainstorm` establishes intent, `brain-write-spec` records behavior, `brain-decompose` defines coherent functional responsibilities, `brain-blueprint` specifies code-level implementation, and `brain-write-tasks` produces executable tasks. `brain-implement` writes verification and progress separately to `execution.md`. Read the authoritative schema at `brain-init/references/feature-document-contract.md` in the installed skills. Skip unhelpful intermediate stages for simple work.
 
 ## Understand changes after implementation
 
@@ -164,9 +164,13 @@ Also spell out stream behavior: one TCP receive call may return part of a frame,
 
 **Approval checkpoint:** Approve expected behavior, conformance examples, error handling, and binding architectural constraints.
 
-**Optional coordination:** If the feature spans many modules or sessions, use `brain-plan` to organize phases and dependencies. Use `brain-write-tasks` when independently verifiable work items are valuable. Neither replaces the specification or code-level blueprint.
+**Optional coordination:** If the feature spans many modules or sessions, use `brain-plan` to organize phases and dependencies. Use `brain-decompose` before code-level design when distinct functional responsibilities need definition; generate tasks with `brain-write-tasks` **after** the technical plans are approved. Neither replaces the specification.
 
-## Step 3: `/brain-blueprint` — Agree on the actual code design
+## Step 3: `/brain-decompose` — Define functional components
+
+For a substantial TCP messaging feature, first map the approved requirements to functional components such as message contract, framing/stream handling, dispatch, and lifecycle behavior. Produce `03-components/` documents with `CMP-` identifiers and qualified `SPEC-...#REQ-...` coverage; get approval of functional boundaries. Do not assume each functional component becomes a software class or service.
+
+## Step 4: `/brain-blueprint` — Agree on the actual code design
 
 **Example prompt:**
 
@@ -223,7 +227,11 @@ The blueprint should label **binding decisions** separately from **suggested sig
 
 **Approval checkpoint:** You explicitly approve the code-level design before production code is modified.
 
-## Step 4: `/brain-implement` — Build and review coherent increments
+## Step 5: `/brain-write-tasks` — Define executable work
+
+From the approved code-level plans, create `05-tasks/` files with `TASK-` IDs, concrete technical actions, genuine dependencies, and verification criteria. Preserve the plan's decisions and map each requirement to the tasks that implement it. Skip task files when one small change can be implemented directly.
+
+## Step 6: `/brain-implement` — Build and review coherent increments
 
 In collaborative mode, Claude implements a small testable behavior, verifies it, presents the actual code changes, and **waits for approval** before advancing.
 
@@ -267,7 +275,7 @@ You inspect the code and request a refinement:
 
 Claude makes the correction and presents the revised increment. Only after you approve does work continue.
 
-## Step 5: `/brain-review-code` — Independent final review
+## Step 7: `/brain-review-code` — Independent final review
 
 **Example prompt:**
 
