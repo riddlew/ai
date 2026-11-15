@@ -27,7 +27,7 @@ put() {
 family=help
 if [ "$#" -gt 0 ]; then family=$1;shift;fi
 case "$family" in help|--help|-h) echo 'brain-tool <init|doc|validate|git|record|context> [options]';exit 0;; esac
-case "$1" in new|list|summary) shift;; esac
+case "${1:-}" in new|list|summary) shift;; esac
 BRAIN= FEATURE= KIND= NAME= REPO=. AUTHORIZED= APPLY=0 TRACKING=ignored REVISION= DATE= MAIN=main PARENTS= SINCE= AFFECTED= HASHFILE= COVERAGE=0 EVENT= DETAIL= BRANCH=
 while [ "$#" -gt 0 ]; do
   arg=$1;shift
@@ -190,8 +190,36 @@ context)
   fi
   ;;
 validate)
-  # Never claim full parity when the available shell parser cannot prove it.
-  die 'full feature-document validation needs Python or Node; shell fallback refuses incomplete validation'
+  need brain "$BRAIN"
+  tmp=$(mktemp -d);trap 'rm -rf "$tmp"' 0 HUP INT TERM
+  : > "$tmp/manifest"
+  if [ -d "$BRAIN/features" ]; then
+    find "$BRAIN/features" -type f -name '*.md' | LC_ALL=C sort | while IFS= read -r p; do
+      case "$p" in */01-brief/*|*/02-specifications/*|*/03-components/*|*/04-implementation-plans/*|*/05-tasks/*) :;; *) continue;; esac
+      feature=$(basename "$(dirname "$(dirname "$p")")")
+      sha=$(git hash-object "$p") || die 'Git required for document hashes'
+      awk -v file="$p" -v feature="$feature" -v hash="$sha" -f "$HERE/brain-tool-scan.awk" "$p"
+    done > "$tmp/manifest"
+  fi
+  if [ -n "$HASHFILE" ]; then
+    [ -f "$HASHFILE" ] || die "document not found: $HASHFILE"
+    ref=$(awk -F '\t' -v f="$HASHFILE" '$1=="DOC" && $11==f {print $6}' "$tmp/manifest")
+    result=
+    oldIFS=$IFS;IFS=,
+    for parent in $ref; do
+      IFS=$oldIFS
+      parent=$(printf '%s' "$parent" | tr -d ' ')
+      [ -n "$parent" ] || continue
+      hash=$(awk -F '\t' -v id="$parent" '$1=="DOC" && $3==id {print $10}' "$tmp/manifest")
+      [ -n "$hash" ] || die "unknown parent: $parent"
+      result="$result$( [ -z "$result" ] || printf ', ' )$parent@$hash"
+      IFS=,
+    done
+    IFS=$oldIFS
+    printf 'parent_hashes: [%s]\n' "$result"
+    exit 0
+  fi
+  awk -F '\t' -v check_coverage="$COVERAGE" -v affected="$AFFECTED" -f "$HERE/brain-tool-validate.awk" "$tmp/manifest" || die 'feature-document error(s)'
   ;;
 *) die "unknown command: $family";;
 esac
