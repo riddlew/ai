@@ -33,9 +33,8 @@ scenarios = importlib.util.module_from_spec(spec)
 sys.modules[spec.name] = scenarios
 spec.loader.exec_module(scenarios)
 
-STRONGEST, STANDARD = "claude-opus-5-5", "claude-sonnet-5-5"
+STANDARD = "sonnet"
 MODELS = {name: STANDARD for name in scenarios.SCENARIOS}
-MODELS.update({name: STRONGEST for name in ("H1", "H2", "H4", "H7", "H11")})
 RED_SKILLS = {"brain-write-tasks": "brain-write-tickets", "brain-decompose": None}
 ALWAYS, IF_NO_CODE_CHANGE = "always", "if-no-code-change"
 FOLLOWUPS = {
@@ -63,7 +62,9 @@ Use only the skills named here and the skills they mention; don't invoke other i
 {skill_line}{context}The user says: "{trigger}"
 Behave exactly as you would in a real session. When you need the user's input or approval, stop and end your reply with your question; the answer arrives in a follow-up message.
 End every reply with a section "Files read and commands run:" that lists each one, including every file written and every subagent dispatched, with its model."""
-TURN_TIMEOUT = 45 * 60
+TURN_TIMEOUT = 5 * 60
+DEFAULT_MAX_TURNS = 5
+DEFAULT_BUDGET_USD = 1.00
 
 
 def export_arm(ref: str, destination: Path) -> None:
@@ -116,15 +117,20 @@ def read_only(*paths: Path) -> list[str]:
 
 
 def claude(prompt: str, run_dir: Path, model: str, extra: list[str], log: Path,
-           readable: list[str]) -> dict:
+           readable: list[str], budget: float = DEFAULT_BUDGET_USD,
+           turns: int = DEFAULT_MAX_TURNS, timeout: int = TURN_TIMEOUT,
+           subagents: bool = False) -> dict:
     command = ["claude", "-p", prompt, "--model", model, "--setting-sources", "project,local",
                "--disable-slash-commands", "--strict-mcp-config",
-               "--permission-mode", "acceptEdits", "--allowedTools", "Bash", "Agent", *readable,
+               "--permission-mode", "acceptEdits", "--allowedTools", "Bash", *readable,
+               "--max-budget-usd", str(budget), "--max-turns", str(turns),
                "--output-format", "stream-json", "--verbose", *extra]
+    if not subagents:
+        command += ["--disallowedTools", "Agent"]
     started = time.time()
     with log.open("w") as out:
         process = subprocess.run(command, cwd=run_dir, stdout=out, stderr=subprocess.PIPE,
-                                 text=True, timeout=TURN_TIMEOUT)
+                                 text=True, timeout=timeout)
     result = {}
     for line in log.read_text().splitlines():
         try:
@@ -139,7 +145,10 @@ def claude(prompt: str, run_dir: Path, model: str, extra: list[str], log: Path,
             "is_error": result.get("is_error"), "num_turns": result.get("num_turns")}
 
 
-def run(scenario: str, arm: str, arm_dir: Path, sample: int, evidence: Path) -> Path:
+def run(scenario: str, arm: str, arm_dir: Path, sample: int, evidence: Path,
+        model: str = STANDARD, budget: float = DEFAULT_BUDGET_USD,
+        turns: int = DEFAULT_MAX_TURNS, timeout: int = TURN_TIMEOUT,
+        subagents: bool = False, sample_budget: float = 2.00) -> Path:
     out = evidence / f"{scenario}-{arm}-{sample}"
     out.mkdir(parents=True)
     root = Path(tempfile.mkdtemp(prefix="brain-run-"))
@@ -165,7 +174,6 @@ def run(scenario: str, arm: str, arm_dir: Path, sample: int, evidence: Path) -> 
     context = f"Context: {prepared.context}\n" if prepared.context else ""
     prompt = WRAPPER.format(cwd=prepared.cwd, policy=prepared.repo / "CLAUDE.local.md",
                             skill_line=skill_line, context=context, trigger=prepared.trigger)
-    model = MODELS[scenario]
     extra = [arg for d in prepared.add_dirs for arg in ("--add-dir", str(d))]
     first = extra + (["--worktree", prepared.worktree] if prepared.worktree else [])
     meta = {"scenario": scenario, "arm": arm, "arm_dir": str(arm_dir),
@@ -178,11 +186,17 @@ def run(scenario: str, arm: str, arm_dir: Path, sample: int, evidence: Path) -> 
     before_code = code_digest(prepared.cwd)
     readable = read_only(arm_dir, prepared.repo)
     meta["arm_digest_before"] = hashlib.sha1(json.dumps(tree_digest(arm_dir)).encode()).hexdigest()
-    turn = claude(prompt, prepared.launch, model, first, out / "turn1.jsonl", readable)
+    turn = claude(prompt, prepared.launch, model, first, out / "turn1.jsonl", readable,
+                  budget, turns, timeout, subagents)
     meta["turns"].append({"user": prompt, **turn})
     (out / "reply1.md").write_text(turn["reply"] or "")
     for index, (condition, text) in enumerate(FOLLOWUPS.get(scenario, []), start=2):
-        if not meta["turns"][-1]["session_id"]:
+        last = meta["turns"][-1]
+        if not last.get("session_id") or last.get("is_error") or last.get("exit") != 0:
+            break
+        remaining = sample_budget - sum(t.get("cost_usd") or 0 for t in meta["turns"])
+        if remaining <= 0:
+            meta["turns"].append({"user": None, "skipped": "estimated sample budget exhausted"})
             break
         after_code = code_digest(prepared.cwd)
         if condition == IF_NO_CODE_CHANGE and after_code != before_code:
@@ -192,7 +206,8 @@ def run(scenario: str, arm: str, arm_dir: Path, sample: int, evidence: Path) -> 
         message = f"The user replies: {text}"
         turn = claude(message, prepared.cwd, model,
                       extra + ["--resume", meta["turns"][-1]["session_id"]],
-                      out / f"turn{index}.jsonl", readable)
+                      out / f"turn{index}.jsonl", readable,
+                      min(budget, remaining), turns, timeout, subagents)
         meta["turns"].append({"user": message, **turn})
         (out / f"reply{index}.md").write_text(turn["reply"] or "")
     for name, path in brains.items():
@@ -220,10 +235,24 @@ def main() -> int:
     batch.add_argument("evidence", type=Path)
     batch.add_argument("--arm", action="append", required=True, help="name=exported skill dir")
     batch.add_argument("--jobs", nargs="+", required=True, help="SCENARIO:ARM:SAMPLE")
-    batch.add_argument("--parallel", type=int, default=4)
+    batch.add_argument("--parallel", type=int, default=1)
+    batch.add_argument("--model", default=STANDARD)
+    batch.add_argument("--max-budget-usd", type=float, default=DEFAULT_BUDGET_USD)
+    batch.add_argument("--sample-budget-usd", type=float, default=2.00)
+    batch.add_argument("--max-turns", type=int, default=DEFAULT_MAX_TURNS)
+    batch.add_argument("--timeout", type=int, default=TURN_TIMEOUT)
+    batch.add_argument("--subagents", action="store_true")
+    batch.add_argument("--execute", action="store_true", help="explicitly allow paid agent runs")
     args = parser.parse_args()
     if args.command == "export-arm":
         export_arm(args.ref, args.destination)
+        return 0
+    if not 1 <= args.parallel <= 4 or args.max_budget_usd <= 0 or args.sample_budget_usd <= 0 or args.max_turns < 1 or args.timeout < 10:
+        parser.error("invalid execution limits")
+    if not args.execute:
+        print("DRY RUN: no agents launched. Add --execute for paid agent sessions.")
+        for job in args.jobs:
+            print(f"  {job}: model={args.model}, maximum per turn=${args.max_budget_usd:.2f}, per sample=${args.sample_budget_usd:.2f}")
         return 0
     arms = dict(item.split("=", 1) for item in args.arm)
     limited = []
@@ -233,10 +262,13 @@ def main() -> int:
         if limited:
             return f"{spec} SKIPPED: usage limit reached earlier in this batch"
         try:
-            out = run(scenario, arm, Path(arms[arm]), int(sample), args.evidence)
+            out = run(scenario, arm, Path(arms[arm]), int(sample), args.evidence,
+                      args.model, args.max_budget_usd, args.max_turns,
+                      args.timeout, args.subagents, args.sample_budget_usd)
             meta = json.loads((out / "meta.json").read_text())
-            if any(t.get("is_error") for t in meta["turns"]):
-                if any("limit" in (t.get("reply") or "") for t in meta["turns"]):
+            if any(t.get("is_error") or t.get("exit") not in (None, 0) for t in meta["turns"]):
+                if any(any(word in ((t.get("reply") or "") + (t.get("stderr") or "")).lower()
+                           for word in ("limit", "budget", "quota")) for t in meta["turns"]):
                     limited.append(spec)
                 return f"{spec} ERROR in a turn: void, rerun ({out.name})"
             return f"{spec} done ${meta['cost_usd']:.2f} turns={len(meta['turns'])}"
