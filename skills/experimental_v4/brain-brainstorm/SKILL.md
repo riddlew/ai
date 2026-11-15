@@ -63,10 +63,10 @@ Resolve **Investigate** rows from source, tests, configuration, documentation, a
 For each **User decision** whose dependencies are resolved:
 
 1. Load the lens for each area the decision touches, from `${CLAUDE_SKILL_DIR}/lenses/`:
-   - `architecture.md` — ownership, lifecycle, dependency direction, reversibility
-   - `data.md` — schema, migration, consistency, idempotency
-   - `contracts.md` — API versioning, error contracts, compatibility
-   - `failure.md` — retries, partial failure, concurrency
+   - `${CLAUDE_SKILL_DIR}/lenses/architecture.md` — ownership, lifecycle, dependency direction, reversibility
+   - `${CLAUDE_SKILL_DIR}/lenses/data.md` — schema, migration, consistency, idempotency
+   - `${CLAUDE_SKILL_DIR}/lenses/contracts.md` — API versioning, error contracts, compatibility
+   - `${CLAUDE_SKILL_DIR}/lenses/failure.md` — retries, partial failure, concurrency
 
    Load none when no lens fits.
 2. State the forces: the requirements and constraints any option must satisfy, and the evidence the lens directs you to gather.
