@@ -32,7 +32,7 @@ After this step, continue with §1 or §2, and report whether the policy was ins
 
 The distributable sources are `${CLAUDE_SKILL_DIR}/references/USAGE.md` and `${CLAUDE_SKILL_DIR}/references/README.md`. Install them as `USAGE.md` and `README.md` **at the root of the selected brain**, not at the repository root and not beside the installed skills. Always use the bundled copies; never copy the project's own `README.md` in their place. A brain stored outside the checkout gets the guides in that external brain.
 
-Run this step whenever §1 finds a **valid, writable brain** and after §2 step 5 creates a new one. Obey the same isolated-worktree and write-safety restrictions as other brain operations; if the selected brain isn't writable, report that and stop rather than writing to another location.
+Run this step whenever §1 finds a **valid, writable brain** and after §2 step 5 creates a new one. Obey the same write-safety rules as other brain operations (`${CLAUDE_SKILL_DIR}/references/CLAUDE.local.md` §Worktrees and brain writes); if the selected brain isn't writable, report that and ask how to proceed rather than writing to another location.
 
 1. Confirm both bundled source files exist and can be read. If either is unavailable, report which one is missing; do not fabricate or substitute documentation.
 2. For each destination, **copy** the bundled content if the file is absent. If its content is identical, leave it untouched. If a different file already exists, preserve it and report the difference; ask before replacing or reconciling it. Never silently overwrite a user-edited guide. Do not remove or move the bundled source.
@@ -55,7 +55,7 @@ A brain is a folder that has `00_index.md`: the folder a `Project brain:` line o
 
 **Where the first run creates it.** From a linked git worktree, an untracked brain goes in the main checkout, so every worktree shares it. If the user chooses to track it, or you are not in a linked worktree, it goes at the current worktree root.
 
-**Isolated worktree sessions.** Claude Code isolates a session in a worktree only when the session was started with `claude --worktree` or entered the worktree you are working in with `EnterWorktree`; a linked worktree alone is not isolation. An isolated session can't edit the main checkout. If this session is isolated, or an edit to the main checkout is refused, and the brain would be created there, say so before investigating, and stop. Don't write it anywhere else or through shell commands. Tell the user to run `/brain-init` from a session in the main checkout.
+**Write access.** Follow `${CLAUDE_SKILL_DIR}/references/CLAUDE.local.md` §Worktrees and brain writes. If creating or writing the brain is denied, stop, say what could not be written, and ask how to proceed; never route around the denial or create the brain anywhere else.
 
 A `.brain/` folder without `00_index.md` (for example, one holding a spec another skill saved) is not a brain; keep its files and index them during the first run.
 
