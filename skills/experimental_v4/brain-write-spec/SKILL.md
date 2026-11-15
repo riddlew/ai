@@ -43,7 +43,7 @@ Give each normative requirement or invariant a stable ID (`REQ-001`, `REQ-002`, 
 - Derive each expected outcome independently from the approved requirements. Do not copy what the current code happens to do unless the requirements say current behavior is preserved.
 - Examples illustrate; they are not exhaustive. The general rules define behavior between examples.
 - If an expected outcome depends on a choice nobody has made, do not write the example. Add the case to Open Decisions.
-- Use concrete values. Number examples across the spec (`E1`, `E2`, …) so tickets and tests can reference them.
+- Use concrete values. Number examples across the spec (`E1`, `E2`, …) so tasks and tests can reference them.
 
 ## 3. Define the verification strategy
 

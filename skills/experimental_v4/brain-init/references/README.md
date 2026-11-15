@@ -166,7 +166,7 @@ These are **examples, not checklists**. Skip any step that does not provide valu
 
 Example: Add a `--json` option to an existing export command.
 
-1. Run `/brain-implement` directly from the request; a specification, tickets, and a separate blueprint are optional for this small settled change.
+1. Run `/brain-implement` directly from the request; a specification, task set, and a separate blueprint are optional for this small settled change.
 2. Claude makes the smallest coherent change and runs targeted verification.
 3. In default **collaborative** mode, review the actual diff and tests; request edits or approve the increment. You do **not** need to commit to continue. The final check is `brain-implement`'s own diff inspection; full `brain-review-code` runs when consequential or requested.
 4. To learn how the changed code works, run `/brain-explain-changes` (or give a file, symbol, or commit range). It traces real call paths in short, plain-language steps without making code changes.
@@ -208,7 +208,7 @@ Example: Changes to note permissions regularly require updates across several mo
 1. Use `brain-review-architecture` in **discovery mode** to identify evidence-backed friction.
 2. Select a candidate for **focused review**; compare preserving the existing design and the smallest correction with larger alternatives only when justified.
 3. Approve any consequential change before it is recorded through `brain-update` or implemented.
-4. Write a spec and tickets only if the change is substantial or needs staged migration.
+4. Write a specification, component definitions, technical plan, and executable tasks only where the scope justifies that detail.
 
 ### Merge request review
 
@@ -248,18 +248,18 @@ A substantial feature keeps stable design and mutable execution evidence in **di
 
 Implementation uses focused test-first increments, starting from the specification's examples and covering stated invariants and failure paths beyond them. In collaborative/guided mode, **technically verified is not finished until you review the increment**. A user may revise code between increments; Claude compares the actual diff and reruns impacted checks rather than undoing user edits. At completion, validation is proportional to scope and risk. `brain-review-code` runs for substantial or consequential changes, **not every trivial edit**; in subagent-driven mode each task also gets a task review with up to five fix rounds. `brain-review-security` is similarly risk-based. Review findings are handled by `${CLAUDE_SKILL_DIR}/../brain-implement/references/review-feedback.md`: verify before acting, and push back with evidence. No task is marked done without meaningful verification inspected in that session; when automated tests are inapplicable, alternatives and their limitations must be recorded.
 
-All four `brain-review-*` skills share the severity, confidence, and finding format in `${CLAUDE_SKILL_DIR}/../brain-review-code/references/findings.md`, plus the per-review folder layout in `${CLAUDE_SKILL_DIR}/../brain-review-code/references/report-storage.md`. New reports always use `.brain/reviews/<type>/<NN>-<slug>/review.md`; legacy flat reports remain readable. Standalone architecture reviews save by default when a brain is writable; other review skills save only when requested or needed by an invoking workflow.
+All four `brain-review-*` skills share the severity, confidence, and finding format in `${CLAUDE_SKILL_DIR}/../brain-review-code/references/findings.md`, plus the per-review folder layout in `${CLAUDE_SKILL_DIR}/../brain-review-code/references/report-storage.md`. New reports always use `.brain/reviews/<type>/<NN>-<slug>/review.md`; existing flat review reports remain readable. Standalone architecture reviews save by default when a brain is writable; other review skills save only when requested or needed by an invoking workflow.
 
 `brain-test-skill` supports behavioral verification in fresh agents against throwaway repositories, comparing original and changed skills. The development fixtures and scenarios are included in the source archive, but are not part of the installed skills; static checks alone do not prove agent behavior. Run behavioral tests before relying on a changed rule in production.
 
 ## Reviews
 
-Every spec, ticket set, blueprint, and newly constructed impl-plan execution checklist gets an author self-check, then a fresh standard-tier builder review (or, without a subagent tool, a self-read the skill reports as weaker) that reads it as someone who must build from it without asking.
+Every specification, task set, technical blueprint, and newly constructed execution work-item set gets an author self-check and then a fresh standard-tier builder review (or, without a subagent tool, a self-read the skill reports as weaker) that reads it as someone who must build from it without asking.
 
 | Skill | Review |
 |---|---|
 | `brain-brainstorm` | None |
-| `brain-plan` | None of its own; tickets go through `brain-write-tasks` |
+| `brain-plan` | Owns investigation and decision tickets; executable tasks are produced separately from approved technical plans |
 | `brain-write-spec` | Write the spec → self-check → fresh reviewer |
 | `brain-write-tasks` | Draft the set → self-check (coverage table) → fresh reviewer → you approve → write the files |
 | `brain-blueprint` | Investigate code → propose/revise design → self-check → fresh reviewer → **your explicit blueprint approval**; no production edits |

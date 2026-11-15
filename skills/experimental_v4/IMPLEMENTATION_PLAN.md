@@ -104,12 +104,13 @@ A document's `id` is stable within a feature, regardless of filename; requiremen
 **Gate:** Installed guides and skill contracts agree on paths and authority.
 
 ### P7 — Skill behavior tests and regression
-**Status: Static tests and scenario definitions authored; tests not yet run**
+**Status: Static CI passing; fresh-agent behavior tests still pending**
 
 - [x] Add H1–H11 behavior scenario definitions (not yet executed).
 - [ ] Execute RED/GREEN scenarios in fresh agents.
 - [x] Add initial static checks for IDs, dependencies, cycles, parent approval, requirement lineage, and stage coverage; cross-feature and stale-approval behavior still needs validation.
-- [ ] Execute and extend static checks where necessary.
+- [x] Execute static tests and StartMachine structural fixture in GitHub Actions (`Brain static contracts`, passing at `c157f20`).
+- [ ] Extend static checks where necessary and run the H1–H11 fresh-agent behavior scenarios.
 - [ ] Check trivial-change bypass, worktree/branch safety, execution resume, and no unapproved architectural decisions.
 - [ ] Exercise `StartMachine` end to end: idea → brief → specs → components → plans → tasks → verified implementation.
 - [ ] Run the existing relevant `experimental_v4` static tests and fresh-agent regression scenarios.
@@ -127,4 +128,4 @@ Five document types have explicit contracts, the new `brain-decompose` exists, `
 
 ## Current verification and integration limitations
 
-The branch now contains the new `brain-decompose` skill, the renamed `brain-write-tasks` skill (with old `brain-write-tickets/SKILL.md` deleted), updated core producers, and the initial separation of plans from `execution.md`. These are authored instructions, **not yet verified in fresh-agent scenarios**. Existing usage guides, review helpers, and many tests may still refer to the removed layout and skill name; treat that cleanup as open. The validator, unit tests, and fresh-agent behavior scenarios have not yet been executed against a runnable checkout through the GitHub integration. `tests/test_skill_reference_contract.py` now checks referenced bundled files, retired ticket writer naming, and canonical producer targets. A previously malformed `brain-update` indexing step and obsolete shared-plan documentation have been corrected. Test execution and semantic validation remain necessary. Do not claim regression success before running actual checks in a checkout.
+The branch now contains the new `brain-decompose` skill, the renamed `brain-write-tasks` skill (with old `brain-write-tickets/SKILL.md` deleted), updated core producers, and the initial separation of plans from `execution.md`. These are authored instructions, **not yet verified in fresh-agent scenarios**. Existing usage guides, review helpers, and many tests may still refer to the removed layout and skill name; treat that cleanup as open. GitHub Actions now executes the Python static contract tests and the StartMachine structural fixture on the branch. The initial CI failure identified three stale migration/naming assertions; these were corrected, and the subsequent run succeeded at `c157f20`. Fresh-agent behavior scenarios have **not** been executed. `tests/test_skill_reference_contract.py` now checks referenced bundled files, retired ticket writer naming, and canonical producer targets. A previously malformed `brain-update` indexing step and obsolete shared-plan documentation have been corrected. Test execution and semantic validation remain necessary. Do not claim regression success before running actual checks in a checkout.
