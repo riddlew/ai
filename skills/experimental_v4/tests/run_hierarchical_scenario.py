@@ -106,10 +106,20 @@ def code_digest(cwd: Path) -> str:
     return hashlib.sha1(b"".join(f.read_bytes() for f in files if f.exists())).hexdigest()
 
 
-def claude(prompt: str, run_dir: Path, model: str, extra: list[str], log: Path) -> dict:
+def read_only(*paths: Path) -> list[str]:
+    """Permission rules that let the agent read, but not edit, these trees."""
+    rules = set()
+    for path in paths:
+        for variant in (path, path.resolve()):
+            rules.add(f"Read(/{variant}/**)")
+    return sorted(rules)
+
+
+def claude(prompt: str, run_dir: Path, model: str, extra: list[str], log: Path,
+           readable: list[str]) -> dict:
     command = ["claude", "-p", prompt, "--model", model, "--setting-sources", "project,local",
                "--disable-slash-commands", "--strict-mcp-config",
-               "--permission-mode", "acceptEdits", "--allowedTools", "Bash", "Agent",
+               "--permission-mode", "acceptEdits", "--allowedTools", "Bash", "Agent", *readable,
                "--output-format", "stream-json", "--verbose", *extra]
     started = time.time()
     with log.open("w") as out:
@@ -166,7 +176,9 @@ def run(scenario: str, arm: str, arm_dir: Path, sample: int, evidence: Path) -> 
             "worktree": prepared.worktree, "prompt": prompt, "turns": []}
     (out / "prompt.txt").write_text(prompt)
     before_code = code_digest(prepared.cwd)
-    turn = claude(prompt, prepared.launch, model, first, out / "turn1.jsonl")
+    readable = read_only(arm_dir, prepared.repo)
+    meta["arm_digest_before"] = hashlib.sha1(json.dumps(tree_digest(arm_dir)).encode()).hexdigest()
+    turn = claude(prompt, prepared.launch, model, first, out / "turn1.jsonl", readable)
     meta["turns"].append({"user": prompt, **turn})
     (out / "reply1.md").write_text(turn["reply"] or "")
     for index, (condition, text) in enumerate(FOLLOWUPS.get(scenario, []), start=2):
@@ -180,7 +192,7 @@ def run(scenario: str, arm: str, arm_dir: Path, sample: int, evidence: Path) -> 
         message = f"The user replies: {text}"
         turn = claude(message, prepared.cwd, model,
                       extra + ["--resume", meta["turns"][-1]["session_id"]],
-                      out / f"turn{index}.jsonl")
+                      out / f"turn{index}.jsonl", readable)
         meta["turns"].append({"user": message, **turn})
         (out / f"reply{index}.md").write_text(turn["reply"] or "")
     for name, path in brains.items():
@@ -191,6 +203,7 @@ def run(scenario: str, arm: str, arm_dir: Path, sample: int, evidence: Path) -> 
                                            + git_state(prepared.cwd))
     meta["digest_before"] = {n: tree_digest(out / "before" / n) for n in brains}
     meta["digest_after"] = {n: tree_digest(out / "after" / n) for n in brains}
+    meta["arm_digest_after"] = hashlib.sha1(json.dumps(tree_digest(arm_dir)).encode()).hexdigest()
     meta["cost_usd"] = sum(t.get("cost_usd") or 0 for t in meta["turns"])
     (out / "meta.json").write_text(json.dumps(meta, indent=2))
     return out
