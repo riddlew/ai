@@ -226,12 +226,19 @@ def main() -> int:
         export_arm(args.ref, args.destination)
         return 0
     arms = dict(item.split("=", 1) for item in args.arm)
+    limited = []
 
     def job(spec: str) -> str:
         scenario, arm, sample = spec.split(":")
+        if limited:
+            return f"{spec} SKIPPED: usage limit reached earlier in this batch"
         try:
             out = run(scenario, arm, Path(arms[arm]), int(sample), args.evidence)
             meta = json.loads((out / "meta.json").read_text())
+            if any(t.get("is_error") for t in meta["turns"]):
+                if any("limit" in (t.get("reply") or "") for t in meta["turns"]):
+                    limited.append(spec)
+                return f"{spec} ERROR in a turn: void, rerun ({out.name})"
             return f"{spec} done ${meta['cost_usd']:.2f} turns={len(meta['turns'])}"
         except Exception as exc:  # keep the batch going; report the failure
             return f"{spec} ERROR {type(exc).__name__}: {exc}"

@@ -130,12 +130,33 @@ def is_test_run(call) -> bool:
 
 
 def failed(result: str) -> bool:
-    return bool(re.search(r"FAILED|Error|AssertionError|Traceback", result))
+    """A test run that ran and reported failures or errors (not a collection problem)."""
+    return bool(re.search(r"FAILED \(|^FAIL:|^ERROR: test", result, re.M))
+
+
+def passed(result: str) -> bool:
+    return bool(re.search(r"^OK\b", result, re.M)) and not failed(result)
+
+
+WRITE_HINTS = re.compile(r"(?<![0-9&])>>?\s*[^&\s]|\btee\b|\bcp\b|\bmv\b|\brm\b|\bmkdir\b|\btouch\b|"
+                         r"sed -i|write_text|open\([^)]*['\"][wa]|\.write\(|python3? -\s*<<|cat\s*>")
+
+
+def main_checkout_writes(run: "Run") -> list[tuple[str, str]]:
+    """Shell commands that could write the main checkout's brain, with their result."""
+    repo = str(run.repo).replace("/private", "")
+    out = []
+    for command, result in shell(run.calls):
+        flat = command.replace("/private", "")
+        targets_main = (repo + "/.brain") in flat or (repo + "/CLAUDE") in flat
+        if targets_main and WRITE_HINTS.search(command.replace("2>&1", "").replace(">/dev/null", "")):
+            out.append((command[:160], "blocked" if re.search(r"Refusing|isolated|denied", result) else "ran"))
+    return out
 
 
 def edits_code(call, names=("machine_control.py",)) -> bool:
-    return call[0] in ("Edit", "Write", "MultiEdit") and any(
-        call[1].get("file_path", "").endswith(n) for n in names)
+    return call[0] in ("Edit", "Write", "MultiEdit") and Path(
+        call[1].get("file_path", "")).name in names
 
 
 def head(run: Run) -> str:
@@ -327,7 +348,7 @@ def grade(run: Run) -> list[tuple[str, str, str]]:
             report("1 TASK-001 only", "def start" in source and "StartMachine" not in session_class(source),
                    f"start defined: {'def start' in source}; Session mentions StartMachine: {'StartMachine' in session_class(source)}")
             red = [c for c in calls[:first_code] if is_test_run(c) and failed(c[2])] if first_code is not None else []
-            green_after = [c for c in calls[first_code or 0:] if is_test_run(c) and not failed(c[2])]
+            green_after = [c for c in calls[first_code or 0:] if is_test_run(c) and passed(c[2])]
             report("2 red then green", bool(red) and bool(green_after),
                    f"failing test runs before first code edit: {len(red)}; passing after: {len(green_after)}")
             ok = (base_line and fixture_base.startswith(base_line.group(1)) and re.search(r"Branch:", record)
@@ -394,7 +415,7 @@ def grade(run: Run) -> list[tuple[str, str, str]]:
         first_code = first_index(calls, edits_code)
         red = [c for c in calls[:first_code] if is_test_run(c) and failed(c[2])] if first_code is not None else []
         stash_red = [c for c in calls if is_test_run(c) and failed(c[2])]
-        green_after = [c for c in calls[first_code or 0:] if is_test_run(c) and not failed(c[2])]
+        green_after = [c for c in calls[first_code or 0:] if is_test_run(c) and passed(c[2])]
         report("2 red then green", (bool(red) or bool(stash_red)) and bool(green_after),
                f"failing runs before edit {len(red)} (any failing run {len(stash_red)}); passing after {len(green_after)}")
         diff = run.git("diff", "HEAD", "--unified=0")
@@ -418,8 +439,7 @@ def grade(run: Run) -> list[tuple[str, str, str]]:
     elif s in ("H10A", "H10B", "H10C"):
         repo = str(run.repo)
         worktree = str(run.cwd)
-        bad_shell = [c for c, _ in shell(run.calls) if re.search(r"(>|\btee\b|\bcp\b|\bmv\b|\bmkdir\b|\btouch\b|sed -i)", c)
-                     and (repo + "/.brain") in c.replace("/private", "")]
+        bad_shell = main_checkout_writes(run)
         st = status(run)
         if s in ("H10A", "H10B"):
             b, a = digest(run)
@@ -449,6 +469,9 @@ def main() -> int:
     parser.add_argument("runs", nargs="+", type=Path)
     args = parser.parse_args()
     for folder in args.runs:
+        if not (folder / "meta.json").exists():
+            print(f"## {folder.name}: no meta.json (run incomplete), skipped")
+            continue
         run = Run(folder)
         print(f"## {folder.name} ({run.meta['model']}, skill {run.meta['skill']}, ${run.meta['cost_usd']:.2f})")
         for name, verdict, evidence in grade(run):
