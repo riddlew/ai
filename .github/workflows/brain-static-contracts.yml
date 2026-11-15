@@ -1,0 +1,35 @@
+name: Brain static contracts
+
+on:
+  push:
+    branches: [feature/hierarchical-brain]
+    paths:
+      - "skills/experimental_v4/**"
+      - ".github/workflows/brain-static-contracts.yml"
+  pull_request:
+    paths:
+      - "skills/experimental_v4/**"
+      - ".github/workflows/brain-static-contracts.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Compile validator and contract tests
+        run: python -m compileall -q skills/experimental_v4/scripts skills/experimental_v4/tests
+      - name: Run Python static contract tests
+        run: python -m unittest discover -s skills/experimental_v4/tests -p 'test_*_contract.py' -v
+      - name: Validate StartMachine feature fixture
+        run: >
+          python skills/experimental_v4/scripts/validate_feature_docs.py
+          skills/experimental_v4/tests/fixture/hierarchical-brain/.brain/features
+          --check-coverage
