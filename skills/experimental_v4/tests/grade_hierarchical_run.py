@@ -276,8 +276,9 @@ def grade(run: Run) -> list[tuple[str, str, str]]:
                f"coverage table in reply 1: {table}; approved writes in turn 1: {turn1_approvals}")
         body = "\n".join(text(p) for p in comps)
         codes = set(re.findall(r'"error"\s*:\s*"(\w+)"', body)) - KNOWN_CODES - {"not_eligible"}
+        class_terms = sorted(set(re.findall(r"\b[A-Z][a-z]+(?:Manager|Service|Handler|Controller)\b", body)))
         report("5 nothing invented", False if codes else "CHECK",
-               f"new codes {sorted(codes) or 'none'}; class-like terms {sorted(set(re.findall(r'\b[A-Z][a-z]+(?:Manager|Service|Handler|Controller)\b', body)))}")
+               f"new codes {sorted(codes) or 'none'}; class-like terms {class_terms}")
         b, a = digest(run, prefix=f"{FEATURE}/02-")
         report("6 no code, spec unchanged", status(run) == "" and a == b, f"git {status(run)!r}")
 
