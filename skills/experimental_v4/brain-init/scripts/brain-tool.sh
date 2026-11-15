@@ -72,7 +72,7 @@ while [ "$#" -gt 0 ]; do
         --repo) REPO=$v;; --authorized-root) AUTHORIZED=$v;; --tracking) TRACKING=$v;;
         --revision) REVISION=$v;; --at) DATE=$v;; --main-branch) MAIN=$v;;
         --parent) PARENTS="$PARENTS $v";; --since) SINCE=$v;; --affected) AFFECTED=$v;;
-        --show-parent-hashes) HASHFILE=$v;; --event) EVENT=$v;; --detail) DETAIL=$v;; --branch) BRANCH=$v;;
+        --show-parent-hashes) HASHFILE=$v;; --event) EVENT=$v;; --detail) DETAIL=$v;; --branch) BRANCH=$v;; --report-type) REPORTTYPE=$v;;
       esac;;
     *) die "unknown argument: $arg";;
   esac
