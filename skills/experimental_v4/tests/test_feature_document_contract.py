@@ -114,6 +114,25 @@ class FeatureDocumentContract(unittest.TestCase):
         self.assertFalse(any("03-components" in error and "no approved document covers"
                              in error for error in errors))
 
+    def test_absent_features_directory_is_valid_empty_brain(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual([], validator.validate_features(Path(tmp) / ".brain" / "features", True))
+
+    def test_non_directory_features_path_is_reported(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            file = Path(tmp) / "features"
+            file.write_text("not a directory")
+            self.assertIn("expected directory", "\n".join(validator.validate_features(file)))
+
+    def test_approved_task_rejects_unapproved_dependency(self):
+        self.write("TASK-002", "task", parents=["PLAN-001"],
+                   requirements=["SPEC-001#REQ-001"], status="draft")
+        self.write("TASK-001", "task", parents=["PLAN-001"],
+                   requirements=["SPEC-001#REQ-001", "SPEC-001#REQ-002"],
+                   depends_on=["TASK-002"])
+        self.assertIn("approved document has unapproved dependency TASK-002",
+                      "\n".join(validator.validate_feature(self.feature)))
+
     def test_block_yaml_list_is_supported(self):
         path = self.feature / "05-tasks" / "TASK-001.md"
         content = path.read_text().replace("parents: [PLAN-001]",

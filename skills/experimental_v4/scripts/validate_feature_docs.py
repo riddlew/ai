@@ -137,6 +137,8 @@ def validate_feature(feature: Path, check_coverage: bool = False) -> list[str]:
                 errors.append(f"{path}: dependency {dep_id} must be at the same level")
             elif dep_id == doc["id"]:
                 errors.append(f"{path}: self-dependency {dep_id}")
+            elif meta["status"] == "approved" and dep["meta"]["status"] != "approved":
+                errors.append(f"{path}: approved document has unapproved dependency {dep_id}")
         parent_requirements: set[str] = set()
         for parent_id in meta["parents"]:
             parent = documents.get(parent_id)
@@ -204,8 +206,10 @@ def validate_feature(feature: Path, check_coverage: bool = False) -> list[str]:
 
 
 def validate_features(features_root: Path, check_coverage: bool = False) -> list[str]:
+    if not features_root.exists():
+        return []  # A new brain need not have a features directory yet.
     if not features_root.is_dir():
-        return [f"{features_root}: feature directory does not exist"]
+        return [f"{features_root}: expected directory, found non-directory"]
     errors: list[str] = []
     for feature in sorted(p for p in features_root.iterdir() if p.is_dir()):
         errors.extend(validate_feature(feature, check_coverage))
