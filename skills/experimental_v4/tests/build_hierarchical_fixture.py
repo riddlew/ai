@@ -32,7 +32,7 @@ def build(destination: Path, stage: str = "none") -> Path:
         raise ValueError(f"invalid stage {stage!r}; choose from {STAGES}")
     if destination.exists():
         raise FileExistsError(f"refusing to overwrite existing fixture {destination}")
-    shutil.copytree(APP, destination)
+    shutil.copytree(APP, destination, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     (destination / "CLAUDE.local.md").write_text(
         (ROOT / "brain-init" / "references" / "CLAUDE.local.md").read_text(encoding="utf-8"),
         encoding="utf-8",
@@ -45,7 +45,7 @@ def build(destination: Path, stage: str = "none") -> Path:
     revision = git(destination, "rev-parse", "HEAD")
     exclude = destination / ".git" / "info" / "exclude"
     with exclude.open("a", encoding="utf-8") as f:
-        f.write("\n.brain/\n")
+        f.write("\n.brain/\n__pycache__/\n*.pyc\n")
     brain = destination / ".brain"
     brain.mkdir()
     (brain / "00_index.md").write_text(
