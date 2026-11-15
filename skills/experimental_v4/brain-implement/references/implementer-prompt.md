@@ -28,7 +28,7 @@ Code locations:
 
 {constraints}
 
-## Approved blueprint (relevant excerpts only)
+## Approved implementation plan (relevant excerpts only)
 
 {blueprint_constraints}
 
@@ -37,7 +37,7 @@ Clearly distinguish binding approved structure from illustrative method sketches
 ## Rules
 
 - Work test-first when a reliable test surface exists. For each behavior, write the test, run it, and confirm it fails for the intended reason before changing code. Otherwise use the strongest practical alternative verification and disclose the limitation; do not invent red-green evidence.
-- Make the smallest change within approved architectural and blueprint ownership. Preserve binding design patterns, interfaces, and negative constraints; illustrative helpers may be refined with an explanation.
+- Make the smallest change within approved architectural and implementation-plan ownership. Preserve binding design patterns, interfaces, and negative constraints; illustrative helpers may be refined with an explanation.
 - Do not commit, stage, or switch branches.
 - Never delete, revert, stash, or overwrite files or changes this task did not make. If a finding asks for that, push back.
 - Do not dispatch subagents.
@@ -50,7 +50,7 @@ The first line is exactly one of `DONE`, `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT`, 
 
 1. The test commands run and relevant output (red and green), or the alternative verification used and why tests were inapplicable.
 2. The files changed.
-3. Any deviations from the approved blueprint (or explicitly `none`), and any concerns.
+3. Any deviations from the approved implementation plan (or explicitly `none`), and any concerns.
 
 ## Fix round
 
