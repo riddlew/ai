@@ -1,0 +1,22 @@
+#!/bin/sh
+# Runtime selection: Python > Node.js > POSIX shell. No installation required.
+set -eu
+ROOT=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
+case "\${BRAIN_RUNTIME:-auto}" in
+  auto)
+    if command -v python3 >/dev/null 2>&1; then runtime=python
+    elif command -v node >/dev/null 2>&1; then runtime=node
+    else runtime=sh
+    fi;;
+  python|node|sh) runtime=$BRAIN_RUNTIME;;
+  *) echo "ERROR unsupported BRAIN_RUNTIME" >&2;exit 1;;
+esac
+case "$runtime" in
+  python)
+    command -v python3 >/dev/null 2>&1 || { echo 'ERROR python3 unavailable' >&2;exit 1; }
+    exec python3 "$ROOT/brain-tool.py" "$@";;
+  node)
+    command -v node >/dev/null 2>&1 || { echo 'ERROR node unavailable' >&2;exit 1; }
+    exec node "$ROOT/brain-tool.mjs" "$@";;
+  sh) exec sh "$ROOT/brain-tool.sh" "$@";;
+esac
