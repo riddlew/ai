@@ -85,7 +85,8 @@ def in_scope(destination: Path, options: dict) -> None:
 def changes(items: list[tuple[Path, str]], options: dict) -> None:
     """Preflight the whole change set; never replace differing files."""
     for target, text in items:
-        in_scope(target, options)
+        if options.get("apply"):
+            in_scope(target, options)
         if target.exists() and (not target.is_file() or target.read_text() != text):
             raise Problem(f"existing content differs: {target}")
     for target, text in items:
@@ -274,7 +275,7 @@ def validate(options: dict) -> None:
         while True:
             next_set = affected | {
                 key for key, (_, meta) in docs.items()
-                if (key[0], ident) not in affected
+                if key not in affected
                 and any((key[0], parent) in affected
                         for parent in meta["parents"] + meta["depends_on"])
             }
@@ -331,10 +332,6 @@ def record(options: dict) -> None:
     if not options.get("apply"):
         print(f"APPEND {target} (dry-run)")
         return
-    # Refuse to rewrite stale content between preflight and update.
-    before = target.stat().st_mtime_ns
-    if target.stat().st_mtime_ns != before:
-        raise Problem("execution record changed concurrently")
     with target.open("a", encoding="utf-8") as f:
         f.write(("\n" if not text.endswith("\n") else "") + entry)
     print(f"APPENDED {target}")
@@ -346,7 +343,9 @@ def context(options: dict) -> None:
         raise Problem(f"not a Brain: {brain}")
     files = [f for f in brain.glob("*.md") if f.name not in ("README.md", "USAGE.md")]
     if options.get("branch"):
-        branch = slug(str(options["branch"]).replace("/", "--"))
+        branch = str(options["branch"]).replace("/", "--")
+        if not re.fullmatch(r"[A-Za-z0-9._-]+", branch) or ".." in branch:
+            raise Problem("invalid branch name")
         item = brain / "pending" / f"{branch}.md"
         if item.is_file():
             files.append(item)
