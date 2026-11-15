@@ -1,7 +1,36 @@
-# StartMachine — execution
+# StartMachine: Execution
 
-Illustrative fixture only. No code was executed and no implementation is claimed complete.
+Review base: not recorded; no feature code has been changed
+Branch: main
+Workspace: main checkout
+Collaboration mode: collaborative
+Execution mode: inline
 
 ## Task status
+
 - TASK-001: pending
 - TASK-002: pending
+
+## Current focus
+
+None.
+
+## Blockers and open decisions
+
+None.
+
+## Design deviations
+
+None.
+
+## Verification evidence (command, outcome, revision)
+
+None yet.
+
+## Rulings and deferred issues
+
+None.
+
+## Review focus and checkpoint history
+
+None.

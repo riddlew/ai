@@ -1,9 +1,4 @@
-"""Small, dependency-free reference application for Brain skill testing.
-
-There is deliberately no StartMachine behavior in the initial application.
-The Session owns protocol routing; MachineRegistry owns machine state changes.
-This exercises a functional boundary but is not a production TCP server.
-"""
+"""In-memory machine control: request routing and machine state."""
 from dataclasses import dataclass
 
 
@@ -14,6 +9,8 @@ class Machine:
 
 
 class MachineRegistry:
+    """Owns machine state transitions."""
+
     def __init__(self, machines: dict[str, Machine]):
         self.machines = machines
 
@@ -28,7 +25,7 @@ class MachineRegistry:
 
 
 class Session:
-    """Existing message dispatcher; do not move connection/session ownership."""
+    """Routes client requests and owns the client session."""
 
     def __init__(self, registry: MachineRegistry):
         self.registry = registry

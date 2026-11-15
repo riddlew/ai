@@ -1,4 +1,4 @@
-"""Only existing StopMachine behavior is tested at the fixture baseline."""
+"""Session and MachineRegistry behavior."""
 import sys
 import unittest
 from pathlib import Path
