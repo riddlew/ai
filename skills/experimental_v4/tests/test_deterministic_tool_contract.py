@@ -65,8 +65,23 @@ class DeterministicCliContract(unittest.TestCase):
                     "--feature", "demo", "--kind", "specification",
                     "--slug", "start", "--parent", "BRF-001", *common,
                     ok=False).returncode, 0)
+                invoke(runtime, "doc", "--brain", brain, "--feature", "demo",
+                       "--kind", "execution", *common)
+                invoke(runtime, "doc", "--brain", brain, "--feature", "demo",
+                       "--kind", "planning-index", *common)
+                invoke(runtime, "doc", "--brain", brain, "--feature", "demo",
+                       "--kind", "planning-ticket", "--slug", "risk-review", *common)
+                invoke(runtime, "doc", "--brain", brain, "--feature", "demo",
+                       "--kind", "diagnosis", "--slug", "lost-update", *common)
+                invoke(runtime, "doc", "--brain", brain, "--feature", "demo",
+                       "--kind", "review", "--slug", "data-flow",
+                       "--report-type", "architecture", *common)
+                invoke(runtime, "git", "--repo", repo, "--brain", brain,
+                       "--pending", "--branch", "feature/demo",
+                       "--at", "2026-01-01", *common)
+                self.assertIn("Branch: feature/demo",
+                    (brain / "pending/feature--demo.md").read_text())
                 record = brain / "features/demo/execution.md"
-                record.write_text("# Demo\n\n## Checkpoints\n")
                 invoke(runtime, "record", "--brain", brain, "--feature", "demo",
                        "--event", "test", "--detail", "passed", *common)
                 before = record.read_bytes()
