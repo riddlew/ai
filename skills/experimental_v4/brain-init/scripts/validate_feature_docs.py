@@ -221,18 +221,33 @@ def validate_feature(feature: Path, check_coverage: bool = False) -> list[str]:
             for doc in by_level[2] if doc["meta"]["status"] == "approved"
             for req in DECLARED_REQUIREMENT.findall(doc["body"])
         }
+        # A level may be intentionally skipped for one specification while
+        # another specification in the same feature uses it. Coverage is
+        # complete per participating specification, not feature-wide.
         for level in range(3, 6):
-            if not by_level[level]:
-                continue  # A deliberate skipped level is not a coverage failure.
-            if any(doc["meta"]["status"] != "approved" for doc in by_level[level]):
-                continue  # Partial drafts are not claiming complete stage coverage.
-            covered = {
-                req for doc in by_level[level] if doc["meta"]["status"] == "approved"
-                for req in doc["meta"]["requirements"]
-            }
-            for req in sorted(required - covered):
-                errors.append(f"{feature / next(k for k, v in LEVELS.items() if v[2] == level)}: "
-                              f"no approved document covers {req}")
+            participants: dict[str, list[dict]] = {}
+            for doc in by_level[level]:
+                scope = {
+                    match.group(1)
+                    for value in doc["meta"]["requirements"]
+                    if (match := REQUIREMENT.fullmatch(value))
+                }
+                scope.update(parent for parent in doc["meta"]["parents"]
+                             if parent.startswith("SPEC-"))
+                for spec_id in scope:
+                    participants.setdefault(spec_id, []).append(doc)
+            for spec_id, scoped_docs in participants.items():
+                if any(doc["meta"]["status"] != "approved" for doc in scoped_docs):
+                    continue  # A draft is not a claim of complete coverage.
+                expected = {req for req in required if req.startswith(f"{spec_id}#")}
+                covered = {
+                    req for doc in scoped_docs for req in doc["meta"]["requirements"]
+                }
+                for req in sorted(expected - covered):
+                    errors.append(
+                        f"{feature / next(k for k, v in LEVELS.items() if v[2] == level)}: "
+                        f"no approved document covers {req}"
+                    )
     return errors
 
 

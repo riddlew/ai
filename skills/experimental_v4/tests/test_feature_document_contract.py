@@ -86,6 +86,22 @@ class FeatureDocumentContract(unittest.TestCase):
                       "\n".join(validator.validate_feature(self.feature, True)))
         self.assertEqual([], validator.validate_feature(self.feature, False))
 
+    def test_one_spec_may_skip_component_level_when_another_uses_it(self):
+        self.write("SPEC-002", "specification", parents=[],
+                   body="- REQ-001: Independent small change")
+        self.assertEqual([], validator.validate_feature(self.feature, True))
+
+    def test_draft_other_spec_does_not_mask_missing_coverage(self):
+        self.write("SPEC-002", "specification", parents=[],
+                   body="- REQ-001: Another behavior")
+        self.write("CMP-002", "component", parents=["SPEC-002"],
+                   requirements=["SPEC-002#REQ-001"], status="draft")
+        self.write("CMP-001", "component", parents=["SPEC-001"],
+                   requirements=["SPEC-001#REQ-001"])
+        errors = "\n".join(validator.validate_feature(self.feature, True))
+        self.assertIn("no approved document covers SPEC-001#REQ-002", errors)
+        self.assertNotIn("no approved document covers SPEC-002#REQ-001", errors)
+
     def test_skipped_middle_levels_are_allowed(self):
         for level in ("03-components", "04-implementation-plans"):
             for path in (self.feature / level).glob("*.md"):
