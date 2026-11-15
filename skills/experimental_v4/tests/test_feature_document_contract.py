@@ -38,10 +38,18 @@ class FeatureDocumentContract(unittest.TestCase):
               status="approved", body="# Example"):
         def yaml_list(values):
             return "[" + ", ".join(values or []) + "]"
+        parent_hashes = []
+        for parent in parents or []:
+            for parent_kind, directory in LEVELS.items():
+                parent_file = self.feature / directory / f"{parent}.md"
+                if parent_file.exists():
+                    parent_hashes.append(f"{parent}@{validator.git_blob_sha(parent_file)}")
+                    break
         content = (f"---\nid: {doc_id}\nkind: {kind}\nstatus: {status}\n"
                    f"parents: {yaml_list(parents)}\n"
                    f"requirements: {yaml_list(requirements)}\n"
-                   f"depends_on: {yaml_list(depends_on)}\n---\n{body}\n")
+                   f"depends_on: {yaml_list(depends_on)}\n"
+                   f"parent_hashes: {yaml_list(parent_hashes)}\n---\n{body}\n")
         directory = self.feature / LEVELS[kind]
         directory.mkdir(parents=True, exist_ok=True)
         path = directory / f"{doc_id}.md"
@@ -132,6 +140,27 @@ class FeatureDocumentContract(unittest.TestCase):
                    depends_on=["TASK-002"])
         self.assertIn("approved document has unapproved dependency TASK-002",
                       "\n".join(validator.validate_feature(self.feature)))
+
+    def test_parent_revision_invalidates_approved_children(self):
+        spec = self.feature / "02-specifications" / "SPEC-001.md"
+        spec.write_text(spec.read_text() + "\\nAn approved behavior changed.\\n")
+        errors = "\\n".join(validator.validate_feature(self.feature))
+        self.assertIn("stale parent hash for SPEC-001", errors)
+
+    def test_approved_child_needs_parent_hash(self):
+        path = self.feature / "03-components" / "CMP-001.md"
+        content = path.read_text()
+        content = content.replace("parent_hashes: [SPEC-001@", "parent_hashes: [INVALID@")
+        path.write_text(content)
+        errors = "\\n".join(validator.validate_feature(self.feature))
+        self.assertIn("approved document missing parent hash for SPEC-001", errors)
+
+    def test_hash_helper_reports_current_parent(self):
+        child = self.feature / "03-components" / "CMP-001.md"
+        self.assertEqual(
+            [f"SPEC-001@{validator.git_blob_sha(self.feature / '02-specifications' / 'SPEC-001.md')}"],
+            validator.describe_parent_hashes(child),
+        )
 
     def test_block_yaml_list_is_supported(self):
         path = self.feature / "05-tasks" / "TASK-001.md"

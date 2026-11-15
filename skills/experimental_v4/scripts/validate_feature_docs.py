@@ -7,6 +7,7 @@ frontmatter subset defined in feature-document-contract.md.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import re
 from pathlib import Path
 
@@ -17,10 +18,11 @@ LEVELS = {
     "04-implementation-plans": ("implementation-plan", "PLAN", 4),
     "05-tasks": ("task", "TASK", 5),
 }
-SEQUENCES = {"parents", "requirements", "depends_on"}
+SEQUENCES = {"parents", "requirements", "depends_on", "parent_hashes"}
 REQUIRED = {"id", "kind", "status", *SEQUENCES}
 STATUSES = {"draft", "approved", "needs-revision"}
 REQUIREMENT = re.compile(r"^(SPEC-\d{3})#(REQ-\d{3})$")
+PARENT_HASH = re.compile(r"^((?:BRF|SPEC|CMP|PLAN|TASK)-\d{3})@([0-9a-f]{40})$")
 DECLARED_REQUIREMENT = re.compile(r"^\s*(?:[-*]\s*)?(REQ-\d{3}):", re.MULTILINE)
 
 
@@ -31,6 +33,13 @@ def _items(value: str) -> list[str]:
     if value.startswith("[") and value.endswith("]"):
         value = value[1:-1]
     return [item.strip().strip("'\"") for item in value.split(",") if item.strip()]
+
+
+def git_blob_sha(path: Path) -> str:
+    """Content fingerprint; works for ignored/untracked project-brain files."""
+    content = path.read_bytes()
+    header = f"blob {len(content)}\\0".encode("ascii")
+    return hashlib.sha1(header + content).hexdigest()
 
 
 def parse_document(path: Path) -> tuple[dict, str]:
@@ -121,6 +130,18 @@ def validate_feature(feature: Path, check_coverage: bool = False) -> list[str]:
         if doc["level"] > 1 and not meta["parents"]:
             if any(by_level[i] for i in range(1, doc["level"])):
                 errors.append(f"{path}: parent reference required when earlier documents exist")
+        parent_hashes: dict[str, str] = {}
+        for recorded in meta["parent_hashes"]:
+            match = PARENT_HASH.fullmatch(recorded)
+            if not match:
+                errors.append(f"{path}: malformed parent hash {recorded!r}")
+                continue
+            parent_id, digest = match.groups()
+            if parent_id in parent_hashes:
+                errors.append(f"{path}: duplicate parent hash for {parent_id}")
+            parent_hashes[parent_id] = digest
+            if parent_id not in meta["parents"]:
+                errors.append(f"{path}: parent hash for non-parent {parent_id}")
         for parent_id in meta["parents"]:
             parent = documents.get(parent_id)
             if parent is None:
@@ -129,6 +150,13 @@ def validate_feature(feature: Path, check_coverage: bool = False) -> list[str]:
                 errors.append(f"{path}: parent {parent_id} must be from an earlier level")
             elif meta["status"] == "approved" and parent["meta"]["status"] != "approved":
                 errors.append(f"{path}: approved document has unapproved parent {parent_id}")
+            if parent is not None and meta["status"] == "approved":
+                actual = git_blob_sha(parent["path"])
+                recorded = parent_hashes.get(parent_id)
+                if recorded is None:
+                    errors.append(f"{path}: approved document missing parent hash for {parent_id}")
+                elif recorded != actual:
+                    errors.append(f"{path}: stale parent hash for {parent_id} (parent was revised)")
         for dep_id in meta["depends_on"]:
             dep = documents.get(dep_id)
             if dep is None:
@@ -205,6 +233,24 @@ def validate_feature(feature: Path, check_coverage: bool = False) -> list[str]:
     return errors
 
 
+
+def describe_parent_hashes(path: Path) -> list[str]:
+    """Print a valid fingerprint list to copy into an approved child document."""
+    metadata, _ = parse_document(path)
+    feature = path.parent.parent
+    known: dict[str, Path] = {}
+    for folder in LEVELS:
+        for candidate in (feature / folder).glob("*.md"):
+            child_meta, _ = parse_document(candidate)
+            known[child_meta["id"]] = candidate
+    result: list[str] = []
+    for parent_id in metadata.get("parents", []):
+        if parent_id not in known:
+            raise ValueError(f"unknown parent {parent_id} in {feature}")
+        result.append(f"{parent_id}@{git_blob_sha(known[parent_id])}")
+    return result
+
+
 def validate_features(features_root: Path, check_coverage: bool = False) -> list[str]:
     if not features_root.exists():
         return []  # A new brain need not have a features directory yet.
@@ -218,10 +264,21 @@ def validate_features(features_root: Path, check_coverage: bool = False) -> list
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("features_root", type=Path, help="path to .brain/features")
+    parser.add_argument("features_root", type=Path, nargs="?", help="path to .brain/features")
+    parser.add_argument("--show-parent-hashes", type=Path, metavar="DOCUMENT",
+                        help="print hashes for a child's current parents, without editing files")
     parser.add_argument("--check-coverage", action="store_true",
                         help="require each populated downstream stage to cover approved requirements")
     args = parser.parse_args()
+    if args.show_parent_hashes is not None:
+        try:
+            values = describe_parent_hashes(args.show_parent_hashes)
+        except (OSError, ValueError) as exc:
+            parser.exit(1, f"{exc}\\n")
+        print("parent_hashes: [" + ", ".join(values) + "]")
+        return 0
+    if args.features_root is None:
+        parser.error("features_root is required unless --show-parent-hashes is supplied")
     errors = validate_features(args.features_root, args.check_coverage)
     if errors:
         for error in errors:
