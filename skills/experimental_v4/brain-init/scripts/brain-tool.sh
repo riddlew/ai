@@ -136,7 +136,7 @@ doc)
       if($0~/^parents: /){print "parents: "list;next}
       if($0~/^(requirements|depends_on|parent_hashes): /){split($0,b,":");print b[1]": []";next}
       if(kind=="specification"&&$0~/^- (REQ-[0-9][0-9][0-9]|E[0-9]+): /)next
-      gsub(/<Feature area>|<Feature>/,feature);print
+      title=feature;gsub(/-/," ",title);parts=split(title,words," ");title="";for(w=1;w<=parts;w++)title=title (w>1?" ":"") toupper(substr(words[w],1,1)) substr(words[w],2);gsub(/<Feature area>|<Feature>/,title);print
     }' "$REFS/feature-document-templates.md" > "$tmp/doc"
   [ -s "$tmp/doc" ] || die 'missing template'
   put "$target" "$tmp/doc"
