@@ -1,6 +1,6 @@
 # Hierarchical Brain redesign — implementation plan
 
-Status: **Core skills, H1–H11 fixtures, and worktree/approval fixes implemented; static tests passing locally; targeted fresh-agent reruns (H10B, H7) pending approval** (branch `feature/hierarchical-brain`)
+Status: **Implemented; static tests passing (64); H10B verified in a fresh agent after the worktree fix; ready for review** (branch `feature/hierarchical-brain`) (branch `feature/hierarchical-brain`)
 
 ## Objective
 
@@ -110,16 +110,17 @@ A document's `id` is stable within a feature, regardless of filename; requiremen
 - [x] Add H1–H11 behavior scenario definitions (not yet executed).
 - [x] Execute pre-fix RED (3 samples) and GREEN (1 sample) runs in fresh agents; results in `tests/hierarchical-scenarios.md`. H10B failed and H7 showed an approval gap.
 - [x] Fix the demonstrated failures: general worktree rules in `CLAUDE.local.md` (worktrees share the configured brain, denied writes are never routed around, unavailable writes are explained and asked about, unmerged facts go to `pending/<branch>.md`) that `brain-implement` and `brain-update` follow, and `needs-revision` on material spec revision in `brain-write-spec`; static regression tests in `test_worktree_and_approval_contract.py`.
-- [ ] Rerun H10B and H7 (one Sonnet session each, user-approved) after the fixes.
+- [x] Rerun H10B after the fixes (one approved Sonnet session at `4da51b2`): passed all four criteria. The first rerun at `0f0f041` failed (a script wrote outside the session's scope without any denial), which led to the authorized-scope rule.
+- [ ] H7 rerun not performed; spec-revision invalidation is covered by static tests and the pre-fix evidence only.
 - [x] Validate IDs, dependencies, cycles, parent approval, requirement lineage, coverage, and direct-parent hash mismatches; structural stale-approval detection has regression tests.
 - [x] Allow independent specifications without inferred unrelated parents; reject requirement-bearing descendants without parents and malformed non-sequence metadata.
 - [x] Execute 47 static contract tests, fixture setup verification, and StartMachine structural validation in GitHub Actions (`Brain static contracts`, passing at `1c5c55d`).
 - [x] Add `tests/build_hierarchical_fixture.py` and `tests/prepare_hierarchical_scenario.py` so H1–H11 have isolated, reproducible Git repositories, prompts, invalid references, independent approval scopes, a real localized bug, and worktree scenarios.
-- [ ] Optional, only if approved: H10E (ordinary worktree control) and H10D (external brain resume). The full RED/GREEN matrix is not planned.
-- [ ] Check trivial-change bypass, worktree/branch safety, execution resume, and no unapproved architectural decisions.
+- [ ] Not performed and not planned before merge: H10E, H10D reruns, repeated samples, and a post-fix RED/GREEN matrix.
+- [x] Check trivial-change bypass (H8), worktree/branch safety (H10A–H10C pre-fix, H10B post-fix), and execution resume (H6B) in single fresh-agent samples.
 - [ ] Exercise `StartMachine` end to end: idea → brief → specs → components → plans → tasks → verified implementation.
 - [x] Run existing `experimental_v4` static contract tests through GitHub Actions.
-- [ ] Run fresh-agent regression scenarios.
+- [x] Run fresh-agent regression scenarios (pre-fix RED ×3 and GREEN ×1; post-fix H10B ×1).
 - [x] Distinguish tests actually run from planned/unverified tests (Results section; void runs listed).
 
 **Gate:** Evidence demonstrates the redesigned workflow and important existing guarantees.
@@ -134,4 +135,7 @@ Five document types have explicit contracts, the new `brain-decompose` exists, `
 
 ## Current verification and integration limitations
 
-The branch contains the five-stage document hierarchy, `brain-decompose`, the renamed `brain-write-tasks`, updated producers and review prompts, and separate `execution.md` ownership. A worked StartMachine example documents illustrative ADR and failure-path mappings; no real server code has been implemented. GitHub Actions executes Python static contract tests and the StartMachine structural fixture. Static CI passed at `1c5c55d` (47 tests); the current branch runs 64 static tests locally. The validator now lives in `brain-init/scripts/`, making it available when the individual skill directories are installed; all producer skills have instructions for preserving approved-parent fingerprints. The fixture builder and scenario preparer are executed in GitHub Actions, and pre-fix fresh-agent runs are recorded in `tests/hierarchical-scenarios.md`; the fixes for H10B and H7 are not yet verified by a rerun. Agent runs use `tests/run_hierarchical_scenario.py`, which is a dry run unless `--execute` is given and runs one bounded Sonnet session at a time. Fresh-agent runs remain necessary to validate that agents actually respect approvals, worktree safety, document ownership, progressive decomposition, resume behavior, and proportionality. A passing structural fixture does **not** demonstrate that StartMachine was implemented. `tests/AGENT_TESTING.md` describes fixture preparation, the runner, and the grader.
+- **Static:** 64 Python contract tests, compilation, and StartMachine structural validation pass locally; GitHub Actions runs the same checks.
+- **Fresh agents (recorded in `tests/hierarchical-scenarios.md`):** pre-fix RED (`main`, 3 samples) and GREEN (1 sample) across H1–H11 showed the new document layout, approval gates, resume, and proportionality working, and exposed two defects. Both were fixed: shared worktree rules in `CLAUDE.local.md` (shared brain, authorized write scope, no bypass, explain and ask, `pending/<branch>.md`), and `needs-revision` on material spec revision in `brain-write-spec`. H10B passed after the fixes.
+- **Not verified by an agent after the fixes:** H7 (spec-revision invalidation), H10A, H10C, H10D, H10E. Results are single samples on Sonnet; they show what can happen, not how often.
+- **Scope:** the StartMachine app is an in-memory fixture, not a TCP server; a passing structural fixture does not show that StartMachine was implemented. Agent runs use `tests/run_hierarchical_scenario.py`, which is a dry run unless `--execute` is given and runs one bounded Sonnet session at a time; CI never runs agents.
