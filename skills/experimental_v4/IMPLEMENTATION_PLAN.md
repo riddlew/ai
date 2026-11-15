@@ -1,6 +1,6 @@
 # Hierarchical Brain redesign — implementation plan
 
-Status: **Core hierarchy and producer refactor authored; static integration checks added; runtime verification pending** (branch `feature/hierarchical-brain`)
+Status: **Core hierarchy and producer refactor implemented; static CI passing; agent-behavior verification pending** (branch `feature/hierarchical-brain`)
 
 ## Objective
 
@@ -31,33 +31,33 @@ Detailed contracts and templates live in:
 - `brain-init/references/feature-document-contract.md`
 - `brain-init/references/feature-document-templates.md`
 
-Initial structural checks are implemented in `scripts/validate_feature_docs.py` and `tests/test_feature_document_contract.py`. They have **not yet been executed** in an agent sandbox.
+Initial structural checks are implemented in `scripts/validate_feature_docs.py` and `tests/test_feature_document_contract.py`, and run in GitHub Actions. Fresh-agent behavior tests are still pending.
 
 A document's `id` is stable within a feature, regardless of filename; requirement and example IDs are qualified by their specification. A child references the relevant parents and requirements. ADRs remain independent authorities under `.brain/adrs/`. `execution.md` records mutable progress, not intended design.
 
 ## Implementation phases
 
 ### P1 — Document model and templates
-**Status: Authored; verification pending**
+**Status: Authored; static checks passing**
 
 - [x] Establish canonical paths and stable document identifiers.
 - [x] Establish per-level schemas, authoring rules, and readiness/approval states.
 - [x] Establish ownership, traceability, stale-descendant handling, and scope-proportional skipping.
 - [x] Provide templates and an explicit example.
 - [x] Add initial structural validator and contract-test source.
-- [ ] Run and review the contract tests; correct any failures.
+- [x] Run and review contract tests through GitHub Actions; fix observed failures.
 
 **Gate:** A brief, specification, component, plan, task, and execution record can be authored consistently without duplicating authority.
 
 ### P2 — Core brain infrastructure and validation
-**Status: Initial skill changes authored; validation pending**
+**Status: Instructions authored; static validation passing, behavioral verification pending**
 
-- [ ] Update `brain-init` to use the feature hierarchy for new projects.
-- [ ] Update `brain-update` to index features and verify links without editing producer-owned content.
-- [ ] Update `brain-init/references/CLAUDE.local.md` with document authority, write ownership, and approval rules.
-- [x] Author initial dependency/reference validator and unit tests (execution not yet verified).
-- [ ] Run validator tests and integrate structural checks into skill handoffs.
-- [ ] Preserve existing main-branch, worktree, and context-loading safeguards. Load feature details on demand.
+- [x] Update `brain-init` instructions to use the feature hierarchy for new projects; behavior tests pending.
+- [x] Update `brain-update` instructions to index features and report broken links without rewriting producer-owned content; behavior tests pending.
+- [x] Update `brain-init/references/CLAUDE.local.md` with document authority, write ownership, and approval rules.
+- [x] Author and execute dependency/reference validator and unit tests in GitHub Actions.
+- [x] Run validator tests and introduce structural checks into skill handoffs.
+- [x] Preserve existing main-branch, worktree, and context-loading safeguards in skill instructions; [ ] test these behaviors in fresh agents.
 
 **Gate:** New-brain setup, indexing, structural checks, and branch-aware updates work with the canonical feature layout.
 
@@ -76,8 +76,8 @@ A document's `id` is stable within a feature, regardless of filename; requiremen
 
 - [x] `brain-blueprint`: produce codebase-grounded `04-implementation-plans/` documents for components; preserve binding/illustrative design distinctions and explicit approvals.
 - [x] **Rename and evolve `brain-write-tickets` → `brain-write-tasks`**. Reuse its dependency/coverage/builder-review discipline, but generate executable `05-tasks/` documents from approved plans.
-- [x] Remove the old `brain-write-tickets/SKILL.md` and update core planning handoffs; [ ] finish references in guides, supporting skills, and tests; **do not** maintain parallel ticket/task generation.
-- [ ] Preserve `brain-plan` planning tickets as a separate kind of investigation/decision record, not implementation tasks.
+- [x] Remove old `brain-write-tickets/SKILL.md` and update guides, supporting skills, and tests. No parallel ticket/task generator.
+- [x] Preserve `brain-plan` planning tickets as investigation/decision records, not implementation tasks.
 
 **Gate:** Approved component designs yield small, executable, verifiable tasks with real dependencies.
 
@@ -87,8 +87,9 @@ A document's `id` is stable within a feature, regardless of filename; requiremen
 - [x] `brain-implement`: consume actionable tasks and governing documents; preserve collaborative/guided/autonomous modes.
 - [x] Move mutable progress and review evidence out of implementation plans into feature-level `execution.md`.
 - [x] Retain review base, branch, worktree, checkpoints, verification, Rulings, Deferred, and design deviations in the new execution template; [ ] verify behavior in agent tests.
-- [x] Require re-verification of completed work and source assumptions on resume; [ ] behavior-test the process. do not silently rewrite approved plans.
-- [ ] Preserve direct implementation without five documents for small settled changes.
+- [x] Require re-verification of completed work and source assumptions on resume without silently rewriting approved plans.
+- [ ] Behavior-test the resumption process.
+- [x] Preserve direct implementation without five documents in skill instructions; [ ] behavior-test proportionality.
 
 **Gate:** A multi-session task run resumes from code and evidence, not checked boxes alone.
 
@@ -97,8 +98,8 @@ A document's `id` is stable within a feature, regardless of filename; requiremen
 
 - [x] Update bundled `README.md`, `USAGE.md`, `CLAUDE.local.md`, and `brain-update/references/templates.md` to describe the new hierarchy.
 - [ ] Verify guide examples and prose are fully consistent with the new skills.
-- [ ] Update skill-local templates, review prompts, and links to changed paths.
-- [ ] Remove outdated descriptions of old spec/ticket/impl-plan storage.
+- [x] Update skill-local templates, builder-review prompts, subagent handoffs, and explicit bundled-file paths.
+- [x] Remove obsolete shared-plan storage descriptions in primary guides and key skill references.
 - [ ] Provide an end-to-end `StartMachine` example, including ADR links and failure cases.
 
 **Gate:** Installed guides and skill contracts agree on paths and authority.
@@ -109,11 +110,12 @@ A document's `id` is stable within a feature, regardless of filename; requiremen
 - [x] Add H1–H11 behavior scenario definitions (not yet executed).
 - [ ] Execute RED/GREEN scenarios in fresh agents.
 - [x] Add initial static checks for IDs, dependencies, cycles, parent approval, requirement lineage, and stage coverage; cross-feature and stale-approval behavior still needs validation.
-- [x] Execute static tests and StartMachine structural fixture in GitHub Actions (`Brain static contracts`, passing at `c157f20`).
+- [x] Execute static tests and StartMachine structural fixture in GitHub Actions (`Brain static contracts`, passing at `d07ac0c`).
 - [ ] Extend static checks where necessary and run the H1–H11 fresh-agent behavior scenarios.
 - [ ] Check trivial-change bypass, worktree/branch safety, execution resume, and no unapproved architectural decisions.
 - [ ] Exercise `StartMachine` end to end: idea → brief → specs → components → plans → tasks → verified implementation.
-- [ ] Run the existing relevant `experimental_v4` static tests and fresh-agent regression scenarios.
+- [x] Run existing `experimental_v4` static contract tests through GitHub Actions.
+- [ ] Run fresh-agent regression scenarios.
 - [ ] Distinguish tests actually run from planned/unverified tests.
 
 **Gate:** Evidence demonstrates the redesigned workflow and important existing guarantees.
@@ -128,4 +130,4 @@ Five document types have explicit contracts, the new `brain-decompose` exists, `
 
 ## Current verification and integration limitations
 
-The branch now contains the new `brain-decompose` skill, the renamed `brain-write-tasks` skill (with old `brain-write-tickets/SKILL.md` deleted), updated core producers, and the initial separation of plans from `execution.md`. These are authored instructions, **not yet verified in fresh-agent scenarios**. Existing usage guides, review helpers, and many tests may still refer to the removed layout and skill name; treat that cleanup as open. GitHub Actions now executes the Python static contract tests and the StartMachine structural fixture on the branch. The initial CI failure identified three stale migration/naming assertions; these were corrected, and the subsequent run succeeded at `c157f20`. Fresh-agent behavior scenarios have **not** been executed. `tests/test_skill_reference_contract.py` now checks referenced bundled files, retired ticket writer naming, and canonical producer targets. A previously malformed `brain-update` indexing step and obsolete shared-plan documentation have been corrected. Test execution and semantic validation remain necessary. Do not claim regression success before running actual checks in a checkout.
+The branch contains the five-stage document hierarchy, `brain-decompose`, the renamed `brain-write-tasks`, updated producers and review prompts, and separate `execution.md` ownership. GitHub Actions executes Python static contract tests and the StartMachine structural fixture. The last confirmed successful static run was at `d07ac0c`; subsequent commits also receive CI checks. A physical checkout was unavailable in this chat environment, so fresh-agent behavior scenarios H1–H11 have **not** been executed. They remain necessary to validate that agents actually respect approvals, worktree safety, document ownership, progressive decomposition, resume behavior, and proportionality. A passing structural fixture does **not** demonstrate that StartMachine was implemented.
