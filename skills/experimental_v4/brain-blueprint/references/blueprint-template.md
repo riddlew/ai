@@ -1,65 +1,49 @@
-# Blueprint template
+# Implementation plan template
 
-Create or update the **Implementation Design** section of the one per-feature file under `.brain/impl_plans/`. This is a proposal and continuity aid, not an authority over specifications, ADRs, or durable user decisions. Include only relevant sections; preserve any existing execution sections verbatim except for changes separately requested by the user.
-
-For a new file:
+Follow the shared feature-document contract. `brain-blueprint` owns the plan; `brain-implement` keeps execution evidence **outside** it in the feature's `execution.md`. Do not mix design approval and mutable execution status.
 
 ```markdown
-# <Feature> — Implementation Plan
+---
+id: PLAN-001
+kind: implementation-plan
+status: draft
+parents: [CMP-001]
+requirements: [SPEC-001#REQ-001]
+depends_on: []
+parent_hashes: []
+---
+# <Component / functional area> — Implementation Plan
 
-Specification: `.brain/specs/<NN>-<feature>.md` (if applicable)
-Tickets: `.brain/tickets/<feature>/` (if applicable)
-Blueprint status: draft
 Design inspected at: <full HEAD SHA>
-Blueprint approval: not yet approved
+Approval: pending
 
-## Implementation Design
+## Intended change and unchanged boundaries
+- Change:
+- Keep unchanged:
 
-### Intended change and unchanged boundaries
-- Change: <observable feature and affected owners>
-- Keep unchanged: <explicit constraints and relevant existing behavior>
-
-### Binding design constraints
-- <approved ownership, pattern, interface, contract, or other constraint>.
-  Source: <spec/ADR/decision or explicit user approval>.
-
-### Proposed structure
-| Existing file / component | Current owner / behavior | Proposed edit | Why |
+## Existing code and verified owners
+| Existing file / component | Verified current behavior | Intended change | Why |
 |---|---|---|---|
-| `src/...` | ... | ... | ... |
 
-### Interfaces and call flow
-<Important signatures, call sequence, state changes, and failure paths.>
-<Mark code examples 'Binding' only when the user approved their exact structure;
-otherwise mark 'Illustrative' and describe the actual invariant.>
+## Binding design constraints
+- <approved requirement or design choice; cite decision, ADR, or user approval>
 
-### Method outlines (optional)
-- `<signature>` — inputs/outputs and responsibility
-  - Intended steps and key invariants (comments or pseudocode as requested)
-  - Failure behavior, caller expectations, and interaction with existing owners
-  - Binding or Illustrative (state which; omit this section when it adds no value)
+## Proposed structure, interfaces and call flow
+<Important interfaces, state transitions, error paths, and interactions. Label examples Binding or Illustrative.>
 
-### Behavioral increments and verification
-1. <Small coherent behavior> — <Examples / criteria> — <targeted verification>
-2. ...
+## Method outlines (optional)
+<Only when important or user-requested.>
 
-### Assumptions and blockers
-- <Unverified fact or unresolved consequential decision; or None>
+## Behavioral increments and verification
+1. <coherent behavior> — <SPEC-001#REQ-001 / SPEC-001#E1> — <verification boundary>
 
+## Dependencies and assumptions
+- <real prerequisite, unknown, or None>
+
+## Open consequential decisions
+- <question and affected scope, or None>
 ```
 
-Once the user approves, update the header:
+Fill `parent_hashes` with current fingerprints of approved parent components (or whichever earlier levels actually govern the plan), using the shared contract's helper. Do not approve the plan with empty parent hashes when `parents` is nonempty.
 
-```markdown
-Blueprint status: approved
-Blueprint approval: user confirmed <YYYY-MM-DD> (<conversation or linked decision>)
-```
-
-`brain-implement` subsequently adds `Review base:`, `Branch:`, `Collaboration mode:`, `Workspace:`, `Execution mode:` and mutable `## Work Items`, `## Verification`, etc. **Do not create a second implementation plan or duplicate this design under another filename.**
-
-**Quality rules**
-- Source paths and signatures must be grounded in inspected code, not guessed.
-- Separate approved design constraints from illustrative suggestions and unresolved proposals.
-- Leave unnecessary method details to implementation; honor exact signatures or detailed pseudocode only where the user deliberately wants them.
-- Each increment should be demonstrably correct on its own; avoid a purely "models → services → UI" sequence unless the intermediate state has independent verification value.
-- The spec governs requirements; the blueprint cannot approve new behavior or override an ADR.
+After explicit user approval set `status: approved` and record `Approval: user confirmed <date/context>`. If binding details change, set `needs-revision` until reaffirmed. Plan files contain **no** `Review base`, execution checklist, worktree, verification result, or mutable task progress.

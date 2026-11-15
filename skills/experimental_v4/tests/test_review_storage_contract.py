@@ -35,11 +35,11 @@ class ReviewStorageContract(unittest.TestCase):
         self.assertIn("standalone `brain-review-architecture` saves a baseline by default", policy)
         self.assertIn("invoked solely as a specialist", architecture)
 
-    def test_template_and_migration_do_not_specify_flat_new_reports(self):
+    def test_template_preserves_nested_review_layout_without_legacy_migration(self):
         template = (ROOT / "brain-update/references/templates.md").read_text()
         initializer = (ROOT / "brain-init/SKILL.md").read_text()
         self.assertIn("`reviews/architecture/01-<slug>/review.md`", template)
-        self.assertIn(".brain/reviews/architecture/<NN>-<slug>/review.md", initializer)
+        self.assertIn("Do not move, import, or translate legacy feature documents", initializer)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 # Builder review
 
-A fresh reviewer reads an artifact (spec, ticket set, blueprint, or impl plan) as the person who must build from it. Used by `brain-write-spec`, `brain-write-tickets`, `brain-blueprint`, and `brain-implement`.
+A fresh reviewer reads a specification, component set, implementation plan, executable task set, or execution work-item set as the builder who must act on it. Used by `brain-write-spec`, `brain-decompose`, `brain-blueprint`, `brain-write-tasks`, and `brain-implement`.
 
 ## For the author
 
@@ -12,7 +12,7 @@ A fresh reviewer reads an artifact (spec, ticket set, blueprint, or impl plan) a
 
 1. **Answered** by the conversation, the code, or the brain: put the answer into the artifact.
 2. **Routine:** a sensible builder could settle it without changing what gets built. Leave it out, as implementation discretion.
-3. **Only the user can answer:** ask in one message, most important first, and wait. After the reply, record every question left unanswered as an Open Decision (spec), a blocked ticket (ticket set), or a Blocker (blueprint or impl plan), and never ask it again. Never settle it to make the artifact look complete, and never reopen a settled decision. Then continue the calling skill's flow.
+3. **Only the user can answer:** ask in one message, most important first, and wait. After the reply, record every question left unanswered as an Open Decision (specification), a blocked component/task when its scope requires a new user decision, or an execution Blocker (implementation plan / work-item set), and never ask it again. Never settle it to make the artifact look complete, and never reopen a settled decision. Then continue the calling skill's flow.
 
 **Report** one line, with the counts:
 
@@ -43,7 +43,7 @@ Return a numbered list, most important first. Each item gives:
 - what is unclear, contradictory, or missing, including unstated failure behavior;
 - why two builders would build different things from it.
 
-For a `blueprint`, also check:
+For an `implementation plan` or `blueprint`, also check:
 
 - cited files, owners, and proposed signatures are grounded in inspected code, not invented;
 - approved requirements and architectural constraints are preserved, while proposals and illustrative snippets are not silently treated as binding;
@@ -51,11 +51,24 @@ For a `blueprint`, also check:
 - proposed increments are coherent, reviewable, and verifiable, with a plausible path to satisfying each governing Example or criterion;
 - any unresolved consequential design decision is explicitly blocked rather than guessed.
 
-For an `impl plan`, also check:
+For a `component set`, also check:
 
-- the work items cover every governing Example and criterion, in an order that respects dependencies;
-- each item is one coherent, testable increment;
-- `Review Focus` is complete.
+- every approved requirement is mapped to coherent functional ownership, including failure cases;
+- interactions and overlapping responsibilities are explicit, without inventing a class/service design;
+- unknown consequential boundaries remain blocked rather than silently decided.
+
+For a `task set`, also check:
+
+- tasks derive from approved technical plans and governing requirements, not speculative architecture;
+- every planned increment and applicable Example maps to independently verifiable work;
+- dependencies are genuine and acyclic, with blocking choices clearly identified.
+
+For an `execution work-item set`, also check:
+
+- work items cover each approved task and governing Example/criterion;
+- each item is a coherent testable increment respecting real dependencies;
+- `Review Focus` covers uncovered failures and blocked decisions;
+- mutable progress is separate from approved implementation plans.
 
 ## Rules
 

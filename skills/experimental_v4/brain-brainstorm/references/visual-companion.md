@@ -1,6 +1,6 @@
 # Visual companion
 
-A browser tab that shows mockups and side-by-side options while a decision is discussed in the terminal. The scripts are in `${CLAUDE_SKILL_DIR}/scripts/` (`${CLAUDE_SKILL_DIR}` is the folder holding this skill's `SKILL.md`). They need Node.js and make no network request beyond localhost. Adapted from the superpowers `brainstorming` visual companion; see `scripts/README.md`.
+A browser tab that shows mockups and side-by-side options while a decision is discussed in the terminal. The scripts are in `${CLAUDE_SKILL_DIR}/scripts/` (`${CLAUDE_SKILL_DIR}` is the folder holding this skill's `SKILL.md`). They need Node.js and make no network request beyond localhost. Adapted from the superpowers `brainstorming` visual companion; see `${CLAUDE_SKILL_DIR}/scripts/README.md`.
 
 ## Use it per question
 

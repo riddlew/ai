@@ -63,10 +63,10 @@ Resolve **Investigate** rows from source, tests, configuration, documentation, a
 For each **User decision** whose dependencies are resolved:
 
 1. Load the lens for each area the decision touches, from `${CLAUDE_SKILL_DIR}/lenses/`:
-   - `architecture.md` — ownership, lifecycle, dependency direction, reversibility
-   - `data.md` — schema, migration, consistency, idempotency
-   - `contracts.md` — API versioning, error contracts, compatibility
-   - `failure.md` — retries, partial failure, concurrency
+   - `${CLAUDE_SKILL_DIR}/lenses/architecture.md` — ownership, lifecycle, dependency direction, reversibility
+   - `${CLAUDE_SKILL_DIR}/lenses/data.md` — schema, migration, consistency, idempotency
+   - `${CLAUDE_SKILL_DIR}/lenses/contracts.md` — API versioning, error contracts, compatibility
+   - `${CLAUDE_SKILL_DIR}/lenses/failure.md` — retries, partial failure, concurrency
 
    Load none when no lens fits.
 2. State the forces: the requirements and constraints any option must satisfy, and the evidence the lens directs you to gather.
@@ -151,4 +151,6 @@ Present the final summary in this format, which `brain-write-spec` consumes:
 
 Ask the user to confirm the direction, including each **Unchanged** and **Assumptions** line, before treating it as established. If it was already confirmed in the discussion, do not ask again. Do not begin implementation without authorization.
 
-Once the user confirms the direction, it is established. Preserve confirmed technical preferences in the summary for `brain-write-spec`, and suggest `/brain-blueprint` for a collaborative code-level design after the spec. A tentative signature or pattern is not approved merely because Claude proposed it. Then invoke `brain-update` with a one-line summary of what changed.
+Once the user confirms the direction, it is established. For a nontrivial feature, write an approved brief to `.brain/features/<feature-slug>/01-brief/brief.md` using `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md` and `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-templates.md`. Record the confirmed objective, motivation, scope, success criteria, binding decisions, open decisions, and approval source. Use stable `BRF-<NNN>` metadata, `kind: brief`, `parents: []`, `parent_hashes: []`, and mark `approved` only after explicit direction confirmation. Reuse the existing brief on revision and flag impacted descendants for revalidation; do not silently edit them. Trivial work may skip the brief; never create placeholders.
+
+Once the user confirms the direction, it is established. Preserve confirmed technical preferences in the summary for `brain-write-spec`, and suggest `/brain-blueprint` for a collaborative code-level design after the spec. A tentative signature or pattern is not approved merely because Claude proposed it. When a brief was produced, report its ID and path. Then invoke `brain-update` with a one-line summary of what changed.

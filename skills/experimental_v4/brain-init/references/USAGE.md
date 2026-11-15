@@ -48,6 +48,12 @@ For a brand-new, multi-session project, see [Scenario 6: ZPL printer library and
 
 ---
 
+For a complete traceability example including ADR references, negative-path requirements, component ownership, technical plans, and executable task mappings, read `${CLAUDE_SKILL_DIR}/../brain-init/references/start-machine-example.md`. This is a planning example, not an implemented TCP feature.
+
+## Hierarchical feature workflow
+
+For nontrivial features, use `.brain/features/<slug>/01-brief/` → `02-specifications/` → `03-components/` → `04-implementation-plans/` → `05-tasks/`. `brain-brainstorm` establishes intent, `brain-write-spec` records behavior, `brain-decompose` defines coherent functional responsibilities, `brain-blueprint` specifies code-level implementation, and `brain-write-tasks` produces executable tasks. `brain-implement` writes verification and progress separately to `execution.md`. Read the authoritative schema at `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md` in the installed skills. Skip unhelpful intermediate stages for simple work.
+
 ## Understand changes after implementation
 
 Run `/brain-explain-changes` to walk through the working-tree changes (or the latest commit if the tree is clean). Pass a file, symbol, or commit range to focus it, for example `/brain-explain-changes connection_manager`. Claude starts with a plain-language overview, traces actual application calls in small steps, and pauses for questions rather than giving a full code review. This skill reads files but does not edit them or create reports.
@@ -162,9 +168,13 @@ Also spell out stream behavior: one TCP receive call may return part of a frame,
 
 **Approval checkpoint:** Approve expected behavior, conformance examples, error handling, and binding architectural constraints.
 
-**Optional coordination:** If the feature spans many modules or sessions, use `brain-plan` to organize phases and dependencies. Use `brain-write-tickets` when independently verifiable work items are valuable. Neither replaces the specification or code-level blueprint.
+**Optional coordination:** If the feature spans many modules or sessions, use `brain-plan` to organize phases and dependencies. Use `brain-decompose` before code-level design when distinct functional responsibilities need definition; generate tasks with `brain-write-tasks` **after** the technical plans are approved. Neither replaces the specification.
 
-## Step 3: `/brain-blueprint` — Agree on the actual code design
+## Step 3: `/brain-decompose` — Define functional components
+
+For a substantial TCP messaging feature, first map the approved requirements to functional components such as message contract, framing/stream handling, dispatch, and lifecycle behavior. Produce `03-components/` documents with `CMP-` identifiers and qualified `SPEC-...#REQ-...` coverage; get approval of functional boundaries. Do not assume each functional component becomes a software class or service.
+
+## Step 4: `/brain-blueprint` — Agree on the actual code design
 
 **Example prompt:**
 
@@ -221,7 +231,11 @@ The blueprint should label **binding decisions** separately from **suggested sig
 
 **Approval checkpoint:** You explicitly approve the code-level design before production code is modified.
 
-## Step 4: `/brain-implement` — Build and review coherent increments
+## Step 5: `/brain-write-tasks` — Define executable work
+
+From the approved code-level plans, create `05-tasks/` files with `TASK-` IDs, concrete technical actions, genuine dependencies, and verification criteria. Preserve the plan's decisions and map each requirement to the tasks that implement it. Skip task files when one small change can be implemented directly.
+
+## Step 6: `/brain-implement` — Build and review coherent increments
 
 In collaborative mode, Claude implements a small testable behavior, verifies it, presents the actual code changes, and **waits for approval** before advancing.
 
@@ -265,7 +279,7 @@ You inspect the code and request a refinement:
 
 Claude makes the correction and presents the revised increment. Only after you approve does work continue.
 
-## Step 5: `/brain-review-code` — Independent final review
+## Step 7: `/brain-review-code` — Independent final review
 
 **Example prompt:**
 
@@ -1256,7 +1270,7 @@ Defer USB, discovery, detailed printer status, advanced layout, and more transpo
 
 | Situation | Typical skill sequence | Your involvement |
 |---|---|---|
-| Large feature, rigid protocol | `brain-brainstorm` → `brain-write-spec` → optional `brain-plan` / `brain-write-tickets` → `brain-blueprint` → `brain-implement` → `brain-review-code` | Approve architecture, spec, blueprint, and implementation increments. |
+| Large feature, rigid protocol | `brain-brainstorm` → `brain-write-spec` → optional `brain-plan` / `brain-write-tasks` → `brain-blueprint` → `brain-implement` → `brain-review-code` | Approve architecture, spec, blueprint, and implementation increments. |
 | Small, settled feature | `brain-implement` | Review the focused change and verification. |
 | Isolated protocol bug | `brain-diagnose` → focused fix → optional `brain-review-code` | Review the diagnosis and correction. |
 | Architecture cleanup | `brain-review-architecture` → `brain-brainstorm` → `brain-write-spec` → `brain-blueprint` → `brain-implement` → `brain-review-code` | Choose improvements and shape the exact design. |

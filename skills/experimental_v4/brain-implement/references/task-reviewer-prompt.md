@@ -20,7 +20,7 @@ Pre-existing changes at task start (paths plus baseline patches/content; the use
 
 {examples_and_criteria}
 
-## Approved blueprint constraints
+## Approved implementation-plan constraints
 
 {blueprint_constraints}
 
@@ -33,7 +33,7 @@ Pre-existing changes at task start (paths plus baseline patches/content; the use
 - Read-only. Do not edit, stage, commit, or dispatch subagents.
 - Scope: `git diff {base}` plus untracked files from `git status --short`. Compare with the supplied baseline to exclude **pre-existing hunks**, not whole files; inspect the task's new edits even in files that were already dirty. Never propose deleting, reverting, or overwriting the user's original work. If the baseline is insufficient to separate edits, mark the affected coverage `unclear` instead of approving it. Any other change outside the task's scope is a finding.
 - Treat the implementer's report as unverified claims. Verify them against the diff and by running applicable targeted tests or meaningful alternatives when automated tests are inapplicable; identify any behavior you could not verify.
-- Check the diff against approved **binding** blueprint constraints and declared unchanged boundaries. A deviation from an **illustrative** snippet is not itself a defect; assess correctness and whether the actual constraints are preserved. Unapproved consequential redesign is a finding even if tests pass.
+- Check the diff against approved **binding** implementation-plan constraints and declared unchanged boundaries. A deviation from an **illustrative** snippet is not itself a defect; assess correctness and whether the actual constraints are preserved. Unapproved consequential redesign is a finding even if tests pass.
 
 ## Output
 

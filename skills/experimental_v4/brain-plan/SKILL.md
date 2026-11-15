@@ -7,12 +7,12 @@ description: Manage complex, multi-session planning efforts using durable, depen
 
 **Project brain:** Follow `CLAUDE.local.md` §Project brain loading: read **all** root `.md` files once per session (again after compaction), plus the active branch's pending file when present. Inspect linked detail and verify task-critical facts against current source. Do not send the whole brain to subagents. If no brain exists, proceed and mention `/brain-init` once.
 
-Track planning state for substantial or uncertain efforts across sessions. This skill owns planning scope, planning tickets and their dependencies, and cross-session continuation. It delegates interactive decisions to `brain-brainstorm` and implementation decomposition to `brain-write-tickets`. Follow `CLAUDE.local.md` for decision authority.
+Track planning state for substantial or uncertain efforts across sessions. This skill owns planning scope, planning tickets and their dependencies, and cross-session continuation. It delegates interactive decisions to `brain-brainstorm` and executable implementation decomposition to `brain-write-tasks` after approved functional and technical design. Planning tickets remain bounded investigations or decisions, not implementation tasks. Follow `CLAUDE.local.md` for decision authority.
 
 ## Boundaries
 
 - **Plan, do not implement.** Bounded investigations, prerequisite tasks, and minimal prototypes are permitted planning work. None of them, nor completed planning, authorizes implementing the final objective.
-- **Planning state is not implementation state.** Do not create `.brain/impl_plans/` entries or keep implementation checklists here. `brain-blueprint` owns the code-level design section in the per-feature impl plan when requested; `brain-implement` tracks execution once authorized. The planning directory remains the record of planning decisions.
+- **Planning state is not implementation state.** Do not create feature implementation plans, executable tasks, or implementation checklists here. `brain-blueprint` owns feature-level `04-implementation-plans/`, `brain-write-tasks` owns `05-tasks/`, and `brain-implement` separately owns `execution.md`. The planning directory remains the record of planning decisions.
 
 ## Start
 
@@ -120,13 +120,6 @@ Move an open area into tickets once it can be stated as a meaningful ticket, and
 
 For a ticket outside the objective: mark it `excluded`, record it under **Out of Scope**, update dependent tickets, and do not count it as an approved resolution.
 
-## Hand off to implementation
+## Hand off to the hierarchical feature workflow
 
-Before handoff, review all unresolved tickets and Open Areas for consequential decisions still needed to produce an unambiguous specification. Resolve blocking questions rather than silently treating unexplored areas as complete. When planning is sufficiently settled, recommend `/brain-write-spec` using the resolved planning decisions as source material, before any optional implementation tickets or blueprint.
-
-Implementation tickets are not required by default; the user may implement directly from a completed specification. When implementation tickets are requested:
-
-1. Check whether any unresolved decision materially affects implementation or decomposition; if so, consult the user.
-2. Otherwise invoke `brain-write-tickets`, using the planning materials as the authoritative source of **approved** decisions.
-
-After the specification (and optional tickets) is established, offer `/brain-blueprint` for substantial or design-sensitive features so the user can approve code structure before `/brain-implement`. This planning skill does not author that blueprint or approve implementation.
+Review unresolved tickets and Open Areas before handoff; resolve every consequential decision that blocks an unambiguous requirement. Record a feature brief through `brain-brainstorm` when appropriate, then invoke `brain-write-spec` for approved behavior, `brain-decompose` for meaningful functional boundaries, `brain-blueprint` for code-aware implementation plans, and `brain-write-tasks` for executable tasks when task decomposition adds value. A simple settled change may skip unnecessary levels. Planning tickets in `.brain/planning/` remain investigation/decision records, never executable tasks. Do not authorize implementation merely because planning concluded.

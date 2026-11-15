@@ -50,7 +50,7 @@ class ExplainChangesContract(unittest.TestCase):
     def test_skill_appears_in_installed_guides(self):
         readme = (ROOT / "brain-init" / "references" / "README.md").read_text(encoding="utf-8")
         usage = (ROOT / "brain-init" / "references" / "USAGE.md").read_text(encoding="utf-8")
-        self.assertIn("**17 Claude Code skills**", readme)
+        self.assertIn("**18 Claude Code skills**", readme)
         self.assertIn("/brain-explain-changes", readme)
         self.assertIn("/brain-explain-changes", usage)
 
