@@ -2,7 +2,7 @@
 # Runtime selection: Python > Node.js > POSIX shell. No installation required.
 set -eu
 ROOT=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
-case "\${BRAIN_RUNTIME:-auto}" in
+case "${BRAIN_RUNTIME:-auto}" in
   auto)
     if command -v python3 >/dev/null 2>&1; then runtime=python
     elif command -v node >/dev/null 2>&1; then runtime=node
