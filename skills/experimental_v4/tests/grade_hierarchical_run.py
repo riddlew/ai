@@ -232,8 +232,9 @@ def grade(run: Run) -> list[tuple[str, str, str]]:
         if s == "H2":
             report("2 metadata/draft", m.get("id") == "SPEC-001" and "BRF-001" in m.get("parents", "")
                    and m.get("kind") == "specification" and m.get("status") != "approved", m)
-            report("3 REQ/E ids", bool(re.search(r"REQ-\d{3}", body) and re.search(r"\bE\d+\b", body)),
-                   f"{len(set(re.findall(r'REQ-\d{3}', body)))} REQ ids")
+            req_count = len(set(re.findall(r"REQ-\d{3}", body)))
+            report("3 REQ/E ids", bool(req_count and re.search(r"\bE\d+\b", body)),
+                   f"{req_count} REQ ids")
             success = re.search(r'"ok"\s*:\s*true\s*,\s*"state"\s*:\s*"running"', body)
             report("4 contract codes", bool(success) and "invalid_message" in body
                    and "machine_not_found" in body, "success/invalid_message/machine_not_found present")
