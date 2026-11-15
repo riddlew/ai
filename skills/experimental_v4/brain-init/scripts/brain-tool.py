@@ -146,7 +146,7 @@ def init(options: dict) -> None:
     ]
     for filename, purpose in guide_rows:
         if not re.search(r"(?m)^\|\s*\`?" + re.escape(filename) + r"\`?\s*\|", index):
-            index += f"| \`{filename}\` | {purpose} | reference |\n"
+            index += f"| `{filename}` | {purpose} | reference |\n"
     items = [(brain / file, (REFS / file).read_text())
              for file, _ in guide_rows]
     if not existing.is_file() or index != existing.read_text():
