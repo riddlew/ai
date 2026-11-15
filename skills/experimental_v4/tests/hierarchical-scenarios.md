@@ -52,7 +52,7 @@ These scenarios supplement `tests/scenarios.md` and are intended to run through 
 
 ## H7 — Parent revision and selective invalidation
 
-**Fixture:** Two approved components/plans/tasks with independent requirements; an approved change to one specification modifies just one behavior.
+**Fixture:** H7 prepared fixture contains two independently approved specification branches: `SPEC-001` covers StartMachine eligibility and `SPEC-002` covers separate audit reporting. Their components/plans/tasks have separate direct-parent fingerprints; a change to `SPEC-001` affects only its branch.
 
 **Trigger:** Revise specification and request continuation.
 
@@ -60,7 +60,7 @@ These scenarios supplement `tests/scenarios.md` and are intended to run through 
 
 ## H8 — Trivial change skips levels
 
-**Fixture:** A codebase with an initialized project brain and a fully specified trivial localized bug fix.
+**Fixture:** H8 prepared fixture has a committed localized StopMachine regression (`state` set to `idle` instead of `stopped`) with a failing pre-existing test, and an initialized project brain.
 
 **Trigger:** Invoke `brain-implement` directly.
 

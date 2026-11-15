@@ -7,6 +7,7 @@ Keep the grading criteria in hierarchical-scenarios.md outside the agent repo.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 from pathlib import Path
 
@@ -36,12 +37,14 @@ SCENARIOS = {
            "Implement only the next authorized task. Keep technical plans unchanged, "
            "record evidence in execution.md, and pause for collaborative review."),
     "H7": ("tasks", "brain-write-spec",
-           "The user changes approved eligibility behavior. Revise the governing "
-           "specification and identify which downstream approvals need revalidation. "
-           "Do not mark unchanged documents freshly approved without review."),
+           "The user changes SPEC-001's approved eligibility behavior. Identify which "
+           "downstream approvals must be revalidated and leave independent "
+           "SPEC-002's approved audit-reporting branch eligible to proceed. "
+           "Do not refresh hashes without design review."),
     "H8": ("none", "brain-implement",
-           "Make a trivial, localized, settled bug fix with verification. Do not "
-           "manufacture a five-document feature hierarchy."),
+           "Fix the existing StopMachine regression: it incorrectly sets state to "
+           "'idle' instead of 'stopped'. Run the existing targeted test, restore "
+           "the agreed behavior, and do not create a five-document feature hierarchy."),
     "H9": ("tasks", None,
            "Validate this intentionally corrupted feature hierarchy using the "
            "installed structural validator; report errors without changing files."),
@@ -66,6 +69,54 @@ def prepare(destination: Path, scenario: str) -> tuple[Path, str]:
             raise RuntimeError("fixture contract changed: missing H9 parent anchor")
         file.write_text(source.replace("parents: [PLAN-001]", "parents: [PLAN-999]"),
                         encoding="utf-8")
+    elif scenario == "H7":
+        # Independent specifications let unaffected work continue even when
+        # all children of the modified spec are conservatively invalidated.
+        feature = destination / ".brain/features/start-machine"
+        def fingerprint(path: Path) -> str:
+            data = path.read_bytes()
+            return hashlib.sha1(f"blob {len(data)}\0".encode() + data).hexdigest()
+        def write(level: str, filename: str, doc_id: str, kind: str,
+                  parent_id: str, parent_path: Path | None, reqs: list[str],
+                  body: str) -> Path:
+            folder = feature / level
+            folder.mkdir(exist_ok=True)
+            parents = f"[{parent_id}]" if parent_id else "[]"
+            hashes = f"[{parent_id}@{fingerprint(parent_path)}]" if parent_path else "[]"
+            path = folder / filename
+            path.write_text(
+                "---\nid: " + doc_id + "\nkind: " + kind
+                + "\nstatus: approved\nparents: " + parents
+                + "\nrequirements: [" + ", ".join(reqs)
+                + "]\ndepends_on: []\nparent_hashes: " + hashes
+                + "\n---\n" + body + "\n", encoding="utf-8",
+            )
+            return path
+        spec2 = write("02-specifications", "audit.md", "SPEC-002",
+                      "specification", "", None, [],
+                      "# Audit reporting\n\n- REQ-001: Approved audit records include an event type")
+        cmp2 = write("03-components", "audit.md", "CMP-003",
+                     "component", "SPEC-002", spec2, ["SPEC-002#REQ-001"],
+                     "# Audit responsibility\n\nPreserve independent reporting.")
+        plan2 = write("04-implementation-plans", "audit.md", "PLAN-003",
+                      "implementation-plan", "CMP-003", cmp2,
+                      ["SPEC-002#REQ-001"],
+                      "# Audit plan\n\nIllustrative independent scope.")
+        write("05-tasks", "TASK-003-audit.md", "TASK-003", "task",
+              "PLAN-003", plan2, ["SPEC-002#REQ-001"],
+              "# Audit task\n\nUnchanged independent outcome.")
+    elif scenario == "H8":
+        # Commit an intentional localized regression as the test baseline.
+        target = destination / "machine_control.py"
+        body = target.read_text(encoding="utf-8")
+        anchor = 'machine.state = "stopped"'
+        if body.count(anchor) != 1:
+            raise RuntimeError("missing H8 StopMachine regression anchor")
+        target.write_text(body.replace(anchor, 'machine.state = "idle"'),
+                          encoding="utf-8")
+        builder.git(destination, "add", "machine_control.py")
+        builder.git(destination, "commit", "-qm",
+                    "test: introduce a local StopMachine regression")
     elif scenario == "H11":
         for legacy in ("specs", "tickets", "impl_plans"):
             folder = destination / ".brain" / legacy
