@@ -127,9 +127,11 @@ def validate_feature(feature: Path, check_coverage: bool = False) -> list[str]:
         meta, path = doc["meta"], doc["path"]
         if doc["level"] == 1 and meta["parents"]:
             errors.append(f"{path}: brief must not have parents")
-        if doc["level"] > 1 and not meta["parents"]:
-            if any(by_level[i] for i in range(1, doc["level"])):
-                errors.append(f"{path}: parent reference required when earlier documents exist")
+        # A specification may stand alone even when another scope has a brief.
+        # For later stages, a requirement-bearing document cannot omit its
+        # governing chain simply because the filenames are different.
+        if doc["level"] > 2 and meta["requirements"] and not meta["parents"]:
+            errors.append(f"{path}: requirements need at least one governing parent")
         parent_hashes: dict[str, str] = {}
         for recorded in meta["parent_hashes"]:
             match = PARENT_HASH.fullmatch(recorded)

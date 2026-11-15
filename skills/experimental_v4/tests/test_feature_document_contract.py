@@ -94,6 +94,17 @@ class FeatureDocumentContract(unittest.TestCase):
                    requirements=["SPEC-001#REQ-001", "SPEC-001#REQ-002"])
         self.assertEqual([], validator.validate_feature(self.feature, True))
 
+    def test_independent_spec_is_allowed_alongside_unrelated_brief(self):
+        self.write("SPEC-002", "specification", parents=[],
+                   body="- REQ-001: Independently authorized behavior")
+        self.assertEqual([], validator.validate_feature(self.feature, False))
+
+    def test_requirement_bearing_component_needs_governing_parent(self):
+        self.write("CMP-002", "component", parents=[],
+                   requirements=["SPEC-001#REQ-001"])
+        errors = "\n".join(validator.validate_feature(self.feature))
+        self.assertIn("requirements need at least one governing parent", errors)
+
     def test_approved_child_rejects_unapproved_parent(self):
         self.write("PLAN-001", "implementation-plan", parents=["CMP-001"],
                    requirements=["SPEC-001#REQ-001", "SPEC-001#REQ-002"],
