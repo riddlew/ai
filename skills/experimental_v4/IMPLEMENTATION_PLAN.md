@@ -109,7 +109,7 @@ A document's `id` is stable within a feature, regardless of filename; requiremen
 
 - [x] Add H1–H11 behavior scenario definitions (not yet executed).
 - [x] Execute pre-fix RED (3 samples) and GREEN (1 sample) runs in fresh agents; results in `tests/hierarchical-scenarios.md`. H10B failed and H7 showed an approval gap.
-- [x] Fix the demonstrated failures: shared worktree rule in `CLAUDE.local.md`, `brain-implement` brain-write-access check, consistent `brain-update` wording, and `needs-revision` on material spec revision in `brain-write-spec`; static regression tests in `test_worktree_and_approval_contract.py`.
+- [x] Fix the demonstrated failures: general worktree rules in `CLAUDE.local.md` (worktrees share the configured brain, denied writes are never routed around, unavailable writes are explained and asked about, unmerged facts go to `pending/<branch>.md`) that `brain-implement` and `brain-update` follow, and `needs-revision` on material spec revision in `brain-write-spec`; static regression tests in `test_worktree_and_approval_contract.py`.
 - [ ] Rerun H10B and H7 (one Sonnet session each, user-approved) after the fixes.
 - [x] Validate IDs, dependencies, cycles, parent approval, requirement lineage, coverage, and direct-parent hash mismatches; structural stale-approval detection has regression tests.
 - [x] Allow independent specifications without inferred unrelated parents; reject requirement-bearing descendants without parents and malformed non-sequence metadata.

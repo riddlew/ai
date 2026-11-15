@@ -30,27 +30,23 @@ def section(text: str, start: str, end: str) -> str:
 
 
 class WorktreeSafetyContract(unittest.TestCase):
-    def test_policy_distinguishes_ordinary_worktrees_from_isolated_sessions(self):
+    def test_policy_states_general_worktree_rules(self):
         rule = section(POLICY, "**Worktrees and brain writes.**", "\n\n")
-        for phrase in ("ordinary linked Git worktree is not isolation", "claude --worktree",
-                       "EnterWorktree", "external brain", "/brain-init <path>",
-                       "non-isolated session", "Bash, Python", "pending/<branch>.md"):
+        for phrase in ("uses the brain located above", "worktrees share one brain",
+                       "when access is permitted", "never route around a denied write",
+                       "copy of the brain", "ask the user how to proceed", "pending/<branch>.md"):
             self.assertIn(phrase, rule)
 
-    def test_implement_checks_brain_access_before_code_and_review_base(self):
-        boundary = section(IMPLEMENT, "## 1. Establish the boundary", "**Execution mode switch.**")
-        self.assertLess(boundary.index("**Brain write access.**"), boundary.index("Record the review base"))
-        step = section(boundary, "**Brain write access.**", "\n6. ")
-        for phrase in ("§Worktrees and brain writes", "ordinary worktree", "before editing code",
-                       "/brain-init <path>", "non-isolated session", "Bash, Python"):
-            self.assertIn(phrase, step)
-        self.assertIn("pending/<branch>.md", section(IMPLEMENT, "## 6. Keep state accurate", "## 7."))
-
-    def test_update_follows_the_same_rule(self):
-        rule = section(UPDATE, "**Isolated worktree sessions.**", "\n\n")
-        for phrase in ("§Worktrees and brain writes", "Bash, Python", "non-isolated session",
-                       "ordinary worktree", "pending/<branch>.md", "/brain-init <path>"):
-            self.assertIn(phrase, rule)
+    def test_skills_follow_the_policy_without_environment_specific_rules(self):
+        self.assertIn("If that write is denied, follow `CLAUDE.local.md` §Worktrees and brain writes",
+                      section(IMPLEMENT, "## 2.", "## 3."))
+        self.assertIn("do not copy brain documents into it", section(IMPLEMENT, "## 1.", "## 2."))
+        rule = section(UPDATE, "**Write access.**", "\n\n")
+        self.assertIn("§Worktrees and brain writes", rule)
+        self.assertIn("never route around the denial", rule)
+        for text in (POLICY, IMPLEMENT, UPDATE):
+            for term in ("claude --worktree", "EnterWorktree", "isolated session"):
+                self.assertNotIn(term, text)
 
 
 class ApprovalInvalidationContract(unittest.TestCase):
