@@ -1,6 +1,6 @@
 # Hierarchical Brain redesign — implementation plan
 
-Status: **Core skills and reproducible H1–H11 fixtures implemented; static CI passing; fresh-agent execution pending** (branch `feature/hierarchical-brain`)
+Status: **Core skills, H1–H11 fixtures, and worktree/approval fixes implemented; static tests passing locally; targeted fresh-agent reruns (H10B, H7) pending approval** (branch `feature/hierarchical-brain`)
 
 ## Objective
 
@@ -108,17 +108,19 @@ A document's `id` is stable within a feature, regardless of filename; requiremen
 **Status: Static CI passing; fresh-agent behavior tests still pending**
 
 - [x] Add H1–H11 behavior scenario definitions (not yet executed).
-- [ ] Execute RED/GREEN scenarios in fresh agents.
+- [x] Execute pre-fix RED (3 samples) and GREEN (1 sample) runs in fresh agents; results in `tests/hierarchical-scenarios.md`. H10B failed and H7 showed an approval gap.
+- [x] Fix the demonstrated failures: shared worktree rule in `CLAUDE.local.md`, `brain-implement` brain-write-access check, consistent `brain-update` wording, and `needs-revision` on material spec revision in `brain-write-spec`; static regression tests in `test_worktree_and_approval_contract.py`.
+- [ ] Rerun H10B and H7 (one Sonnet session each, user-approved) after the fixes.
 - [x] Validate IDs, dependencies, cycles, parent approval, requirement lineage, coverage, and direct-parent hash mismatches; structural stale-approval detection has regression tests.
 - [x] Allow independent specifications without inferred unrelated parents; reject requirement-bearing descendants without parents and malformed non-sequence metadata.
 - [x] Execute 47 static contract tests, fixture setup verification, and StartMachine structural validation in GitHub Actions (`Brain static contracts`, passing at `1c5c55d`).
 - [x] Add `tests/build_hierarchical_fixture.py` and `tests/prepare_hierarchical_scenario.py` so H1–H11 have isolated, reproducible Git repositories, prompts, invalid references, independent approval scopes, a real localized bug, and worktree scenarios.
-- [ ] Dispatch fresh agents for H1–H11 with RED/GREEN comparisons and grade observed behavior against scenario criteria.
+- [ ] Optional, only if approved: H10E (ordinary worktree control) and H10D (external brain resume). The full RED/GREEN matrix is not planned.
 - [ ] Check trivial-change bypass, worktree/branch safety, execution resume, and no unapproved architectural decisions.
 - [ ] Exercise `StartMachine` end to end: idea → brief → specs → components → plans → tasks → verified implementation.
 - [x] Run existing `experimental_v4` static contract tests through GitHub Actions.
 - [ ] Run fresh-agent regression scenarios.
-- [ ] Distinguish tests actually run from planned/unverified tests.
+- [x] Distinguish tests actually run from planned/unverified tests (Results section; void runs listed).
 
 **Gate:** Evidence demonstrates the redesigned workflow and important existing guarantees.
 
@@ -132,4 +134,4 @@ Five document types have explicit contracts, the new `brain-decompose` exists, `
 
 ## Current verification and integration limitations
 
-The branch contains the five-stage document hierarchy, `brain-decompose`, the renamed `brain-write-tasks`, updated producers and review prompts, and separate `execution.md` ownership. A worked StartMachine example documents illustrative ADR and failure-path mappings; no real server code has been implemented. GitHub Actions executes Python static contract tests and the StartMachine structural fixture. Static CI passed at `1c5c55d` (47 Python contract tests, fixture construction for H1–H11, and StartMachine structural validation). The validator now lives in `brain-init/scripts/`, making it available when the individual skill directories are installed; all producer skills have instructions for preserving approved-parent fingerprints. The fixture builder and scenario preparer are executed in GitHub Actions, but **no fresh AI agents have been dispatched** for scenarios H1–H11 in this session. The GitHub connector does not expose an agent runner. They remain necessary to validate that agents actually respect approvals, worktree safety, document ownership, progressive decomposition, resume behavior, and proportionality. A passing structural fixture does **not** demonstrate that StartMachine was implemented. `tests/AGENT_TESTING.md` contains the fixture preparation command and grading instructions for a future interactive agent test run.
+The branch contains the five-stage document hierarchy, `brain-decompose`, the renamed `brain-write-tasks`, updated producers and review prompts, and separate `execution.md` ownership. A worked StartMachine example documents illustrative ADR and failure-path mappings; no real server code has been implemented. GitHub Actions executes Python static contract tests and the StartMachine structural fixture. Static CI passed at `1c5c55d` (47 tests); the current branch runs 64 static tests locally. The validator now lives in `brain-init/scripts/`, making it available when the individual skill directories are installed; all producer skills have instructions for preserving approved-parent fingerprints. The fixture builder and scenario preparer are executed in GitHub Actions, and pre-fix fresh-agent runs are recorded in `tests/hierarchical-scenarios.md`; the fixes for H10B and H7 are not yet verified by a rerun. Agent runs use `tests/run_hierarchical_scenario.py`, which is a dry run unless `--execute` is given and runs one bounded Sonnet session at a time. Fresh-agent runs remain necessary to validate that agents actually respect approvals, worktree safety, document ownership, progressive decomposition, resume behavior, and proportionality. A passing structural fixture does **not** demonstrate that StartMachine was implemented. `tests/AGENT_TESTING.md` describes fixture preparation, the runner, and the grader.

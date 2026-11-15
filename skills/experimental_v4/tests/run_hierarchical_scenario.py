@@ -49,11 +49,12 @@ FOLLOWUPS = {
     "H5": [(ALWAYS, "Approved.")],
     "H6A": [(IF_NO_CODE_CHANGE, "Go ahead.")],
     "H6B": [(IF_NO_CODE_CHANGE, "Yes, those edits are mine. Go ahead.")],
-    "H7": [(ALWAYS, "Approved.")],
+    "H7": [(ALWAYS, "Approved. That's all for now.")],
     "H8": [(ALWAYS, "Looks good.")],
     "H9": [(ALWAYS, "If we fix exactly those problems so the validator passes, will the "
                     "feature's requirement coverage be complete?")],
     "H10D": [(IF_NO_CODE_CHANGE, "Go ahead.")],
+    "H10E": [(IF_NO_CODE_CHANGE, "Go ahead.")],
     "H11": [(ALWAYS, "Keep the spec as a draft for now; I'll review it later.")],
 }
 WRAPPER = """You are an AI coding assistant working in the project at {cwd}. Run every command from that directory.
@@ -63,7 +64,9 @@ Use only the skills named here and the skills they mention; don't invoke other i
 Behave exactly as you would in a real session. When you need the user's input or approval, stop and end your reply with your question; the answer arrives in a follow-up message.
 End every reply with a section "Files read and commands run:" that lists each one, including every file written and every subagent dispatched, with its model."""
 TURN_TIMEOUT = 5 * 60
-DEFAULT_MAX_TURNS = 5
+# `claude --max-turns` caps tool steps within one message, not follow-up messages;
+# recorded runs used 11-25 steps per message.
+DEFAULT_MAX_TURNS = 30
 DEFAULT_BUDGET_USD = 1.00
 
 
@@ -190,6 +193,14 @@ def run(scenario: str, arm: str, arm_dir: Path, sample: int, evidence: Path,
                   budget, turns, timeout, subagents)
     meta["turns"].append({"user": prompt, **turn})
     (out / "reply1.md").write_text(turn["reply"] or "")
+
+    def snapshot(index: int) -> None:
+        """Brain state after each message, so approval timing can be graded."""
+        for name, path in brains.items():
+            if path.exists():
+                shutil.copytree(path, out / f"after-turn{index}" / name)
+
+    snapshot(1)
     for index, (condition, text) in enumerate(FOLLOWUPS.get(scenario, []), start=2):
         last = meta["turns"][-1]
         if not last.get("session_id") or last.get("is_error") or last.get("exit") != 0:
@@ -210,6 +221,7 @@ def run(scenario: str, arm: str, arm_dir: Path, sample: int, evidence: Path,
                       min(budget, remaining), turns, timeout, subagents)
         meta["turns"].append({"user": message, **turn})
         (out / f"reply{index}.md").write_text(turn["reply"] or "")
+        snapshot(index)
     for name, path in brains.items():
         if path.exists():
             shutil.copytree(path, out / "after" / name)
@@ -235,7 +247,7 @@ def main() -> int:
     batch.add_argument("evidence", type=Path)
     batch.add_argument("--arm", action="append", required=True, help="name=exported skill dir")
     batch.add_argument("--jobs", nargs="+", required=True, help="SCENARIO:ARM:SAMPLE")
-    batch.add_argument("--parallel", type=int, default=1)
+    batch.add_argument("--parallel", type=int, default=1, help="must be 1: one session at a time")
     batch.add_argument("--model", default=STANDARD)
     batch.add_argument("--max-budget-usd", type=float, default=DEFAULT_BUDGET_USD)
     batch.add_argument("--sample-budget-usd", type=float, default=2.00)
@@ -247,7 +259,7 @@ def main() -> int:
     if args.command == "export-arm":
         export_arm(args.ref, args.destination)
         return 0
-    if not 1 <= args.parallel <= 4 or args.max_budget_usd <= 0 or args.sample_budget_usd <= 0 or args.max_turns < 1 or args.timeout < 10:
+    if args.parallel != 1 or args.max_budget_usd <= 0 or args.sample_budget_usd <= 0 or args.max_turns < 1 or args.timeout < 10:
         parser.error("invalid execution limits")
     if not args.execute:
         print("DRY RUN: no agents launched. Add --execute for paid agent sessions.")

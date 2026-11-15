@@ -36,6 +36,6 @@ Arms are exported without `tests/` and `IMPLEMENTATION_PLAN.md`, and agents may 
 
 ## Usage safeguards
 
-The batch runner is now a **dry run by default**. A paid agent session requires the explicit `--execute` flag. It defaults to one Sonnet worker, no nested subagents, five turns, five minutes per turn, an estimated $1 per invocation, and a $2 per-sample estimated ceiling for scripted follow-ups. Limits are not guarantees about your five-hour subscription quota. Start with only one GREEN scenario; inspect recorded evidence before authorizing any more runs. Avoid full RED/GREEN batches until important regressions justify that cost.
+The batch runner is now a **dry run by default**. A paid agent session requires the explicit `--execute` flag. It runs exactly one Sonnet session at a time, with no nested subagents, 30 tool steps per message (`--max-turns` caps steps within a message, not follow-up messages; recorded runs used 11–25), five minutes per message, an estimated $1 per invocation, and a $2 per-sample estimated ceiling for scripted follow-ups. Limits are not guarantees about your five-hour subscription quota. Start with only one GREEN scenario; inspect recorded evidence before authorizing any more runs. Avoid full RED/GREEN batches until important regressions justify that cost.
 
-A single bounded pilot can be started with `--jobs H3:green:1 --parallel 1 --model sonnet --max-budget-usd 1 --sample-budget-usd 2 --max-turns 5 --timeout 300 --execute`. Omitting `--execute` only previews the job.
+A single bounded pilot can be started with `--jobs H3:green:1 --parallel 1 --model sonnet --max-budget-usd 1 --sample-budget-usd 2 --max-turns 30 --timeout 300 --execute`. Omitting `--execute` only previews the job.

@@ -131,6 +131,27 @@ class HierarchicalScenarioContract(unittest.TestCase):
                 self.assertIn("?? notes/", status)
                 self.assertEqual("", scenarios.builder.git(prepared.repo, "status", "--porcelain"))
 
+    def test_h7_needs_revision_blocks_only_the_revised_chain(self):
+        prepared = self.prepare("H7")
+        features = prepared.repo / ".brain/features"
+        spec1 = features / "start-machine/02-specifications/start-machine.md"
+        spec1.write_text(spec1.read_text().replace("status: approved", "status: needs-revision", 1)
+                         .replace("state stays `\"running\"`", "state stays `\"running\"` (revised)"))
+        result = validate(features)
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("approved document has unapproved parent SPEC-001", result.stdout)
+        for unaffected in ("audit.md", "audit-reporting.md", "audit-log.md", "TASK-003", "SPEC-002"):
+            self.assertNotIn(unaffected, result.stdout)
+
+    def test_h10e_ordinary_worktree_session_can_write_the_shared_brain(self):
+        prepared = self.prepare("H10E")
+        self.assertIsNone(prepared.worktree)
+        self.assertEqual(prepared.repo / ".claude/worktrees/h10", prepared.cwd)
+        self.assertEqual(prepared.cwd, prepared.launch)
+        self.assertEqual([prepared.repo / ".brain"], prepared.add_dirs)
+        self.assertTrue((prepared.repo / FEATURE / "execution.md").is_file())
+        self.assertFalse((prepared.cwd / ".brain").exists())
+
     def test_h10_external_brain_wins_over_stale_main_checkout_copy(self):
         for name in ("H10C", "H10D"):
             with self.subTest(name=name):

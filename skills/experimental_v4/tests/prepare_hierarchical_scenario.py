@@ -84,6 +84,9 @@ SCENARIOS = {
     "H10B": ("tasks", "brain-implement", "", IMPLEMENT_TRIGGER),
     "H10C": ("tasks", "brain-update", "", UPDATE_TRIGGER),
     "H10D": ("tasks", "brain-implement", "", IMPLEMENT_TRIGGER),
+    # Ordinary (non-isolated) session in the same linked worktree; the brain
+    # in the main checkout is writable, as after the user allows the path.
+    "H10E": ("tasks", "brain-implement", "", IMPLEMENT_TRIGGER),
     "H11": ("none", "brain-write-spec", H11_CONTEXT,
             "Write the StartMachine spec. There is older StartMachine material in the brain "
             "from before we reorganized it; use whatever helps."),
@@ -376,6 +379,9 @@ def prepare(destination: Path, scenario: str, policy: Path | None = None,
     elif scenario in ("H10A", "H10B", "H10C", "H10D"):
         cwd, add_dirs = _prepare_h10(repo, external=scenario in ("H10C", "H10D"))
         worktree = WORKTREE
+    elif scenario == "H10E":
+        cwd, _ = _prepare_h10(repo, external=False)
+        launch, add_dirs = cwd, [repo / ".brain"]
     elif scenario == "H11":
         _prepare_h11(repo)
     return Prepared(scenario, repo, cwd, launch, skill, context, trigger, worktree, add_dirs)

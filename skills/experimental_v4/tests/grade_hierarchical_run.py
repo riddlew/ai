@@ -78,11 +78,15 @@ def text(path: Path) -> str:
 def meta(path: Path) -> dict:
     source = text(path)
     match = re.match(r"---\n(.*?)\n---", source, re.S)
-    values = {}
+    values, active = {}, None
     for line in (match.group(1).splitlines() if match else []):
-        if ":" in line and not line.startswith(" "):
+        if line.startswith("  - ") and active:
+            items = values[active].strip("[]")
+            values[active] = "[" + ", ".join(filter(None, [items, line[4:].strip()])) + "]"
+        elif ":" in line and not line.startswith(" "):
             key, value = line.split(":", 1)
-            values[key.strip()] = value.strip()
+            active = key.strip() if not value.strip() else None
+            values[key.strip()] = value.strip() or "[]"
     return values
 
 
@@ -317,8 +321,9 @@ def grade(run: Run) -> list[tuple[str, str, str]]:
             [(m.get("id"), m.get("parents"), m.get("depends_on")) for m in ms])
         bodies = [text(p) for p in tasks]
         report("2 action/acceptance/verification", bool(tasks) and all(
-            re.search(r"acceptance", b, re.I) and re.search(r"verification", b, re.I) and "machine_control.py" in b
-            for b in bodies), "sections and grounded path in every task")
+            re.search(r"acceptance", b, re.I) and re.search(r"verification", b, re.I)
+            and re.search(r"machine_control\.py|MachineRegistry|Session", b)
+            for b in bodies), "sections and a grounded path or owner in every task")
         routing = [m.get("id") for m, b in zip(ms, bodies) if re.search(r"Session\.handle", b)
                    and m.get("depends_on") in ("[]", None) and "def start" not in b]
         report("3 dependencies", "CHECK" if not routing else False,
@@ -331,7 +336,7 @@ def grade(run: Run) -> list[tuple[str, str, str]]:
         b, a = digest(run, prefix=f"{FEATURE}/04-")
         report("6 plans unchanged, no code", a == b and status(run) == "", f"git {status(run)!r}")
 
-    elif s in ("H6A", "H6B", "H10D"):
+    elif s in ("H6A", "H6B", "H10D", "H10E"):
         brain = run.after("extra-0") if s == "H10D" else after
         bname = "extra-0" if s == "H10D" else "main-brain"
         source = text(run.cwd / "machine_control.py")
@@ -374,6 +379,23 @@ def grade(run: Run) -> list[tuple[str, str, str]]:
             report("5 TASK-002 then checkpoint", "StartMachine" in session_class(source) and not new_commit
                    and asks(run.replies[-1]), f"Session routes StartMachine: {'StartMachine' in session_class(source)}; new commit {new_commit}")
             report("6 plans/tasks unchanged", a == b, "digest of 01-05 levels")
+        elif s == "H10E":
+            index_b, index_a = text(before / "00_index.md"), text(after / "00_index.md")
+            synced = re.findall(r"Last synced: (\w+)", index_b + index_a)
+            roots = sorted(set(p.name for p in after.glob("*.md")) - set(p.name for p in before.glob("*.md")))
+            report("1 shared brain updated", record != text(before / FEATURE / "execution.md")
+                   and not (run.cwd / ".brain").exists() and not main_checkout_writes(run),
+                   f"main-checkout execution.md changed; worktree .brain {(run.cwd / '.brain').exists()}")
+            report("2 branch facts stay pending", len(set(synced)) == 1 and not roots,
+                   f"Last synced {synced}; new root files {roots or 'none'}; pending files "
+                   f"{sorted(p.name for p in (after / 'pending').glob('*.md'))}")
+            report("3 TASK-001 checked first", bool(tests_before), f"test runs before first code edit: {len(tests_before)}")
+            report("4 record", "Branch: agent-h10" in record and ".claude/worktrees/h10" in record
+                   and bool(base_line and fixture_base.startswith(base_line.group(1))) and "TASK-002" in record,
+                   re.findall(r"(Review base:.*|Branch:.*|Workspace:.*|TASK-00\d:.*)", record))
+            st = status(run)
+            report("5 edits kept, no commit, checkpoint", "M README.md" in st and "notes/start-machine.md" in st
+                   and not new_commit and asks(run.replies[-1]), st)
         else:
             stale_b, stale_a = digest(run, "main-brain")
             report("1 external brain used", stale_a == stale_b and record != text(run.before("extra-0") / FEATURE / "execution.md"),
@@ -387,28 +409,23 @@ def grade(run: Run) -> list[tuple[str, str, str]]:
             report("5 checkpoint", asks(run.replies[-1]), run.replies[-1].split("Files read")[0][-300:])
 
     elif s == "H7":
-        spec1 = after / FEATURE / "02-specifications/start-machine.md"
-        m = meta(spec1)
-        reqs = sorted(set(re.findall(r"REQ-00\d", text(spec1))))
-        early = [p for p, t in writes(turn1, "start-machine.md") if "02-spec" in p and "status: approved" in t]
-        turn1_spec_edits = writes(turn1, "02-specifications/start-machine.md")
-        status_changed = any(re.search(r"status: (draft|needs-revision)", t) for _, t in turn1_spec_edits)
-        report("1 revised in place", m.get("id") == "SPEC-001" and reqs == [f"REQ-00{i}" for i in range(1, 6)]
-               and m.get("status") == "approved" and (not turn1_spec_edits or status_changed) and not early,
-               f"status {m.get('status')}; reqs {reqs}; turn-1 spec edits {len(turn1_spec_edits)}, set draft/needs-revision: {status_changed}")
-        refreshed = []
-        for p in after.glob(f"{FEATURE}/0[3-5]-*/*.md"):
-            rel = p.relative_to(after)
-            if meta(p).get("parent_hashes") != meta(before / rel).get("parent_hashes"):
-                refreshed.append((str(rel), meta(p).get("status")))
-        report("2 no hash refresh", not refreshed, refreshed or "no parent_hashes changed")
-        named = [i for i in ("CMP-002", "PLAN-002", "TASK-001") if i in reply_all]
-        statuses = {meta(p).get("id"): meta(p).get("status") for p in after.glob(f"{FEATURE}/0[3-5]-*/*.md")}
-        report("3 affected identified", len(named) == 3 and "CHECK", f"named {named}; statuses {statuses}")
+        spec_rel = Path(FEATURE) / "02-specifications/start-machine.md"
+        mid = run.dir / "after-turn1" / "main-brain"
+        first = meta(mid / spec_rel) if mid.exists() else {}
+        last = meta(after / spec_rel)
+        reqs = sorted(set(re.findall(r"REQ-00\d", text(after / spec_rel))))
+        report("1 needs-revision until approved", first.get("status") == "needs-revision"
+               and last.get("status") == "approved" and last.get("id") == "SPEC-001"
+               and reqs == [f"REQ-00{i}" for i in range(1, 6)],
+               f"after message 1: {first.get('status') or 'no snapshot'}; final: {last.get('status')}; reqs {reqs}")
         b, a = digest(run)
-        audit = [k for k in b if re.search(r"audit", k) and a.get(k) != b[k]]
-        report("4 SPEC-002 branch eligible", "CHECK" if not audit and re.search(r"SPEC-002|audit", reply_all, re.I) else False,
-               f"audit files changed: {audit or 'none'}")
+        owned = sorted(k for k in set(a) | set(b) if re.match(rf"{FEATURE}/0[3-5]-", k) and a.get(k) != b.get(k))
+        report("2 other owners' documents untouched", not owned, owned or "no 03-05 document changed")
+        named = [i for i in ("CMP-002", "PLAN-002", "TASK-001") if i in run.replies[0]]
+        report("3 affected chain named", len(named) == 3 or False, f"named in reply 1: {named}")
+        unaffected = re.search(r"SPEC-002|CMP-003|PLAN-003|TASK-003|audit", run.replies[0], re.I)
+        report("4 unaffected chain named", "CHECK" if unaffected else False,
+               "reply 1 mentions the SPEC-002/audit chain; grader quotes it" if unaffected else "not mentioned")
         report("5 no code", status(run) == "", f"git {status(run)!r}")
 
     elif s == "H8":
@@ -431,7 +448,7 @@ def grade(run: Run) -> list[tuple[str, str, str]]:
         report("1 validator nonzero", any("--check-coverage" in c and "error(s)" in r for c, r in ran),
                [c for c, _ in ran][:3])
         r1 = run.replies[0]
-        found = {"duplicate": bool(re.search(r"duplicate", r1, re.I)), "PLAN-009": "PLAN-009" in r1,
+        found = {"duplicate": bool(re.search(r"duplicate|same (id|ID)|`id: TASK-001`", r1, re.I)), "PLAN-009": "PLAN-009" in r1,
                  "cross-level": "PLAN-002" in r1, "REQ-009": "REQ-009" in r1, "cycle": bool(re.search(r"cycle", r1, re.I))}
         report("2 five defects", all(found.values()), found)
         b, a = digest(run)
@@ -445,6 +462,14 @@ def grade(run: Run) -> list[tuple[str, str, str]]:
         st = status(run)
         if s in ("H10A", "H10B"):
             b, a = digest(run)
+            bad_shell = main_checkout_writes(run)
+            if s == "H10B":
+                body = run.replies[0].split("Files read")[0]
+                report("1 stop before code", "machine_control.py" not in st and "test_machine_control" not in st,
+                       f"worktree status: {st!r}")
+                report("3 remedies offered", bool(re.search(r"/brain-init", body))
+                       and bool(re.search(r"non-isolated|main checkout|ordinary worktree", body, re.I)) and asks(body),
+                       body[-600:])
             report("2 brain untouched", a == b and not (run.cwd / ".brain").exists() and not bad_shell,
                    f"main brain unchanged {a == b}; worktree .brain {(run.cwd / '.brain').exists()}; shell writes {bad_shell}")
             report("1/3 explanation", "CHECK", run.replies[0].split("Files read")[0][:900])

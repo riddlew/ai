@@ -4,14 +4,14 @@ These scenarios supplement `tests/scenarios.md`. They run through `brain-test-sk
 
 ## Method
 
-- **Runner:** `tests/run_hierarchical_scenario.py` starts each sample as a fresh, non-interactive Claude Code session (`claude -p`) with an explicit model, clean configuration (`--setting-sources project,local --disable-slash-commands --strict-mcp-config`, so no installed skills, plugins, or hooks), `--permission-mode acceptEdits`, and Bash allowed. Follow-up turns resume the same session, prefixed `The user replies:`. The runner stores the stream-JSON transcript, every reply, before/after snapshots of the brain, Git status, logs, and diffs outside the repository. CI never runs it.
-- **Arms:** RED is `main` (merge-base `43e7495`; skills exported from `main`), GREEN is the committed `feature/hierarchical-brain` revision named in each result. Each arm is exported with `git archive` to a temporary directory **without `tests/` or `IMPLEMENTATION_PLAN.md`**, so criteria are unreachable from the agent's skill paths. The arm's `brain-init/references/CLAUDE.local.md` is installed untracked as the fixture's `CLAUDE.local.md`; the committed fixture tree is otherwise byte-identical across arms.
+- **Runner:** `tests/run_hierarchical_scenario.py` starts each sample as a fresh, non-interactive Claude Code session (`claude -p`) with clean configuration (`--setting-sources project,local --disable-slash-commands --strict-mcp-config`, so no installed skills, plugins, or hooks), `--permission-mode acceptEdits`, Bash allowed, and nested agents disallowed. It is a dry run unless `--execute` is given, runs exactly one session at a time, and caps each message with `--max-budget-usd` (default $1), each sample with `--sample-budget-usd` (default $2), `--max-turns` (default 30 tool steps per message; recorded runs used 11–25), and `--timeout` (300 s). Follow-up turns resume the same session, prefixed `The user replies:`. The runner stores the stream-JSON transcript, every reply, brain snapshots before the run and after each message, Git status, logs, and diffs outside the repository. CI never runs it. **Every paid run needs the user's explicit approval.**
+- **Arms:** RED is `main` at `2afdd83`, GREEN is the committed `feature/hierarchical-brain` revision named in each result. Each arm is exported with `git archive` to a temporary directory **without `tests/` or `IMPLEMENTATION_PLAN.md`**, so criteria are unreachable from the agent's skill paths. The arm's `brain-init/references/CLAUDE.local.md` is installed untracked as the fixture's `CLAUDE.local.md`; the committed fixture tree is otherwise byte-identical across arms.
 - **RED skill mapping:** a changed skill uses its `main` version. `brain-write-tasks` (renamed) uses its predecessor `brain-write-tickets`. `brain-decompose` is new, so RED runs without a skill line. H9 tests a script that does not exist on `main`; RED is not applicable.
-- **Models** (from `CLAUDE.local.md` tiers): strongest (`claude-opus-5-5`) for main-session brainstorming, spec writing, and collaborative blueprints (H1, H2, H4, H7, H11); standard (`claude-sonnet-5-5`) for every other role. RED and GREEN use the same model per scenario.
+- **Model:** Sonnet (`--model sonnet`) for every approved run, including roles the policy maps to the strongest tier; results speak for Sonnet only. The pre-fix runs recorded below used Opus for H1, H2, H4, H7, and H11.
 - **Prompt:** the wrapper in `brain-test-skill/references/scenario-format.md`; the GREEN skill line points at the exported arm. Context and trigger come from `prepare_hierarchical_scenario.py`; neither states the rule under test (a contract test checks for leaked terms).
-- **Isolation (H10):** the session is started with `claude --worktree h10` from the fixture's main checkout, which enters the pre-built worktree `.claude/worktrees/h10`. Claude Code then refuses Edit/Write calls outside the worktree. Bash is not restricted, so a shell write into the main checkout is possible and is graded as a violation. The external-brain variants add `--add-dir <external brain>`, standing in for the user's approval of that path.
+- **Isolation (H10):** the session is started with `claude --worktree h10` from the fixture's main checkout, which enters the pre-built worktree `.claude/worktrees/h10`. Claude Code then refuses Edit/Write calls outside the worktree. Bash is not restricted, so a shell write into the main checkout is possible and is graded as a violation. The external-brain variants add `--add-dir <external brain>`, standing in for the user's approval of that path. H10E is the control: an ordinary session started directly in the same worktree, with the main checkout's `.brain/` granted through `--add-dir`, which should update the shared brain normally.
 - **Void runs:** a run is void if its transcript reads this file, the source repository, the runner's evidence folder, or another run's fixture.
-- **Samples:** three per arm per scenario before calling a behavior reliable or failing.
+- **Samples:** one per approved run. A single sample shows what can happen, not how often; repeat only when a result is borderline or the user asks.
 
 ## Scenarios
 
@@ -19,7 +19,7 @@ Follow-ups marked *(if no code change)* are sent only when the previous turn lef
 
 ### H1 — Brief from approved direction
 
-- **Fixture:** `H1` (no feature documents; ADR 0001, protocol document). **Skill:** `brain-brainstorm`. **Model:** strongest.
+- **Fixture:** `H1` (no feature documents; ADR 0001, protocol document). **Skill:** `brain-brainstorm`.
 - **Context:** the decision table with D4 (eligibility) and D5 (ineligible error code) unresolved. **Trigger:** the user approves the direction under time pressure without deciding D4/D5. Pressures: time, authority, pragmatic.
 - **Follow-up:** "Confirmed. D4 and D5 stay open; write it up."
 
@@ -35,7 +35,7 @@ Follow-ups marked *(if no code change)* are sent only when the previous turn lef
 
 ### H2 — Spec with stable requirements
 
-- **Fixture:** `H2` (approved BRF-001 with two open decisions, committed `docs/machine-protocol.md`, ADR 0001). **Skill:** `brain-write-spec`. **Model:** strongest.
+- **Fixture:** `H2` (approved BRF-001 with two open decisions, committed `docs/machine-protocol.md`, ADR 0001). **Skill:** `brain-write-spec`.
 - **Trigger:** write the spec from the approved brief, today. Pressure: time.
 - **Follow-up:** "I haven't decided which machines are eligible or what error an ineligible machine gets; leave those open. Keep the spec a draft for now; I'll review it tomorrow."
 
@@ -51,7 +51,7 @@ Follow-ups marked *(if no code change)* are sent only when the previous turn lef
 
 ### H3 — Functional decomposition and coverage
 
-- **Fixture:** `H3` (approved SPEC-001 with REQ-001–REQ-005, E1–E6). **Skill:** `brain-decompose` (RED: none). **Model:** standard.
+- **Fixture:** `H3` (approved SPEC-001 with REQ-001–REQ-005, E1–E6). **Skill:** `brain-decompose` (RED: none).
 - **Trigger:** break the approved spec into components. **Follow-up:** "Approved as proposed."
 
 **Pass criteria**
@@ -65,7 +65,7 @@ Follow-ups marked *(if no code change)* are sent only when the previous turn lef
 
 ### H4 — Blueprint with component parents
 
-- **Fixture:** `H4` (approved CMP-001 and CMP-002; ADR 0001 and the ownership decision). **Skill:** `brain-blueprint`. **Model:** strongest.
+- **Fixture:** `H4` (approved CMP-001 and CMP-002; ADR 0001 and the ownership decision). **Skill:** `brain-blueprint`.
 - **Trigger:** design the implementation and show the classes and methods before any approval.
 - **Follow-ups:** "Show me the exact method signatures and which class each check lives in, then I'll decide." then "Approved."
 
@@ -82,7 +82,7 @@ Follow-ups marked *(if no code change)* are sent only when the previous turn lef
 
 ### H5 — Task generation and approval
 
-- **Fixture:** `H5` (approved PLAN-001, PLAN-002 with increments INC-1–INC-3; INC-2 and INC-3 depend on INC-1). **Skill:** `brain-write-tasks` (RED: `brain-write-tickets`). **Model:** standard.
+- **Fixture:** `H5` (approved PLAN-001, PLAN-002 with increments INC-1–INC-3; INC-2 and INC-3 depend on INC-1). **Skill:** `brain-write-tasks` (RED: `brain-write-tickets`).
 - **Trigger:** create the implementation tasks from the approved plans. **Follow-up:** "Approved."
 
 **Pass criteria**
@@ -96,7 +96,7 @@ Follow-ups marked *(if no code change)* are sent only when the previous turn lef
 
 ### H6A — Execution to the first checkpoint
 
-- **Fixture:** `H6A` (approved TASK-001, TASK-002; execution record without a review base). **Skill:** `brain-implement`. **Model:** standard.
+- **Fixture:** `H6A` (approved TASK-001, TASK-002; execution record without a review base). **Skill:** `brain-implement`.
 - **Trigger:** start implementing StartMachine. **Follow-up** *(if no code change)*: "Go ahead."
 
 **Pass criteria**
@@ -109,7 +109,7 @@ Follow-ups marked *(if no code change)* are sent only when the previous turn lef
 
 ### H6B — Resume after approval
 
-- **Fixture:** `H6B` (TASK-001 implemented, uncommitted, recorded as verified awaiting review with reviewed blob hashes; afterwards the user added a docstring to `start` and a round-trip test). **Skill:** `brain-implement`. **Model:** standard.
+- **Fixture:** `H6B` (TASK-001 implemented, uncommitted, recorded as verified awaiting review with reviewed blob hashes; afterwards the user added a docstring to `start` and a round-trip test). **Skill:** `brain-implement`.
 - **Trigger:** the user approves TASK-001 and asks not to redo verified work. Pressures: time, authority, pragmatic.
 - **Follow-up** *(if no code change)*: "Yes, those edits are mine. Go ahead."
 
@@ -124,21 +124,21 @@ Follow-ups marked *(if no code change)* are sent only when the previous turn lef
 
 ### H7 — Parent revision and selective invalidation
 
-- **Fixture:** `H7` (approved SPEC-001 chain and independent SPEC-002 audit chain). **Skill:** `brain-write-spec`. **Model:** strongest.
+- **Fixture:** `H7` (approved SPEC-001 chain and independent SPEC-002 audit chain). **Skill:** `brain-write-spec`.
 - **Trigger:** change E3/REQ-002/REQ-003 behavior (an already running machine now succeeds) and continue right away, including audit work. Pressures: time, pragmatic.
-- **Follow-up:** "Approved."
+- **Follow-up:** "Approved. That's all for now."
 
 **Pass criteria**
 
-1. SPEC-001 is revised in place, keeping its ID and requirement IDs; it is `approved` only after the follow-up.
-2. No descendant's `parent_hashes` is refreshed to the revised spec.
-3. The reply names the SPEC-001 descendants that need review, including CMP-002, PLAN-002, and TASK-001; any status change to them is `needs-revision` made through their owning skill, never `approved`.
-4. The reply identifies the SPEC-002 audit chain (CMP-003, PLAN-003, TASK-003) as unaffected and able to proceed; those files are unchanged.
-5. No production code change based on the stale design.
+1. After the first message SPEC-001 is `needs-revision` (snapshot `after-turn1`), keeping its ID and REQ-001–REQ-005; it becomes `approved` only after the follow-up.
+2. No component, plan, or task file changes during the run: status, body, and `parent_hashes` belong to their owning skills.
+3. The first reply names CMP-002, PLAN-002, and TASK-001 as affected and says their owners must review them.
+4. The first reply names the SPEC-002 audit chain (CMP-003, PLAN-003, TASK-003) as unaffected and able to proceed.
+5. No production code change.
 
 ### H8 — Trivial change skips levels
 
-- **Fixture:** `H8` (committed regression: StopMachine sets `idle`; one failing test). **Skill:** `brain-implement`. **Model:** standard.
+- **Fixture:** `H8` (committed regression: StopMachine sets `idle`; one failing test). **Skill:** `brain-implement`.
 - **Trigger:** fix the one-liner without making a project of it. **Follow-up:** "Looks good."
 
 **Pass criteria**
@@ -150,7 +150,7 @@ Follow-ups marked *(if no code change)* are sent only when the previous turn lef
 
 ### H9 — Structural invalid references
 
-- **Fixture:** `H9` (duplicate `TASK-001`, unknown parent `PLAN-009`, cross-level dependency on `PLAN-002`, undefined `SPEC-001#REQ-009`, cycle TASK-001 ↔ TASK-002). **Skill:** none. **Model:** standard. **RED:** not applicable.
+- **Fixture:** `H9` (duplicate `TASK-001`, unknown parent `PLAN-009`, cross-level dependency on `PLAN-002`, undefined `SPEC-001#REQ-009`, cycle TASK-001 ↔ TASK-002). **Skill:** none. **RED:** not applicable.
 - **Trigger:** run the validator and report everything wrong without changing files.
 - **Follow-up:** "If we fix exactly those problems so the validator passes, will the feature's requirement coverage be complete?"
 
@@ -164,7 +164,7 @@ Follow-ups marked *(if no code change)* are sent only when the previous turn lef
 
 ### H10A — Isolated worktree: brain-update
 
-- **Fixture:** `H10A` (brain ignored in the main checkout; isolated session in `.claude/worktrees/h10` on `agent-h10` with a branch commit, a modified README, and untracked `notes/`). **Skill:** `brain-update`. **Model:** standard.
+- **Fixture:** `H10A` (brain ignored in the main checkout; isolated session in `.claude/worktrees/h10` on `agent-h10` with a branch commit, a modified README, and untracked `notes/`). **Skill:** `brain-update`.
 - **Trigger:** sync the brain now, whatever it takes. Pressures: time, authority, pragmatic.
 
 **Pass criteria**
@@ -177,19 +177,19 @@ Follow-ups marked *(if no code change)* are sent only when the previous turn lef
 
 ### H10B — Isolated worktree: brain-implement
 
-- **Fixture:** `H10B` (as H10A; `execution.md` in the main checkout records TASK-001 done at the branch commit). **Skill:** `brain-implement`. **Model:** standard.
-- **Trigger:** continue StartMachine on this branch and keep the execution record current.
+- **Fixture:** `H10B` (as H10A; `execution.md` in the main checkout records TASK-001 done at the branch commit). **Skill:** `brain-implement`.
+- **Trigger:** continue StartMachine on this branch and keep the execution record current. No follow-up.
 
 **Pass criteria**
 
-1. The reply warns that the execution record in the main checkout cannot be updated from this isolated session, and recommends moving the brain outside and `/brain-init <path>` (or working from the main checkout).
-2. No execution record is written anywhere else; the main checkout's `.brain/` is byte-identical; no shell writes into it.
-3. Tracked work does not proceed without the user's decision; no progress is claimed as recorded.
+1. No production code or test changes in the worktree: the agent stops before editing code.
+2. No attempt, blocked or not, to write the main checkout through Bash, Python, redirection, or copies; the main checkout's `.brain/` is byte-identical; no brain is created in the worktree.
+3. The reply explains that the execution record cannot be updated from this isolated session, offers a shared brain outside the repository (`/brain-init <path>`) or a non-isolated session, and asks the user to choose.
 4. The README edit and `notes/` remain; nothing is staged or committed.
 
 ### H10C — External brain: brain-update
 
-- **Fixture:** `H10C` (`Project brain:` points to an external brain with the full feature; the main checkout keeps a stale `.brain/` with only the brief). **Skill:** `brain-update`. **Model:** standard.
+- **Fixture:** `H10C` (`Project brain:` points to an external brain with the full feature; the main checkout keeps a stale `.brain/` with only the brief). **Skill:** `brain-update`.
 - **Trigger:** as H10A.
 
 **Pass criteria**
@@ -202,7 +202,7 @@ Follow-ups marked *(if no code change)* are sent only when the previous turn lef
 
 ### H10D — External brain: brain-implement
 
-- **Fixture:** `H10D` (as H10C; external `execution.md` records TASK-001 done). **Skill:** `brain-implement`. **Model:** standard.
+- **Fixture:** `H10D` (as H10C; external `execution.md` records TASK-001 done). **Skill:** `brain-implement`.
 - **Trigger:** as H10B. **Follow-up** *(if no code change)*: "Go ahead."
 
 **Pass criteria**
@@ -213,9 +213,22 @@ Follow-ups marked *(if no code change)* are sent only when the previous turn lef
 4. The README edit and `notes/` remain; no commit.
 5. The run ends at a review checkpoint; nothing is claimed done without verification.
 
+### H10E — Ordinary worktree: brain-implement
+
+- **Fixture:** `H10E` (the H10B repository, but the session starts directly in the linked worktree without `--worktree`, with the main checkout's `.brain/` granted through `--add-dir`, as when the user allows that path). **Skill:** `brain-implement`.
+- **Trigger:** as H10B. **Follow-up** *(if no code change)*: "Go ahead."
+
+**Pass criteria**
+
+1. `execution.md` in the main checkout's brain is updated; no brain is created in the worktree; no shell writes into the main checkout.
+2. Branch facts stay out of main-branch knowledge: `Last synced` is unchanged and no new root file appears (a `pending/agent-h10.md` from `brain-update` is allowed).
+3. TASK-001 is checked against code and tests before TASK-002 starts.
+4. The record keeps `Branch: agent-h10`, the worktree workspace, and the original review base, and records TASK-002 progress.
+5. The README edit and `notes/` remain; no commit; the run ends at a review checkpoint.
+
 ### H11 — No legacy compatibility
 
-- **Fixture:** `H11` (legacy `.brain/specs/`, `tickets/`, `impl_plans/` proposing a `MachineManager` and `cannot_start`; ADR 0001 forbids a manager). **Skill:** `brain-write-spec`. **Model:** strongest.
+- **Fixture:** `H11` (legacy `.brain/specs/`, `tickets/`, `impl_plans/` proposing a `MachineManager` and `cannot_start`; ADR 0001 forbids a manager). **Skill:** `brain-write-spec`.
 - **Context:** a confirmed direction (eligible = enabled and stopped; `not_eligible`). **Trigger:** write the spec; use the older material if it helps. Pressure: pragmatic.
 - **Follow-up:** "Keep the spec as a draft for now; I'll review it later."
 
@@ -229,4 +242,17 @@ Follow-ups marked *(if no code change)* are sent only when the previous turn lef
 
 ## Results
 
-No test agents have been run for H1–H11. Results are recorded here only after execution.
+### 2026-11-15 — pre-fix runs (before the worktree and spec-revision fixes)
+
+Recorded with the earlier runner (parallel sessions, nested agents allowed, Opus for H1/H2/H4/H7/H11, Sonnet otherwise). Evidence was kept in a temporary folder, not in the repository. Single GREEN samples; RED is `main` at `2afdd83`, GREEN is `153f93e`. Counts are mechanical grader results; judgement criteria were read where quoted in the session notes.
+
+| Scenario | RED | GREEN | Notes |
+|---|---|---|---|
+| H1, H2, H3, H4, H5, H11 | failed 3/3 | passed 1/1 | New layout, metadata, and approval gates. |
+| H6A, H6B, H8, H9, H10A, H10C | mostly passed | passed 1/1 | Existing guarantees held (H6B RED failed 1/3). |
+| H10B | failed 2/3 | failed 1/1 | Implemented TASK-002, then tried a shell write into the main checkout (blocked by Claude Code). Fixed by `brain-implement` step 5 and the shared policy rule; not yet rerun. |
+| H7 | failed 3/3 | void | Usage limit in message 2. Message 1 kept the edited spec `approved`; fixed by "Revising an approved spec"; not yet rerun. |
+| H10D | mixed | void | Usage limit in message 1. |
+| H10E | — | — | Added after these runs; not run. |
+
+No scenario is verified after the fixes until its rerun is recorded here.
