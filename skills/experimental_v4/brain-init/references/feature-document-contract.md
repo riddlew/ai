@@ -32,6 +32,7 @@ requirements:
   - SPEC-001#REQ-003
   - SPEC-001#REQ-004
 depends_on: []
+parent_hashes: [SPEC-001@<40-char Git blob hash>]
 ---
 ```
 
@@ -42,9 +43,10 @@ depends_on: []
 - `requirements`: qualified requirements like `SPEC-001#REQ-003`. An `E1` example is addressed as `SPEC-001#E1`. Keep applicable references in downstream docs, and state explicitly when no behavior requirement applies.
 - `depends_on`: IDs of prerequisite documents **of the same kind/level** (most useful for tasks); no self-dependencies or cycles. Use only genuine execution/production prerequisites, not mere preferred order.
 - An `approved` child cannot depend on a parent whose status is `draft` or `needs-revision`. A component, plan, or task may only attribute requirements defined by its governing parents. Stable requirement IDs declared inside a specification must be unique.
+- `parent_hashes`: Git-blob SHA-1 fingerprints of each direct parent document, written as `PARENT-ID@<40 hex chars>`, with `[]` for root briefs. Approved documents MUST capture every direct parent, and the structural validator rejects a changed parent even if its status was not updated. The producer generates these from the actual files after their parent is approved. Run `python ${CLAUDE_SKILL_DIR}/../scripts/validate_feature_docs.py --show-parent-hashes <child-file>` to print the exact value before approval. Recompute only after checking the changed parent and explicitly renewing affected approvals; never update hashes to suppress a conflict.
 - Lists are YAML block sequences or `[]`. No custom YAML tags, anchors, aliases, or hidden metadata magic. IDs and reference values are bare strings.
 
-For a brief, use `parents: []`, `requirements: []`, and `depends_on: []`. For a spec with a brief, use `parents: [BRF-001]` (or an equivalent block sequence); it declares requirements in its body. Components can have multiple specification parents. Plans can have multiple component parents when needed. Tasks can use one or multiple approved plan parents.
+For a brief, use `parents: []`, `requirements: []`, `depends_on: []`, and `parent_hashes: []`. For a spec with a brief, use `parents: [BRF-001]` (or an equivalent block sequence); it declares requirements in its body. Components can have multiple specification parents. Plans can have multiple component parents when needed. Tasks can use one or multiple approved plan parents.
 
 Document filenames are human-readable and may change; **IDs and explicit references are authoritative**. Task filenames may include ID for readability, e.g. `TASK-001-add-message-discriminator.md`.
 
@@ -94,4 +96,4 @@ python skills/experimental_v4/scripts/validate_feature_docs.py .brain/features -
 python -m unittest discover -s skills/experimental_v4/tests -p 'test_feature_document_contract.py'
 ```
 
-The validator checks required metadata, document kinds, stable IDs, parent level ordering, same-level dependencies, cycles, and qualified requirement references. A feature folder may be absent before the first feature is documented; do not require empty placeholder directories. With `--check-coverage`, every **fully approved populated** downstream stage must cover all requirements declared by approved specifications through approved documents; stages containing draft/needs-revision documents are incomplete and do not claim full coverage. Skipped stages are permitted. These are structural checks only; human/agent review remains necessary for semantic coverage and correctness. The tests are authored; runtime execution in a checked-out repository remains pending.
+The validator checks required metadata, document kinds, stable IDs, parent level ordering, same-level dependencies, cycles, qualified requirement references and approved child-to-parent fingerprints. A feature folder may be absent before the first feature is documented; do not require empty placeholder directories. With `--check-coverage`, every **fully approved populated** downstream stage must cover all requirements declared by approved specifications through approved documents; stages containing draft/needs-revision documents are incomplete and do not claim full coverage. Skipped stages are permitted. These are structural checks only; human/agent review remains necessary for semantic coverage and correctness. The tests are authored; runtime execution in a checked-out repository remains pending.

@@ -1,6 +1,6 @@
 # Feature document templates
 
-Use the smallest relevant template. Keep YAML metadata consistent with `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md`; IDs in this file are **illustrative**, not reservations.
+Use the smallest relevant template. To approve a child, fill `parent_hashes` using the actual parent files (see the contract); draft placeholders are not valid evidence of approval. Keep YAML metadata consistent with `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md`; IDs in this file are **illustrative**, not reservations.
 
 ## 01 — Brief (`01-brief/brief.md`)
 
@@ -12,6 +12,7 @@ status: draft
 parents: []
 requirements: []
 depends_on: []
+parent_hashes: []
 ---
 # <Feature>: Brief
 
@@ -33,6 +34,7 @@ status: draft
 parents: [BRF-001]
 requirements: []
 depends_on: []
+parent_hashes: []  # Fill with approved brief fingerprint before approval
 ---
 # <Feature area>: Specification
 
@@ -62,6 +64,7 @@ status: draft
 parents: [SPEC-001]
 requirements: [SPEC-001#REQ-001]
 depends_on: []
+parent_hashes: []  # Fill with approved spec fingerprint before approval
 ---
 # <Functional responsibility>
 
@@ -85,6 +88,7 @@ status: draft
 parents: [CMP-001]
 requirements: [SPEC-001#REQ-001]
 depends_on: []
+parent_hashes: []  # Fill with approved component fingerprint before approval
 ---
 # <Component>: Implementation Plan
 
@@ -112,6 +116,7 @@ status: draft
 parents: [PLAN-001]
 requirements: [SPEC-001#REQ-001]
 depends_on: []
+parent_hashes: []  # Fill with approved plan fingerprint before approval
 ---
 # <Concrete task>
 

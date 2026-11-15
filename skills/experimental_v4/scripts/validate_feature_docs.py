@@ -38,7 +38,7 @@ def _items(value: str) -> list[str]:
 def git_blob_sha(path: Path) -> str:
     """Content fingerprint; works for ignored/untracked project-brain files."""
     content = path.read_bytes()
-    header = f"blob {len(content)}\\0".encode("ascii")
+    header = f"blob {len(content)}\0".encode("ascii")
     return hashlib.sha1(header + content).hexdigest()
 
 
@@ -274,7 +274,7 @@ def main() -> int:
         try:
             values = describe_parent_hashes(args.show_parent_hashes)
         except (OSError, ValueError) as exc:
-            parser.exit(1, f"{exc}\\n")
+            parser.exit(1, f"{exc}\n")
         print("parent_hashes: [" + ", ".join(values) + "]")
         return 0
     if args.features_root is None:

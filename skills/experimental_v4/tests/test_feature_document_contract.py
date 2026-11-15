@@ -143,8 +143,8 @@ class FeatureDocumentContract(unittest.TestCase):
 
     def test_parent_revision_invalidates_approved_children(self):
         spec = self.feature / "02-specifications" / "SPEC-001.md"
-        spec.write_text(spec.read_text() + "\\nAn approved behavior changed.\\n")
-        errors = "\\n".join(validator.validate_feature(self.feature))
+        spec.write_text(spec.read_text() + "\nAn approved behavior changed.\n")
+        errors = "\n".join(validator.validate_feature(self.feature))
         self.assertIn("stale parent hash for SPEC-001", errors)
 
     def test_approved_child_needs_parent_hash(self):
