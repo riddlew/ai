@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 **Project brain:** Follow `CLAUDE.local.md` §Project brain loading: read **all** root `.md` files once per session (again after compaction), plus the active branch's pending file when present. Inspect linked detail and verify task-critical facts against current source. Do not send the whole brain to subagents. If no brain exists, proceed and mention `/brain-init` once.
 
-Record established requirements and approved decisions as a stable implementation contract. For new features, use `.brain/features/<feature-slug>/02-specifications/` and the contract/templates under `../brain-init/references/`. Link to a governing brief when it exists; otherwise allow a direct, sufficiently settled specification. Small, well-understood changes can proceed without a spec. Follow `CLAUDE.local.md` for decision authority.
+Record established requirements and approved decisions as a stable implementation contract. For new features, use `.brain/features/<feature-slug>/02-specifications/` and `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md` and `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-templates.md`. Link to a governing brief when it exists; otherwise allow a direct, sufficiently settled specification. Small, well-understood changes can proceed without a spec. Follow `CLAUDE.local.md` for decision authority.
 
 Do not conduct a new requirements interview (the bounded builder-review questions in §5 are the only exception) or reopen settled choices. If a consequential gap remains, record it under Open Decisions; do not decide it to make the spec look complete.
 

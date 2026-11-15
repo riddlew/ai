@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Decompose into functional components
 
-**Project brain:** Follow `CLAUDE.local.md` for project-brain loading, branch context, source verification, and decision authority. Read the feature-document contract and templates in the sibling `brain-init/references/` directory.
+**Project brain:** Follow `CLAUDE.local.md` for project-brain loading, branch context, source verification, and decision authority. Read the feature-document contract and templates in `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md` and `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-templates.md`.
 
 Translate approved specifications into **coherent functional responsibilities**, not code. Specifications govern required behavior; applicable ADRs and approved user decisions govern architectural decisions. Own only `.brain/features/<feature-slug>/03-components/`. Do not edit specifications, plans, tasks, production code, or the execution record.
 
@@ -27,7 +27,7 @@ Translate approved specifications into **coherent functional responsibilities**,
 
 ## 3. Write component documents
 
-Write `.brain/features/<feature-slug>/03-components/<slug>.md`, using the shared `feature-document-templates.md`. Assign stable IDs `CMP-001`, `CMP-002`, ... within the feature. Required frontmatter:
+Write `.brain/features/<feature-slug>/03-components/<slug>.md`, using `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-templates.md`. Assign stable IDs `CMP-001`, `CMP-002`, ... within the feature. Required frontmatter:
 
 ```yaml
 ---
@@ -52,7 +52,7 @@ Do not duplicate entire specifications or prescribe method names, file changes, 
 
 ## 4. Validate and review
 
-Construct a requirement coverage table for **every approved in-scope requirement**. Multiple components may reference a requirement only with clear division of responsibility. Check invariants and failure behavior semantically, not only by counting references. Validate metadata, references and cycles using `scripts/validate_feature_docs.py` when available; structural coverage is not proof of semantic correctness.
+Construct a requirement coverage table for **every approved in-scope requirement**. Multiple components may reference a requirement only with clear division of responsibility. Check invariants and failure behavior semantically, not only by counting references. Validate metadata, references and cycles using `${CLAUDE_SKILL_DIR}/../scripts/validate_feature_docs.py` when available; structural coverage is not proof of semantic correctness.
 
 Present the proposed component set, scope boundaries, coverage table, and consequential open decisions. Ask for approval. Do not label an unapproved design as `approved`; keep blocked scope `draft`. If a governing specification changes materially, review affected components and mark changed approvals `needs-revision` until reaffirmed. Independent approved scope can proceed.
 

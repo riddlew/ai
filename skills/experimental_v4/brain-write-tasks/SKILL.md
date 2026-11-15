@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Write Tasks
 
-**Project brain:** Follow `CLAUDE.local.md` for project brain, decision authority, and source verification. Read the shared feature document contract/templates from `../brain-init/references/`.
+**Project brain:** Follow `CLAUDE.local.md` for project brain, decision authority, and source verification. Read `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md` and `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-templates.md`.
 
 This skill evolves the former `brain-write-tickets` discipline: coverage, true dependencies, user approval, and builder review, but generates **concrete implementation actions** from approved plans, not delivery tickets from specifications. Own only `.brain/features/<feature-slug>/05-tasks/`. Do not edit approved implementation plans, upstream documents, execution history, or production code. For one trivial action, direct implementation may be more proportionate.
 
@@ -32,7 +32,7 @@ Do not turn a task into a new architecture decision or introduce changes beyond 
 
 Create draft task definitions with ID, title, plan parent IDs, requirements, dependencies, precise action, expected behavior, acceptance criteria, and verification. Construct a **coverage table** mapping each approved plan increment, applicable requirement, and example to one or more tasks. Report missing failure cases; add accepted criteria when a requirement resolves them, otherwise record the unresolved user choice.
 
-Self-check: stable unique IDs, valid plan parents, accurate requirement/example refs, no duplicate ownership or scope creep, genuine acyclic dependencies, and no claimed approvals of unresolved design. Run the shared structural validator when available. Run the builder review from `../brain-review-code/references/builder-review.md` with `artifact_kind: task set` and approved plans/specifications as sources. If no reviewer is available, label a weaker self-review.
+Self-check: stable unique IDs, valid plan parents, accurate requirement/example refs, no duplicate ownership or scope creep, genuine acyclic dependencies, and no claimed approvals of unresolved design. Run the shared structural validator when available. Run the builder review from `${CLAUDE_SKILL_DIR}/../brain-review-code/references/builder-review.md` with `artifact_kind: task set` and approved plans/specifications as sources. If no reviewer is available, label a weaker self-review.
 
 Present the task set, dependency ordering, coverage table, uncovered failure cases, review result, and genuine questions in one approval message. If the user already approved exactly that decomposition, review and write without a redundant approval unless the review changes it materially.
 

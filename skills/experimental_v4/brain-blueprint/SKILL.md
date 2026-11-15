@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Blueprint — Implementation Plans
 
-**Project brain:** Follow `CLAUDE.local.md` project-brain loading, branch context, decision authority, and source verification rules. Read the shared feature-document contract and templates from the sibling `brain-init/references/` directory.
+**Project brain:** Follow `CLAUDE.local.md` project-brain loading, branch context, decision authority, and source verification rules. Read the shared feature-document contract and templates from `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md` and `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-templates.md`.
 
 Define **how** approved functional components will be implemented in the inspected codebase. Preserve approved requirements, architecture, and explicit design preferences. This skill owns only `.brain/features/<feature-slug>/04-implementation-plans/`. `brain-implement` owns mutable `execution.md`; do not record task completion or execution status here. For small settled changes, a separate blueprint is optional.
 
@@ -20,7 +20,7 @@ Define **how** approved functional components will be implemented in the inspect
 
 ## 2. Define smallest viable design
 
-Use the sibling `references/blueprint-template.md` and feature document schema. Prefer one implementation plan per meaningful component, but permit one plan to cover several small related components or multiple plans for a genuinely large component. Never create files just to satisfy a one-to-one rule.
+Use `${CLAUDE_SKILL_DIR}/references/blueprint-template.md` and feature document schema. Prefer one implementation plan per meaningful component, but permit one plan to cover several small related components or multiple plans for a genuinely large component. Never create files just to satisfy a one-to-one rule.
 
 Describe:
 
@@ -36,7 +36,7 @@ Favor extending existing owners over unapproved services, new layers, premature 
 
 ## 3. Review with the user
 
-Present the affected files/owners, call flow, key signatures, unchanged boundaries, testable increments, and real tradeoffs. Invite design corrections. Review the complete plan against code and governing requirements, following the builder review in the sibling `brain-review-code/references/builder-review.md` (`artifact_kind: blueprint`, `sources: component/specification and inspected paths`). If no independent reviewer exists, label it as a weaker self-review.
+Present the affected files/owners, call flow, key signatures, unchanged boundaries, testable increments, and real tradeoffs. Invite design corrections. Review the complete plan against code and governing requirements, following the builder review in `${CLAUDE_SKILL_DIR}/../brain-review-code/references/builder-review.md` (`artifact_kind: blueprint`, `sources: component/specification and inspected paths`). If no independent reviewer exists, label it as a weaker self-review.
 
 Ask explicitly for approval of the revised **binding technical design**. Without approval keep `status: draft` or `needs-revision`; do not implement. A specification approval or feature request is not blueprint approval. On approval set `status: approved`, record when/where approval occurred, and distinguish illustrative implementation suggestions from binding constraints.
 

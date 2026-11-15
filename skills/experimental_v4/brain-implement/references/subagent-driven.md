@@ -1,6 +1,6 @@
 # Subagent-driven mode
 
-For the coordinator (the main session). When filling any template, fill every slot. Path slots are absolute paths: `{review_feedback_path}` is `${CLAUDE_SKILL_DIR}/references/review-feedback.md`, and `{findings_path}` is `findings.md` in `brain-review-code/references/` beside this skill's folder.
+For the coordinator (the main session). When filling any template, fill every slot. Path slots are absolute paths: `{review_feedback_path}` is `${CLAUDE_SKILL_DIR}/references/review-feedback.md`, and `{findings_path}` is `${CLAUDE_SKILL_DIR}/../brain-review-code/references/findings.md`.
 
 Per task, in order:
 
