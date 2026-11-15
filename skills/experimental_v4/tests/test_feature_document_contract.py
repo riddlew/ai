@@ -173,6 +173,11 @@ class FeatureDocumentContract(unittest.TestCase):
             validator.describe_parent_hashes(child),
         )
 
+    def test_non_sequence_yaml_is_rejected(self):
+        path = self.feature / "05-tasks" / "TASK-001.md"
+        path.write_text(path.read_text().replace("parents: [PLAN-001]", "parents: PLAN-001"))
+        self.assertIn("sequence values must use", "\n".join(validator.validate_feature(self.feature)))
+
     def test_block_yaml_list_is_supported(self):
         path = self.feature / "05-tasks" / "TASK-001.md"
         content = path.read_text().replace("parents: [PLAN-001]",

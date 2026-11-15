@@ -30,8 +30,9 @@ def _items(value: str) -> list[str]:
     value = value.strip()
     if value == "[]":
         return []
-    if value.startswith("[") and value.endswith("]"):
-        value = value[1:-1]
+    if not (value.startswith("[") and value.endswith("]")):
+        raise ValueError("sequence values must use [items] or indented - items")
+    value = value[1:-1]
     return [item.strip().strip("'\"") for item in value.split(",") if item.strip()]
 
 
