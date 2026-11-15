@@ -30,7 +30,7 @@ class Problem(Exception):
 def opt(argv: list[str]) -> tuple[list[str], dict[str, object]]:
     pos: list[str] = []
     options: dict[str, object] = {"parent": []}
-    boolean = {"apply", "check-coverage", "save-location"}
+    boolean = {"apply", "check-coverage", "pending"}
     i = 0
     while i < len(argv):
         token = argv[i]
