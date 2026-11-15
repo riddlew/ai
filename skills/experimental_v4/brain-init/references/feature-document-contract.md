@@ -43,7 +43,7 @@ parent_hashes: [SPEC-001@<40-char Git blob hash>]
 - `requirements`: qualified requirements like `SPEC-001#REQ-003`. An `E1` example is addressed as `SPEC-001#E1`. Keep applicable references in downstream docs, and state explicitly when no behavior requirement applies.
 - `depends_on`: IDs of prerequisite documents **of the same kind/level** (most useful for tasks); no self-dependencies or cycles. Use only genuine execution/production prerequisites, not mere preferred order.
 - An `approved` child cannot depend on a parent whose status is `draft` or `needs-revision`. A component, plan, or task may only attribute requirements defined by its governing parents. Stable requirement IDs declared inside a specification must be unique.
-- `parent_hashes`: Git-blob SHA-1 fingerprints of each direct parent document, written as `PARENT-ID@<40 hex chars>`, with `[]` for root briefs. Approved documents MUST capture every direct parent, and the structural validator rejects a changed parent even if its status was not updated. The producer generates these from the actual files after their parent is approved. Run `python ${CLAUDE_SKILL_DIR}/../scripts/validate_feature_docs.py --show-parent-hashes <child-file>` to print the exact value before approval. Recompute only after checking the changed parent and explicitly renewing affected approvals; never update hashes to suppress a conflict.
+- `parent_hashes`: Git-blob SHA-1 fingerprints of each direct parent document, written as `PARENT-ID@<40 hex chars>`, with `[]` for root briefs. Approved documents MUST capture every direct parent, and the structural validator rejects a changed parent even if its status was not updated. The producer generates these from the actual files after their parent is approved. Run `python ${CLAUDE_SKILL_DIR}/../brain-init/scripts/validate_feature_docs.py --show-parent-hashes <child-file>` to print the exact value before approval. Recompute only after checking the changed parent and explicitly renewing affected approvals; never update hashes to suppress a conflict.
 - Lists are YAML block sequences or `[]`. No custom YAML tags, anchors, aliases, or hidden metadata magic. IDs and reference values are bare strings.
 
 For a brief, use `parents: []`, `requirements: []`, `depends_on: []`, and `parent_hashes: []`. For a spec with a brief, use `parents: [BRF-001]` (or an equivalent block sequence); it declares requirements in its body. Components can have multiple specification parents. Plans can have multiple component parents when needed. Tasks can use one or multiple approved plan parents.
@@ -92,7 +92,7 @@ Do not generate filler documents or insist on passing through all five folders. 
 Run from the repository root with Python 3.10+:
 
 ```bash
-python skills/experimental_v4/scripts/validate_feature_docs.py .brain/features --check-coverage
+python skills/experimental_v4/brain-init/scripts/validate_feature_docs.py .brain/features --check-coverage
 python -m unittest discover -s skills/experimental_v4/tests -p 'test_feature_document_contract.py'
 ```
 

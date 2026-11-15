@@ -54,7 +54,7 @@ parent_hashes: []
 
 Each document should include `Action and implementation context`, `Expected behavior / result`, `Applicable design constraints`, `Acceptance criteria and examples`, and `Verification`. Use code paths only when grounded in inspected source; reference the plan rather than duplicate it. Approval of a task set does not authorize code edits without the separately applicable `brain-implement` authorization.
 
-Populate each task's `parent_hashes` with actual approved plan fingerprints using `${CLAUDE_SKILL_DIR}/../scripts/validate_feature_docs.py --show-parent-hashes <task-file>` before final approval. Never simply refresh stale hashes to bypass a changed binding plan.
+Populate each task's `parent_hashes` with actual approved plan fingerprints using `${CLAUDE_SKILL_DIR}/../brain-init/scripts/validate_feature_docs.py --show-parent-hashes <task-file>` before final approval. Never simply refresh stale hashes to bypass a changed binding plan.
 
 An upstream binding design change may invalidate affected tasks. Mark them `needs-revision` until reconciled and reapproved; preserve IDs and unaffected tasks.
 

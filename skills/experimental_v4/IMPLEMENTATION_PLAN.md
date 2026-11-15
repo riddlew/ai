@@ -31,7 +31,7 @@ Detailed contracts and templates live in:
 - `brain-init/references/feature-document-contract.md`
 - `brain-init/references/feature-document-templates.md`
 
-Initial structural checks are implemented in `scripts/validate_feature_docs.py` and `tests/test_feature_document_contract.py`, and run in GitHub Actions. Fresh-agent behavior tests are still pending.
+Initial structural checks are implemented in `brain-init/scripts/validate_feature_docs.py` and `tests/test_feature_document_contract.py`, and run in GitHub Actions. Fresh-agent behavior tests are still pending.
 
 A document's `id` is stable within a feature, regardless of filename; requirement and example IDs are qualified by their specification. A child references the relevant parents and requirements. ADRs remain independent authorities under `.brain/adrs/`. `execution.md` records mutable progress, not intended design.
 

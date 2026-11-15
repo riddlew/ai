@@ -38,7 +38,7 @@ Favor extending existing owners over unapproved services, new layers, premature 
 
 Present the affected files/owners, call flow, key signatures, unchanged boundaries, testable increments, and real tradeoffs. Invite design corrections. Review the complete plan against code and governing requirements, following the builder review in `${CLAUDE_SKILL_DIR}/../brain-review-code/references/builder-review.md` (`artifact_kind: blueprint`, `sources: component/specification and inspected paths`). If no independent reviewer exists, label it as a weaker self-review.
 
-Before approval, populate the plan's `parent_hashes` with current fingerprints for its directly governing components/specifications using `${CLAUDE_SKILL_DIR}/../scripts/validate_feature_docs.py --show-parent-hashes <plan-file>`. Reconcile any changed parent semantics before recording approval.
+Before approval, populate the plan's `parent_hashes` with current fingerprints for its directly governing components/specifications using `${CLAUDE_SKILL_DIR}/../brain-init/scripts/validate_feature_docs.py --show-parent-hashes <plan-file>`. Reconcile any changed parent semantics before recording approval.
 
 Ask explicitly for approval of the revised **binding technical design**. Without approval keep `status: draft` or `needs-revision`; do not implement. A specification approval or feature request is not blueprint approval. On approval set `status: approved`, record when/where approval occurred, and distinguish illustrative implementation suggestions from binding constraints.
 

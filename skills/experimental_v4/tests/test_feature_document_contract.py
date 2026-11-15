@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "validate_feature_docs.py"
+SCRIPT = Path(__file__).resolve().parents[1] / "brain-init" / "scripts" / "validate_feature_docs.py"
 spec = importlib.util.spec_from_file_location("feature_validator", SCRIPT)
 validator = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(validator)
