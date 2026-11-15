@@ -1,6 +1,6 @@
 # Feature document templates
 
-Use the smallest relevant template. Keep YAML metadata consistent with `${CLAUDE_SKILL_DIR}/references/feature-document-contract.md`; IDs in this file are **illustrative**, not reservations.
+Use the smallest relevant template. Keep YAML metadata consistent with `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md`; IDs in this file are **illustrative**, not reservations.
 
 ## 01 — Brief (`01-brief/brief.md`)
 
