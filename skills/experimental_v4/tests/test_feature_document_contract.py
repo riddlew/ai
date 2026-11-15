@@ -86,6 +86,36 @@ class FeatureDocumentContract(unittest.TestCase):
                    requirements=["SPEC-001#REQ-001", "SPEC-001#REQ-002"])
         self.assertEqual([], validator.validate_feature(self.feature, True))
 
+    def test_approved_child_rejects_unapproved_parent(self):
+        self.write("PLAN-001", "implementation-plan", parents=["CMP-001"],
+                   requirements=["SPEC-001#REQ-001", "SPEC-001#REQ-002"],
+                   status="needs-revision")
+        self.assertIn("approved document has unapproved parent PLAN-001",
+                      "\n".join(validator.validate_feature(self.feature)))
+
+    def test_requirement_must_be_in_parent_scope(self):
+        self.write("PLAN-001", "implementation-plan", parents=["CMP-001"],
+                   requirements=["SPEC-001#REQ-001"])
+        self.assertIn("not supported by a parent",
+                      "\n".join(validator.validate_feature(self.feature)))
+
+    def test_duplicate_spec_requirements_are_rejected(self):
+        self.write("SPEC-001", "specification", parents=["BRF-001"],
+                   body="- REQ-001: First rule\n- REQ-001: Conflicting rule")
+        self.assertIn("duplicate declared requirement ID",
+                      "\n".join(validator.validate_feature(self.feature)))
+
+    def test_partial_draft_stage_does_not_claim_total_coverage(self):
+        self.write("CMP-001", "component", parents=["SPEC-001"],
+                   requirements=["SPEC-001#REQ-001"])
+        self.write("CMP-002", "component", parents=["SPEC-001"],
+                   requirements=["SPEC-001#REQ-002"], status="draft")
+        self.assertNotIn("03-components: no approved document covers",
+                         "\n".join(validator.validate_feature(self.feature, True)))
+        errors = validator.validate_feature(self.feature, True)
+        self.assertFalse(any("03-components" in error and "no approved document covers"
+                             in error for error in errors))
+
     def test_block_yaml_list_is_supported(self):
         path = self.feature / "05-tasks" / "TASK-001.md"
         content = path.read_text().replace("parents: [PLAN-001]",

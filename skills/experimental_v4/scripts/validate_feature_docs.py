@@ -108,6 +108,12 @@ def validate_feature(feature: Path, check_coverage: bool = False) -> list[str]:
             documents[doc_id] = doc
             by_level[level].append(doc)
 
+    # Specification requirements must be unique so stable qualified IDs are reliable.
+    for spec in by_level[2]:
+        ids = DECLARED_REQUIREMENT.findall(spec["body"])
+        if len(ids) != len(set(ids)):
+            errors.append(f"{spec['path']}: duplicate declared requirement ID")
+
     for doc in documents.values():
         meta, path = doc["meta"], doc["path"]
         if doc["level"] == 1 and meta["parents"]:
@@ -121,6 +127,8 @@ def validate_feature(feature: Path, check_coverage: bool = False) -> list[str]:
                 errors.append(f"{path}: unknown parent {parent_id}")
             elif parent["level"] >= doc["level"]:
                 errors.append(f"{path}: parent {parent_id} must be from an earlier level")
+            elif meta["status"] == "approved" and parent["meta"]["status"] != "approved":
+                errors.append(f"{path}: approved document has unapproved parent {parent_id}")
         for dep_id in meta["depends_on"]:
             dep = documents.get(dep_id)
             if dep is None:
@@ -129,7 +137,20 @@ def validate_feature(feature: Path, check_coverage: bool = False) -> list[str]:
                 errors.append(f"{path}: dependency {dep_id} must be at the same level")
             elif dep_id == doc["id"]:
                 errors.append(f"{path}: self-dependency {dep_id}")
+        parent_requirements: set[str] = set()
+        for parent_id in meta["parents"]:
+            parent = documents.get(parent_id)
+            if parent is None:
+                continue
+            if parent["kind"] == "specification":
+                parent_requirements.update(
+                    f"{parent_id}#{req}" for req in DECLARED_REQUIREMENT.findall(parent["body"])
+                )
+            else:
+                parent_requirements.update(parent["meta"]["requirements"])
         for req in meta["requirements"]:
+            if doc["level"] >= 3 and meta["parents"] and req not in parent_requirements:
+                errors.append(f"{path}: requirement {req} is not supported by a parent")
             match = REQUIREMENT.fullmatch(req)
             if match is None:
                 errors.append(f"{path}: invalid qualified requirement {req!r}")
@@ -170,6 +191,8 @@ def validate_feature(feature: Path, check_coverage: bool = False) -> list[str]:
         for level in range(3, 6):
             if not by_level[level]:
                 continue  # A deliberate skipped level is not a coverage failure.
+            if any(doc["meta"]["status"] != "approved" for doc in by_level[level]):
+                continue  # Partial drafts are not claiming complete stage coverage.
             covered = {
                 req for doc in by_level[level] if doc["meta"]["status"] == "approved"
                 for req in doc["meta"]["requirements"]
