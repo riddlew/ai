@@ -28,7 +28,7 @@ DECLARED_REQUIREMENT = re.compile(r"^\s*(?:[-*]\s*)?(REQ-\d{3}):", re.MULTILINE)
 
 def _items(value: str) -> list[str]:
     value = value.strip()
-    if value == "[]":
+    if value in ("", "[]"):
         return []
     if not (value.startswith("[") and value.endswith("]")):
         raise ValueError("sequence values must use [items] or indented - items")
