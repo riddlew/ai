@@ -70,7 +70,7 @@ These scenarios supplement `tests/scenarios.md` and are intended to run through 
 
 **Fixture:** A feature tree with duplicate document IDs, missing parents, a cross-level dependency, an undefined qualified requirement, and a same-level dependency cycle.
 
-**Trigger:** Run `scripts/validate_feature_docs.py <fixture>/.brain/features --check-coverage`.
+**Trigger:** Run `${CLAUDE_SKILL_DIR}/../brain-init/scripts/validate_feature_docs.py <fixture>/.brain/features --check-coverage`.
 
 **Pass:** Nonzero exit, actionable diagnostics for each issue and no mutation. A corrected fixture exits zero. Follow up with semantic inspection; passing structural checks do not establish full requirement coverage.
 

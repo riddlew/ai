@@ -18,6 +18,10 @@ class SkillReferenceContract(unittest.TestCase):
                     self.assertTrue((skill.parent / relative).is_file(),
                                     f"{skill} references missing file {relative}")
 
+    def test_shared_validator_is_packaged_inside_brain_init(self):
+        self.assertTrue((ROOT / "brain-init" / "scripts" / "validate_feature_docs.py").is_file())
+        self.assertFalse((ROOT / "scripts" / "validate_feature_docs.py").exists())
+
     def test_no_old_ticket_writer_called(self):
         for skill in SKILLS:
             with self.subTest(skill=skill.parent.name):
