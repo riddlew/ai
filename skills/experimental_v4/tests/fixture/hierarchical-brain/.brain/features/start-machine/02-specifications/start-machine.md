@@ -5,6 +5,7 @@ status: approved
 parents: [BRF-001]
 requirements: []
 depends_on: []
+parent_hashes: [BRF-001@aafabfb7aae01896e0d03c1963d1552b81e8e1d0]
 ---
 # StartMachine specification
 
