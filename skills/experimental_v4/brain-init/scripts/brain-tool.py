@@ -200,13 +200,48 @@ def template(kind: str, doc_id: str, parents: list[str], feature: str) -> str:
     return body.rstrip() + "\n"
 
 
+def scaffold(options: dict, kind: str, brain: Path, feature: str, name: str) -> None:
+    root = Path(__file__).resolve().parent / "scaffolds"
+    title = name.replace("-", " ").title()
+    if kind == "execution":
+        target = brain / "features" / feature / "execution.md"
+    elif kind == "planning-index":
+        target = brain / "planning" / feature / "INDEX.md"
+    elif kind == "planning-ticket":
+        folder = brain / "planning" / feature
+        numbers = [int(m.group(1)) for p in folder.glob("*.md")
+                   if (m := re.match(r"^(\\d+)-.+\\.md$", p.name))]
+        target = folder / f"{max(numbers, default=0)+1:03d}-{name}.md"
+    elif kind == "diagnosis":
+        folder = brain / "diagnoses"
+        numbers = [int(m.group(1)) for p in folder.glob("*.md")
+                   if (m := re.match(r"^(\\d+)-.+\\.md$", p.name))]
+        target = folder / f"{max(numbers, default=0)+1:02d}-{name}.md"
+    elif kind == "review":
+        review_type = str(options.get("report-type", ""))
+        if review_type not in ("architecture", "code", "merge-request", "security"):
+            raise Problem("--report-type is required: architecture, code, merge-request, or security")
+        folder = brain / "reviews" / review_type
+        numbers = [int(m.group(1)) for p in folder.iterdir()
+                   if (m := re.match(r"^(\\d+)-.+(?:\\.md)?$", p.name))] if folder.is_dir() else []
+        target = folder / f"{max(numbers, default=0)+1:02d}-{name}" / "review.md"
+    else:
+        raise Problem(f"unsupported scaffold kind: {kind}")
+    if target.exists():
+        raise Problem(f"existing document; refusing overwrite: {target}")
+    filename = ("review" if kind == "review" else kind) + ".md"
+    content = (root / filename).read_text(encoding="utf-8").replace("{{TITLE}}", title)
+    changes([(target, content)], options)
+
+
 def doc(options: dict) -> None:
     brain = brain_path(options)
     feature = slug(required(options, "feature"))
     kind = required(options, "kind")
-    if kind not in KINDS:
-        raise Problem(f"unknown document kind: {kind}")
     name = slug(str(options.get("slug") or feature))
+    if kind not in KINDS:
+        scaffold(options, kind, brain, feature, name)
+        return
     area = brain / "features" / feature
     ids: set[str] = set()
     by_id: dict[str, int] = {}
@@ -295,6 +330,23 @@ def validate(options: dict) -> None:
 
 def git_state(options: dict) -> None:
     repo = path(str(options.get("repo", ".")))
+    if options.get("pending"):
+        brain = brain_path(options)
+        branch = str(options.get("branch") or git(repo, "branch", "--show-current"))
+        if not branch or not re.fullmatch(r"[A-Za-z0-9._/-]+", branch) or ".." in branch:
+            raise Problem("invalid branch for pending")
+        mapped = branch.replace("/", "--")
+        target = brain / "pending" / (mapped + ".md")
+        if target.exists():
+            current = target.read_text()
+            if not re.search(r"(?m)^Branch: " + re.escape(branch) + r"$", current):
+                raise Problem(f"pending filename collision: {target}")
+            print(f"UNCHANGED {target}")
+            return
+        date = str(options.get("at") or dt.datetime.now(dt.timezone.utc).date())
+        content = (Path(__file__).resolve().parent / "scaffolds/pending.md").read_text()
+        changes([(target, content.replace("{{BRANCH}}", branch).replace("{{DATE}}", date))], options)
+        return
     print("BRANCH " + git(repo, "branch", "--show-current"))
     print("HEAD " + git(repo, "rev-parse", "HEAD"))
     for label, args in (
