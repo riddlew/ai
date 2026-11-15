@@ -1,6 +1,6 @@
 # Hierarchical Brain redesign — implementation plan
 
-Status: **Core skills and packaged validation implemented; 31 static tests passing; agent-behavior verification pending** (branch `feature/hierarchical-brain`)
+Status: **Core skills, packaged validation, and worked example implemented; static CI passing; agent-behavior verification pending** (branch `feature/hierarchical-brain`)
 
 ## Objective
 
@@ -110,7 +110,8 @@ A document's `id` is stable within a feature, regardless of filename; requiremen
 - [x] Add H1–H11 behavior scenario definitions (not yet executed).
 - [ ] Execute RED/GREEN scenarios in fresh agents.
 - [x] Validate IDs, dependencies, cycles, parent approval, requirement lineage, coverage, and direct-parent hash mismatches; structural stale-approval detection has regression tests.
-- [x] Execute 31 static contract tests and StartMachine structural fixture in GitHub Actions (`Brain static contracts`, passing at `e6bf0c7`).
+- [x] Allow independent specifications without inferred unrelated parents; reject requirement-bearing descendants without parents and malformed non-sequence metadata.
+- [x] Execute 31+ static contract tests and StartMachine structural fixture in GitHub Actions (`Brain static contracts`, passing at `a484ff3`; newer commits have additional tests).
 - [ ] Extend static checks where necessary and run the H1–H11 fresh-agent behavior scenarios.
 - [ ] Check trivial-change bypass, worktree/branch safety, execution resume, and no unapproved architectural decisions.
 - [ ] Exercise `StartMachine` end to end: idea → brief → specs → components → plans → tasks → verified implementation.
@@ -130,4 +131,4 @@ Five document types have explicit contracts, the new `brain-decompose` exists, `
 
 ## Current verification and integration limitations
 
-The branch contains the five-stage document hierarchy, `brain-decompose`, the renamed `brain-write-tasks`, updated producers and review prompts, and separate `execution.md` ownership. GitHub Actions executes Python static contract tests and the StartMachine structural fixture. The last confirmed successful static run was at `e6bf0c7` (31 tests, plus the StartMachine fixture). The validator now lives in `brain-init/scripts/`, making it available when the individual skill directories are installed; all producer skills have instructions for preserving approved-parent fingerprints. A physical checkout was unavailable in this chat environment, so fresh-agent behavior scenarios H1–H11 have **not** been executed. They remain necessary to validate that agents actually respect approvals, worktree safety, document ownership, progressive decomposition, resume behavior, and proportionality. A passing structural fixture does **not** demonstrate that StartMachine was implemented.
+The branch contains the five-stage document hierarchy, `brain-decompose`, the renamed `brain-write-tasks`, updated producers and review prompts, and separate `execution.md` ownership. A worked StartMachine example documents illustrative ADR and failure-path mappings; no real server code has been implemented. GitHub Actions executes Python static contract tests and the StartMachine structural fixture. Static CI passed at `a484ff3` (the last completed run as this note was written). The validator now lives in `brain-init/scripts/`, making it available when the individual skill directories are installed; all producer skills have instructions for preserving approved-parent fingerprints. A physical checkout was unavailable in this chat environment, so fresh-agent behavior scenarios H1–H11 have **not** been executed. They remain necessary to validate that agents actually respect approvals, worktree safety, document ownership, progressive decomposition, resume behavior, and proportionality. A passing structural fixture does **not** demonstrate that StartMachine was implemented.
