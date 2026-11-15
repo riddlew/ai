@@ -1,6 +1,6 @@
 # Hierarchical Brain redesign — implementation plan
 
-Status: **Phases 1–5 authored in initial form; integration, validation, and documentation cleanup pending** (branch `feature/hierarchical-brain`)
+Status: **Core hierarchy and producer refactor authored; static integration checks added; runtime verification pending** (branch `feature/hierarchical-brain`)
 
 ## Objective
 
@@ -93,9 +93,10 @@ A document's `id` is stable within a feature, regardless of filename; requiremen
 **Gate:** A multi-session task run resumes from code and evidence, not checked boxes alone.
 
 ### P6 — Docs and reference cleanup
-**Status: Not started**
+**Status: Revised bundled guides; further review pending**
 
-- [ ] Update bundled `README.md`, `USAGE.md`, `CLAUDE.local.md`, and `brain-update/references/templates.md`.
+- [x] Update bundled `README.md`, `USAGE.md`, `CLAUDE.local.md`, and `brain-update/references/templates.md` to describe the new hierarchy.
+- [ ] Verify guide examples and prose are fully consistent with the new skills.
 - [ ] Update skill-local templates, review prompts, and links to changed paths.
 - [ ] Remove outdated descriptions of old spec/ticket/impl-plan storage.
 - [ ] Provide an end-to-end `StartMachine` example, including ADR links and failure cases.
@@ -103,10 +104,12 @@ A document's `id` is stable within a feature, regardless of filename; requiremen
 **Gate:** Installed guides and skill contracts agree on paths and authority.
 
 ### P7 — Skill behavior tests and regression
-**Status: Not started (test development is continuous)**
+**Status: Static tests and scenario definitions authored; tests not yet run**
 
-- [ ] Add new RED/GREEN agent scenarios for each producer and feature relationship.
-- [ ] Check missing/duplicate IDs, requirement gaps, cross-feature identifiers, stale descendant approvals, cycles, and blocked decisions.
+- [x] Add H1–H11 behavior scenario definitions (not yet executed).
+- [ ] Execute RED/GREEN scenarios in fresh agents.
+- [x] Add initial static checks for IDs, dependencies, cycles, parent approval, requirement lineage, and stage coverage; cross-feature and stale-approval behavior still needs validation.
+- [ ] Execute and extend static checks where necessary.
 - [ ] Check trivial-change bypass, worktree/branch safety, execution resume, and no unapproved architectural decisions.
 - [ ] Exercise `StartMachine` end to end: idea → brief → specs → components → plans → tasks → verified implementation.
 - [ ] Run the existing relevant `experimental_v4` static tests and fresh-agent regression scenarios.
@@ -124,4 +127,4 @@ Five document types have explicit contracts, the new `brain-decompose` exists, `
 
 ## Current verification and integration limitations
 
-The branch now contains the new `brain-decompose` skill, the renamed `brain-write-tasks` skill (with old `brain-write-tickets/SKILL.md` deleted), updated core producers, and the initial separation of plans from `execution.md`. These are authored instructions, **not yet verified in fresh-agent scenarios**. Existing usage guides, review helpers, and many tests may still refer to the removed layout and skill name; treat that cleanup as open. The Python validator and its unit tests have not yet been executed in this session because this environment cannot clone the repository or execute repository code from the GitHub integration. Do not claim regression success before running actual checks in a checkout.
+The branch now contains the new `brain-decompose` skill, the renamed `brain-write-tasks` skill (with old `brain-write-tickets/SKILL.md` deleted), updated core producers, and the initial separation of plans from `execution.md`. These are authored instructions, **not yet verified in fresh-agent scenarios**. Existing usage guides, review helpers, and many tests may still refer to the removed layout and skill name; treat that cleanup as open. The validator, unit tests, and fresh-agent behavior scenarios have not yet been executed against a runnable checkout through the GitHub integration. `tests/test_skill_reference_contract.py` now checks referenced bundled files, retired ticket writer naming, and canonical producer targets. A previously malformed `brain-update` indexing step and obsolete shared-plan documentation have been corrected. Test execution and semantic validation remain necessary. Do not claim regression success before running actual checks in a checkout.
