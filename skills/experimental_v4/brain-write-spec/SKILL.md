@@ -61,6 +61,7 @@ status: draft
 parents: [BRF-001]
 requirements: []
 depends_on: []
+parent_hashes: []
 ---
 ```
 
@@ -78,6 +79,8 @@ When there is no brief, `parents: []` is valid. Requirements declared here live 
 ## Open Decisions
 ## Exclusions
 ```
+
+Before approving, calculate and record `parent_hashes` for any governing brief with `${CLAUDE_SKILL_DIR}/../scripts/validate_feature_docs.py --show-parent-hashes <spec-file>`. A spec without parents uses `parent_hashes: []`. Do not refresh a stale fingerprint without reviewing the changed approved brief and obtaining any required reapproval.
 
 Do not mark a spec approved until its contents and binding choices have actually been approved; unsettled scope remains draft or blocked. Maintain complete example and verification coverage. Applicable ADRs and decisions are references, not fabricated parent IDs.
 

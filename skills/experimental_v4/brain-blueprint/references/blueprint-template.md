@@ -10,6 +10,7 @@ status: draft
 parents: [CMP-001]
 requirements: [SPEC-001#REQ-001]
 depends_on: []
+parent_hashes: []
 ---
 # <Component / functional area> — Implementation Plan
 
@@ -42,5 +43,7 @@ Approval: pending
 ## Open consequential decisions
 - <question and affected scope, or None>
 ```
+
+Fill `parent_hashes` with current fingerprints of approved parent components (or whichever earlier levels actually govern the plan), using the shared contract's helper. Do not approve the plan with empty parent hashes when `parents` is nonempty.
 
 After explicit user approval set `status: approved` and record `Approval: user confirmed <date/context>`. If binding details change, set `needs-revision` until reaffirmed. Plan files contain **no** `Review base`, execution checklist, worktree, verification result, or mutable task progress.
