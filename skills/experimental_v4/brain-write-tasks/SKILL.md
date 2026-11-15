@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 **Project brain:** Follow `CLAUDE.local.md` for project brain, decision authority, and source verification. Read `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md` and `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-templates.md`.
 
-This skill evolves the former `brain-write-tickets` discipline: coverage, true dependencies, user approval, and builder review, but generates **concrete implementation actions** from approved plans, not delivery tickets from specifications. Own only `.brain/features/<feature-slug>/05-tasks/`. Do not edit approved implementation plans, upstream documents, execution history, or production code. For one trivial action, direct implementation may be more proportionate.
+Preserve rigorous coverage, genuine dependency checks, user approval, and builder review while generating **concrete implementation actions** from approved plans, rather than delivery tickets from specifications. Own only `.brain/features/<feature-slug>/05-tasks/`. Do not edit approved implementation plans, upstream documents, execution history, or production code. For one trivial action, direct implementation may be more proportionate.
 
 ## 1. Gather governing evidence
 
