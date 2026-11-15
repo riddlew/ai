@@ -24,16 +24,47 @@ put() {
     printf 'CREATED %s\n' "$target"
   fi
 }
+scaffold() {
+  kind=$1;feature=$2;name=$3
+  title=$(printf '%s' "$name" | awk -F- '{for(i=1;i<=NF;i++){w=$i;printf "%s%s",i==1?"":" ",toupper(substr(w,1,1)) substr(w,2)}printf "\n"}')
+  case "$kind" in
+    execution) target=$BRAIN/features/$feature/execution.md;;
+    planning-index) target=$BRAIN/planning/$feature/INDEX.md;;
+    planning-ticket)
+      dir=$BRAIN/planning/$feature
+      n=$(find "$dir" -maxdepth 1 -name '[0-9]*-*.md' -type f 2>/dev/null | awk -F/ '{split($NF,a,"-");if(a[1]+0>m)m=a[1]+0}END{print m+1}')
+      [ -n "$n" ] || n=1
+      num=$(printf '%03d' "$n");target=$dir/$num-$name.md;;
+    diagnosis)
+      dir=$BRAIN/diagnoses
+      n=$(find "$dir" -maxdepth 1 -name '[0-9]*-*.md' -type f 2>/dev/null | awk -F/ '{split($NF,a,"-");if(a[1]+0>m)m=a[1]+0}END{print m+1}')
+      [ -n "$n" ] || n=1
+      num=$(printf '%02d' "$n");target=$dir/$num-$name.md;;
+    review)
+      case "$REPORTTYPE" in architecture|code|merge-request|security) :;; *) die 'invalid or missing --report-type';; esac
+      dir=$BRAIN/reviews/$REPORTTYPE
+      n=$(find "$dir" -maxdepth 1 -name '[0-9]*-*' 2>/dev/null | awk -F/ '{split($NF,a,"-");if(a[1]+0>m)m=a[1]+0}END{print m+1}')
+      [ -n "$n" ] || n=1
+      num=$(printf '%02d' "$n");target=$dir/$num-$name/review.md;;
+    *) die "unknown kind: $kind";;
+  esac
+  [ ! -e "$target" ] || die "existing document; refusing overwrite: $target"
+  tmp=$(mktemp);trap 'rm -f "$tmp"' 0 HUP INT TERM
+  input=$HERE/scaffolds/$kind.md
+  [ -f "$input" ] || die "missing scaffold: $input"
+  sed "s/{{TITLE}}/$title/g" "$input" > "$tmp"
+  put "$target" "$tmp"
+}
 family=help
 if [ "$#" -gt 0 ]; then family=$1;shift;fi
 case "$family" in help|--help|-h) echo 'brain-tool <init|doc|validate|git|record|context> [options]';exit 0;; esac
 case "${1:-}" in new|list|summary) shift;; esac
-BRAIN= FEATURE= KIND= NAME= REPO=. AUTHORIZED= APPLY=0 TRACKING=ignored REVISION= DATE= MAIN=main PARENTS= SINCE= AFFECTED= HASHFILE= COVERAGE=0 EVENT= DETAIL= BRANCH=
+PENDING=0 BRAIN= FEATURE= KIND= NAME= REPO=. AUTHORIZED= APPLY=0 TRACKING=ignored REVISION= DATE= MAIN=main PARENTS= SINCE= AFFECTED= HASHFILE= COVERAGE=0 EVENT= DETAIL= BRANCH= REPORTTYPE=
 while [ "$#" -gt 0 ]; do
   arg=$1;shift
   case "$arg" in
-    --apply) APPLY=1;; --check-coverage) COVERAGE=1;;
-    --brain|--feature|--kind|--slug|--repo|--authorized-root|--tracking|--revision|--at|--main-branch|--parent|--since|--affected|--show-parent-hashes|--event|--detail|--branch)
+    --apply) APPLY=1;; --check-coverage) COVERAGE=1;; --pending) PENDING=1;;
+    --brain|--feature|--kind|--slug|--repo|--authorized-root|--tracking|--revision|--at|--main-branch|--parent|--since|--affected|--show-parent-hashes|--event|--detail|--branch|--report-type)
       [ "$#" -gt 0 ] || die "missing value for $arg"
       v=$1;shift
       case "$arg" in
@@ -94,6 +125,7 @@ doc)
   need brain "$BRAIN";need feature "$FEATURE";need kind "$KIND";slug "$FEATURE"
   [ -n "$NAME" ] || NAME=$FEATURE;slug "$NAME"
   case "$KIND" in
+    execution|planning-index|planning-ticket|diagnosis|review) scaffold "$KIND" "$FEATURE" "$NAME";exit 0;;
     brief) num=01;folder=01-brief;prefix=BRF;;
     specification) num=02;folder=02-specifications;prefix=SPEC;;
     component) num=03;folder=03-components;prefix=CMP;;
@@ -142,6 +174,22 @@ doc)
   put "$target" "$tmp/doc"
   ;;
 git)
+  if [ "$PENDING" = 1 ];then
+    need brain "$BRAIN"
+    [ -n "$BRANCH" ] || BRANCH=$(git -C "$REPO" branch --show-current)
+    case "$BRANCH" in ''|*..*|*[!a-zA-Z0-9._/-]*) die 'invalid branch';; esac
+    mapped=$(printf '%s' "$BRANCH" | sed 's|/|--|g')
+    target=$BRAIN/pending/$mapped.md
+    if [ -f "$target" ];then
+      grep -Fx "Branch: $BRANCH" "$target" >/dev/null || die "pending filename collision: $target"
+      printf 'UNCHANGED %s\n' "$target";exit 0
+    fi
+    [ -n "$DATE" ] || DATE=$(date -u '+%Y-%m-%d')
+    tmp=$(mktemp);trap 'rm -f "$tmp"' 0 HUP INT TERM
+    sed -e "s/{{BRANCH}}/$BRANCH/g" -e "s/{{DATE}}/$DATE/g" "$HERE/scaffolds/pending.md" > "$tmp"
+    put "$target" "$tmp"
+    exit 0
+  fi
   printf 'BRANCH %s\n' "$(git -C "$REPO" branch --show-current)"
   printf 'HEAD %s\n' "$(git -C "$REPO" rev-parse HEAD)"
   git -C "$REPO" status --porcelain --untracked-files=all | sed 's/^/STATUS /'
