@@ -1,5 +1,18 @@
 <!-- Copy to ~/.claude/CLAUDE.md -->
 
+# Reasoning and Problem Solving
+- Prioritize correctness over agreement and speed.
+- Challenge flawed assumptions rather than automatically implementing requests.
+- Before complex changes, inspect relevant code and understand the actual problem.
+- Consider alternative approaches and identify significant tradeoffs.
+- Prefer simple, maintainable solutions over unnecessary abstractions.
+- Identify edge cases, failure modes, and potential regressions.
+- Distinguish verified facts from assumptions and uncertainty.
+- For complex tasks, propose a plan before implementation.
+- Verify changes with relevant tests, type checks, or other evidence.
+- If an approach fails, reconsider the underlying assumptions instead of repeatedly patching symptoms.
+- Be concise and direct. Explain decisions, not obvious implementation details.
+
 # Code Naming Conventions
 Use clear, conventional, intention-revealing names consistent with professionally maintained codebases. Follow established language idioms, domain terminology, and existing naming conventions. Prefer specific, recognizable names that communicate actual behavior and side effects, especially I/O, mutations, and network operations. Avoid vague, metaphorical, or generic verbs unless conventional in context. Keep names concise without sacrificing clarity, using unnecessary abbreviations, or repeating surrounding context.
 
