@@ -18,6 +18,23 @@ class SkillReferenceContract(unittest.TestCase):
                     self.assertTrue((skill.parent / relative).is_file(),
                                     f"{skill} references missing file {relative}")
 
+    def test_worked_example_is_packaged_with_brain_init(self):
+        example = ROOT / "brain-init" / "references" / "start-machine-example.md"
+        self.assertTrue(example.is_file())
+        body = example.read_text(encoding="utf-8")
+        for required in (
+            "SPEC-001#REQ-001",
+            "SPEC-001#REQ-002",
+            "SPEC-001#REQ-003",
+            "TASK-001",
+            "TASK-002",
+            ".brain/adrs/",
+            "execution.md",
+            "not a verified software implementation",
+        ):
+            with self.subTest(required=required):
+                self.assertIn(required, body)
+
     def test_shared_validator_is_packaged_inside_brain_init(self):
         self.assertTrue((ROOT / "brain-init" / "scripts" / "validate_feature_docs.py").is_file())
         self.assertFalse((ROOT / "scripts" / "validate_feature_docs.py").exists())

@@ -6,7 +6,7 @@ The skills are **tools to use when needed**, not a mandatory pipeline. Small cha
 
 ## Hierarchical feature documentation (current architecture)
 
-For new feature work the canonical document structure is `.brain/features/<feature-slug>/01-brief/`, `02-specifications/`, `03-components/`, `04-implementation-plans/`, and `05-tasks/`, with mutable execution state in `execution.md`. The hierarchy is optional when work is trivial or already fully settled; never create placeholder documents. `brain-decompose` maps behavior to functional components. `brain-write-tasks` replaces the former ticket-writing skill and produces executable actions from approved implementation plans. There is no legacy feature-document layout support. The normative contracts and templates ship in `brain-init/references/feature-document-contract.md` and `feature-document-templates.md`.
+For new feature work the canonical document structure is `.brain/features/<feature-slug>/01-brief/`, `02-specifications/`, `03-components/`, `04-implementation-plans/`, and `05-tasks/`, with mutable execution state in `execution.md`. The hierarchy is optional when work is trivial or already fully settled; never create placeholder documents. `brain-decompose` maps behavior to functional components. `brain-write-tasks` replaces the former ticket-writing skill and produces executable actions from approved implementation plans. There is no legacy feature-document layout support. The normative contract, templates, and worked example ship at `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md`, `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-templates.md`, and `${CLAUDE_SKILL_DIR}/../brain-init/references/start-machine-example.md`.
 
 ## Install
 
@@ -265,5 +265,5 @@ Every specification, task set, technical blueprint, and newly constructed execut
 | `brain-blueprint` | Investigate code → propose/revise design → self-check → fresh reviewer → **your explicit blueprint approval**; no production edits |
 | `brain-implement` | Create/update `execution.md` without overwriting approved plans → self-check (Review Focus) → fresh reviewer → first change → **increment review with you (collaborative/guided)**; per-task reviews if subagent-driven; proportional final review |
 
-Questions only you can answer come in one message, and anything left unanswered becomes an Open Decision, a blocked ticket, or a Blocker. A draft/needs-revision blueprint is not authorization to write production code. The execution record's Review Focus lists failure cases no Example covers, and the final review checks each one. The shared reviewer prompt is `${CLAUDE_SKILL_DIR}/../brain-review-code/references/builder-review.md`.
+Questions only you can answer come in one message, and anything left unanswered becomes an Open Decision, a blocked component/task, or an execution Blocker. A draft/needs-revision blueprint is not authorization to write production code. The execution record's Review Focus lists failure cases no Example covers, and the final review checks each one. The shared reviewer prompt is `${CLAUDE_SKILL_DIR}/../brain-review-code/references/builder-review.md`.
 

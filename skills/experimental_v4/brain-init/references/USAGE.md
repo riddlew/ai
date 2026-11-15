@@ -46,6 +46,8 @@ If both are true, use both. **`brain-plan` is not a substitute for `brain-bluepr
 
 ---
 
+For a complete traceability example including ADR references, negative-path requirements, component ownership, technical plans, and executable task mappings, read `${CLAUDE_SKILL_DIR}/../brain-init/references/start-machine-example.md`. This is a planning example, not an implemented TCP feature.
+
 ## Hierarchical feature workflow
 
 For nontrivial features, use `.brain/features/<slug>/01-brief/` → `02-specifications/` → `03-components/` → `04-implementation-plans/` → `05-tasks/`. `brain-brainstorm` establishes intent, `brain-write-spec` records behavior, `brain-decompose` defines coherent functional responsibilities, `brain-blueprint` specifies code-level implementation, and `brain-write-tasks` produces executable tasks. `brain-implement` writes verification and progress separately to `execution.md`. Read the authoritative schema at `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md` in the installed skills. Skip unhelpful intermediate stages for simple work.

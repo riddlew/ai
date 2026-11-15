@@ -97,10 +97,10 @@ A document's `id` is stable within a feature, regardless of filename; requiremen
 **Status: Revised bundled guides; further review pending**
 
 - [x] Update bundled `README.md`, `USAGE.md`, `CLAUDE.local.md`, and `brain-update/references/templates.md` to describe the new hierarchy.
-- [ ] Verify guide examples and prose are fully consistent with the new skills.
+- [x] Update principal guides and example links to agree with the new skills; fresh-agent behavior verification remains pending.
 - [x] Update skill-local templates, builder-review prompts, subagent handoffs, and explicit bundled-file paths.
 - [x] Remove obsolete shared-plan storage descriptions in primary guides and key skill references.
-- [ ] Provide an end-to-end `StartMachine` example, including ADR links and failure cases.
+- [x] Provide an illustrative end-to-end `StartMachine` worked example with ADR links, failure cases, and requirement-to-task traceability (`brain-init/references/start-machine-example.md`). It does not claim implemented TCP behavior.
 
 **Gate:** Installed guides and skill contracts agree on paths and authority.
 
