@@ -29,7 +29,7 @@ These guides are examples and operational documentation, **not** binding project
 
 ## Feature document hierarchy
 
-New feature work lives under `.brain/features/<feature-slug>/` using five levels: `01-brief/`, `02-specifications/`, `03-components/`, `04-implementation-plans/`, and `05-tasks/`. The feature's mutable implementation history is recorded separately in `execution.md`. Follow `brain-init/references/feature-document-contract.md` for metadata, traceability, and readiness rules, and `feature-document-templates.md` for document shape. No legacy feature-document paths are supported by this revision.
+New feature work lives under `.brain/features/<feature-slug>/` using five levels: `01-brief/`, `02-specifications/`, `03-components/`, `04-implementation-plans/`, and `05-tasks/`. The feature's mutable implementation history is recorded separately in `execution.md`. When reading the policy from `brain-init`, use `${CLAUDE_SKILL_DIR}/references/feature-document-contract.md` for metadata, traceability and readiness rules and `${CLAUDE_SKILL_DIR}/references/feature-document-templates.md` for document shapes. No legacy feature-document paths are supported by this revision.
 
 **Ownership:** `brain-brainstorm` writes briefs, `brain-write-spec` specifications, `brain-decompose` functional components, `brain-blueprint` approved implementation designs, `brain-write-tasks` executable tasks, and `brain-implement` execution state. `brain-update` maintains shared root knowledge, ADRs, source maps, and the index; it does not rewrite producer-owned feature documents. `brain-plan` continues owning independent multi-session decision/investigation tickets in `planning/`.
 

@@ -7,4 +7,4 @@ Changes from upstream:
 - `frame-template.html`: the page title.
 - `start-server.sh`: without `--project-dir`, the session folder comes from `mktemp -d`, not a predictable `/tmp/brainstorm-<pid>-<time>` name.
 
-The server needs Node.js and has no npm dependencies. `../references/visual-companion.md` describes how the skill uses the scripts. It is adapted from upstream's `visual-companion.md`, under the same license.
+The server needs Node.js and has no npm dependencies. `${CLAUDE_SKILL_DIR}/references/visual-companion.md` describes how the skill uses the scripts. It is adapted from upstream's `visual-companion.md`, under the same license.

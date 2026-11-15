@@ -48,7 +48,7 @@ If both are true, use both. **`brain-plan` is not a substitute for `brain-bluepr
 
 ## Hierarchical feature documentation (current architecture)
 
-For new feature work the canonical document structure is `.brain/features/<feature-slug>/01-brief/`, `02-specifications/`, `03-components/`, `04-implementation-plans/`, and `05-tasks/`, with mutable execution state in `execution.md`. The hierarchy is optional when work is trivial or already fully settled; never create placeholder documents. `brain-decompose` maps behavior to functional components. `brain-write-tasks` replaces `brain-write-tasks` and produces executable actions from approved implementation plans. There is no legacy feature-document layout support. The normative contracts and templates ship in `brain-init/references/feature-document-contract.md` and `feature-document-templates.md`.
+For new feature work the canonical document structure is `.brain/features/<feature-slug>/01-brief/`, `02-specifications/`, `03-components/`, `04-implementation-plans/`, and `05-tasks/`, with mutable execution state in `execution.md`. The hierarchy is optional when work is trivial or already fully settled; never create placeholder documents. `brain-decompose` maps behavior to functional components. `brain-write-tasks` replaces the former ticket-writing skill and produces executable actions from approved implementation plans. There is no legacy feature-document layout support. The normative contracts and templates ship in `brain-init/references/feature-document-contract.md` and `feature-document-templates.md`.
 
 ## Understand changes after implementation
 
