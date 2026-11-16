@@ -84,7 +84,20 @@ function blob(s){let v=Buffer.from(s);return crypto.createHash('sha1').update(Bu
 function validate(o){let all=scan(brain(o)),errors=[];for(let feature of new Set(all.map(x=>x.feature))){let arr=all.filter(x=>x.feature===feature),ids=new Map(),reqs=new Map();
  for(let d of arr){let m=d.meta,info=kinds[d.kind];if(ids.has(m.id))errors.push(d.file+': duplicate id '+m.id);ids.set(m.id,d);if(m.kind!==info[3])errors.push(d.file+': incorrect kind');if(!new RegExp('^'+info[2]+'-\\d{3}$').test(m.id||''))errors.push(d.file+': invalid id');if(!['draft','approved','needs-revision'].includes(m.status))errors.push(d.file+': invalid status');for(let k of ['parents','requirements','depends_on','parent_hashes'])if(!Array.isArray(m[k]))errors.push(d.file+': missing list '+k)}
  for(let d of arr.filter(x=>x.kind==='specification')){let r=[...d.body.matchAll(/^\s*-\s*(REQ-\d{3}):/gm)].map(x=>x[1]);if(new Set(r).size!==r.length)errors.push(d.file+': duplicate declared requirement ID');reqs.set(d.meta.id,new Set(r))}
- for(let d of arr){let m=d.meta;for(let id of m.parents||[]){let p=ids.get(id);if(!p)errors.push(d.file+': unknown parent '+id);else{if(p.level>=d.level)errors.push(d.file+': parent not earlier '+id);if(m.status==='approved'&&p.meta.status!=='approved')errors.push(d.file+': unapproved parent '+id);if(m.status==='approved'&&!(m.parent_hashes||[]).includes(id+'@'+blob(read(p.file))))errors.push(d.file+': stale/missing parent hash '+id)}}for(let id of m.depends_on||[]){let p=ids.get(id);if(!p||p.level!==d.level||id===m.id)errors.push(d.file+': invalid dependency '+id);else if(m.status==='approved'&&p.meta.status!=='approved')errors.push(d.file+': unapproved dependency '+id)}for(let r of m.requirements||[]){let x=r.match(/^(SPEC-\d{3})#(REQ-\d{3})$/);if(!x||!reqs.get(x[1])?.has(x[2]))errors.push(d.file+': unknown requirement '+r)}}
+ for(let d of arr){let m=d.meta;
+ for(let key of ['parents','requirements','depends_on','parent_hashes']){
+   let values=m[key]||[];
+   if(new Set(values).size!==values.length)errors.push(d.file+': duplicate '+key);
+ }
+ let hashed=new Set();
+ for(let value of m.parent_hashes||[]){
+   let match=/^((?:BRF|SPEC|CMP|PLAN|TASK)-\d{3})@([0-9a-f]{40})$/.exec(value);
+   if(!match){errors.push(d.file+': malformed parent hash '+value);continue}
+   if(hashed.has(match[1]))errors.push(d.file+': duplicate parent hash '+match[1]);
+   hashed.add(match[1]);
+   if(!(m.parents||[]).includes(match[1]))errors.push(d.file+': parent hash for non-parent '+match[1]);
+ }
+ for(let id of m.parents||[]){let p=ids.get(id);if(!p)errors.push(d.file+': unknown parent '+id);else{if(p.level>=d.level)errors.push(d.file+': parent not earlier '+id);if(m.status==='approved'&&p.meta.status!=='approved')errors.push(d.file+': unapproved parent '+id);if(m.status==='approved'&&!(m.parent_hashes||[]).includes(id+'@'+blob(read(p.file))))errors.push(d.file+': stale/missing parent hash '+id)}}for(let id of m.depends_on||[]){let p=ids.get(id);if(!p||p.level!==d.level||id===m.id)errors.push(d.file+': invalid dependency '+id);else if(m.status==='approved'&&p.meta.status!=='approved')errors.push(d.file+': unapproved dependency '+id)}for(let r of m.requirements||[]){let x=r.match(/^(SPEC-\d{3})#(REQ-\d{3})$/);if(!x||!reqs.get(x[1])?.has(x[2]))errors.push(d.file+': unknown requirement '+r)}}
  let active=new Set(),done=new Set();function visit(id){if(active.has(id)){errors.push('dependency cycle: '+id);return}if(done.has(id))return;active.add(id);for(let dep of ids.get(id)?.meta.depends_on||[])if(ids.has(dep))visit(dep);active.delete(id);done.add(id)}for(let id of ids.keys())visit(id);
  if(o['check-coverage'])for(let spec of arr.filter(x=>x.kind==='specification'&&x.meta.status==='approved'))for(let level of [3,4,5]){let participants=arr.filter(x=>x.level===level&&((x.meta.parents||[]).includes(spec.meta.id)||(x.meta.requirements||[]).some(r=>r.startsWith(spec.meta.id+'#'))));if(!participants.length||participants.some(x=>x.meta.status!=='approved'))continue;let covered=new Set(participants.flatMap(x=>x.meta.requirements||[]));for(let req of reqs.get(spec.meta.id)||[])if(!covered.has(spec.meta.id+'#'+req))errors.push('no approved document covers '+spec.meta.id+'#'+req)}
  }
