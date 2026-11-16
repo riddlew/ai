@@ -11,7 +11,7 @@ Keep the **single shared Brain** accurate and attributable to the proper main br
 
 ## 1. Resolve and protect the Brain
 
-Locate a valid `00_index.md` Brain from user path, saved `Project brain:`, current worktree, then linked main checkout. If missing, stop and request `/brain-init`. Use the index's `Main branch:`, checking Git if missing. **Write access.** Follow `CLAUDE.local.md` §Worktrees and brain writes. If a write is denied or outside the session's authorized boundaries, report it and **never route around the restriction**.
+Locate a valid `00_index.md` Brain from user path, saved `Project brain:`, current worktree, then linked main checkout. If missing, stop and request `/brain-init`. Use the index's `Main branch:`, checking Git if missing. **Write access.** Follow `CLAUDE.local.md` §Worktrees and brain writes. If a required write is denied or outside the session's authorized boundaries, report it and **never route around the restriction**.
 
 ## 2. Keep branches isolated
 
