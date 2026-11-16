@@ -186,7 +186,7 @@ git)
     fi
     [ -n "$DATE" ] || DATE=$(date -u '+%Y-%m-%d')
     tmp=$(mktemp);trap 'rm -f "$tmp"' 0 HUP INT TERM
-    sed -e "s/{{BRANCH}}/$BRANCH/g" -e "s/{{DATE}}/$DATE/g" "$HERE/scaffolds/pending.md" > "$tmp"
+    sed -e "s|{{BRANCH}}|$BRANCH|g" -e "s|{{DATE}}|$DATE|g" "$HERE/scaffolds/pending.md" > "$tmp"
     put "$target" "$tmp"
     exit 0
   fi
