@@ -1,0 +1,28 @@
+#!/bin/sh
+# Select Python > Node > POSIX shell; do not retry failed planning in another runtime.
+set -eu
+ROOT=$(CDPATH= cd -- "$(dirname "$0")" && pwd -P)
+has_python() {
+  command -v python3 >/dev/null 2>&1 &&
+    python3 -c 'import sys; sys.exit(sys.version_info < (3, 10))' >/dev/null 2>&1
+}
+has_node() {
+  command -v node >/dev/null 2>&1 &&
+    node -e 'process.exit(Number(process.versions.node.split(".")[0]) < 18 ? 1 : 0)' >/dev/null 2>&1
+}
+case "${BRAIN_RUNTIME:-auto}" in
+  auto)
+    if has_python;then runtime=python
+    elif has_node;then runtime=node
+    else runtime=sh
+    fi;;
+  python|node|sh) runtime=$BRAIN_RUNTIME;;
+  *) echo 'ERROR unsupported BRAIN_RUNTIME' >&2; exit 1;;
+esac
+case "$runtime" in
+  python) has_python || { echo 'ERROR Python 3.10+ unavailable' >&2;exit 1; }
+    exec python3 "$ROOT/brain-context.py" "$@";;
+  node) has_node || { echo 'ERROR Node.js 18+ unavailable' >&2;exit 1; }
+    exec node "$ROOT/brain-context.mjs" "$@";;
+  sh) exec sh "$ROOT/brain-context.sh" "$@";;
+esac
