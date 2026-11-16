@@ -1,6 +1,6 @@
 # Deterministic automation plan for experimental_v4
 
-Status: **proposed; no implementation started**
+Status: **Core command families implemented on the feature branch; static and cross-runtime verification ongoing. The guarded policy change for context loading remains deferred.**
 Base: main at c8713000ac3437ab295ca58053b82334d74c3a20
 Work branch: feature/deterministic-brain-tooling
 
@@ -19,16 +19,13 @@ A tiny POSIX-shell launcher, brain-tool, selects the runtime once, in this order
 2. Otherwise use python3 when a supported interpreter is available, else node when a supported interpreter is available, else /bin/sh.
 3. Once selected, a failed command must fail visibly; **never retry a mutating operation using another runtime**. Runtime selection is not authorization to cross filesystem boundaries.
 
-Proposed source layout (each logical command family has all three implementations):
+Implementation layout (all six families exist in **each** language-specific entry point; consolidating them avoids 18 tiny wrappers):
 
-| Command family | Python | Node.js | POSIX shell | Initial phase |
-|---|---|---|---|---|
-| brain-tool init | scripts/init.py | scripts/init.mjs | scripts/init.sh | 1 |
-| brain-tool doc | scripts/doc.py | scripts/doc.mjs | scripts/doc.sh | 2 |
-| brain-tool validate | scripts/validate.py | scripts/validate.mjs | scripts/validate.sh | 3 |
-| brain-tool git | scripts/git_state.py | scripts/git_state.mjs | scripts/git_state.sh | 4 |
-| brain-tool record | scripts/record.py | scripts/record.mjs | scripts/record.sh | 4 |
-| brain-tool context | scripts/context.py | scripts/context.mjs | scripts/context.sh | 5 |
+| Families | Python | Node.js | POSIX shell |
+|---|---|---|---|
+| init, doc, validate, git, record, context | `scripts/brain-tool.py` | `scripts/brain-tool.mjs` | `scripts/brain-tool.sh` |
+
+The shell validator uses bundled `brain-tool-scan.awk` and `brain-tool-validate.awk`. The shared scaffolds live in `scripts/scaffolds/`. The selector is `scripts/brain-tool`. This consolidation changes file organization, **not** the requirement for independent behavior in all three runtimes.
 
 The launcher is only a shell runtime selector, not a fourth implementation of domain logic. Prefer a small common command contract over many one-off scripts. Reuse existing Python validation logic in brain-init/scripts/validate_feature_docs.py; retain that entry point for compatibility or make it a thin Python wrapper once equivalent implementations exist. Source and templates remain bundled with the skills and resolved relative to the installed skill directory, never the caller's current working directory.
 
@@ -160,10 +157,27 @@ Each work package includes source for **all three runtimes**, fixtures/tests for
 
 ## Definition of done
 
-- All six proposed command families have .py, .mjs, and .sh implementations, with the agreed command/exit/output contract and no third-party language dependencies.
+- All six command families are implemented in the Python, Node and POSIX shell entry points, with shared language-neutral templates and no third-party language dependencies.
 - Python preferred; Node fallback and shell fallback work without installing any packages; Git-only commands clearly require Git.
 - Existing experimental_v4 skills invoke commands for mechanical work and stop rebuilding metadata/structure by hand, without shifting approval or document ownership.
 - All old static/structural fixtures pass and new per-runtime parity, idempotence, permission, collision, and branch-safety tests pass in CI.
 - No regression in optional document levels, tracked/ignored Brain behavior, shared-brain worktrees, stale approved-parent detection, pending-branch isolation, or resumable execution.
 - Context savings and quality are measured; the full-root-read policy changes only in a separately approved decision.
 - All changes remain on feature/deterministic-brain-tooling until reviewed and explicitly merged.
+
+
+## Implemented scope and deliberate boundaries
+
+The first implementation covers the repeatable, checkable operations across all five phases:
+
+| Phase | Implemented | Retained for AI/user approval |
+|---|---|---|
+| 1 | Initialize index, install bundled guides and missing policy, preserve differing files, manage Git exclusions | Project-fact discovery, policy reconciliation for customized files, external Brain setup spanning separately authorized roots |
+| 2 | Feature drafts with IDs/frontmatter, planning indexes/tickets, execution records, numbered diagnosis and review scaffolds | Content, scope, decisions, approval, revision of existing normative documents |
+| 3 | Bounded YAML frontmatter, graph and reference checks, parent fingerprints, coverage, transitive affected-document reporting | Semantic completeness, approval status changes, fixing stale downstream documents |
+| 4 | Git manifest, branch pending skeleton, unique factual execution checkpoints | Interpretation of branch changes, substantive pending entries, indexing human summaries, post-merge semantic reconciliation |
+| 5 | Compact inventory, focused file reads, content fingerprints, estimated bytes/token volume | Mandatory full-root-read policy and quality-gated selective retrieval |
+
+**Not automated by the current CLI:** section-aware merging of customized `CLAUDE.local.md`; applying or semantically reconciling existing index/pending entries; selecting what source facts are authoritative; measured agent token savings; selective-root-loading policy changes. These require user decisions, project-specific reasoning, or additional validation and are **not** silently treated as completed.
+
+Verification uses Python unittest, standard Node built-ins, and POSIX shell/awk with no pip or npm dependencies. The pre-existing Python validator remains the compatibility implementation. New cross-runtime tests check identical file results, script fallbacks, authorized-root protections, symlink denial, block YAML, stale hashes, bad references, collisions, and estimates; GitHub Actions runs these plus the existing static contracts and fixture validator. No paid AI agent batch is needed for deterministic contracts.
