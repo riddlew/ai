@@ -1,6 +1,6 @@
 # Deterministic automation plan for experimental_v4
 
-Status: **Core command families implemented on the feature branch; static and cross-runtime verification ongoing. The guarded policy change for context loading remains deferred.**
+Status: **Core command families implemented and verified in 77 static/cross-runtime tests on Linux and macOS; ready for PR review. Selective-loading policy changes remain deferred.**
 Base: main at c8713000ac3437ab295ca58053b82334d74c3a20
 Work branch: feature/deterministic-brain-tooling
 
@@ -180,4 +180,4 @@ The first implementation covers the repeatable, checkable operations across all 
 
 **Not automated by the current CLI:** section-aware merging of customized `CLAUDE.local.md`; applying or semantically reconciling existing index/pending entries; selecting what source facts are authoritative; measured agent token savings; selective-root-loading policy changes. These require user decisions, project-specific reasoning, or additional validation and are **not** silently treated as completed.
 
-Verification uses Python unittest, standard Node built-ins, and POSIX shell/awk with no pip or npm dependencies. The pre-existing Python validator remains the compatibility implementation. New cross-runtime tests check identical file results, script fallbacks, authorized-root protections, symlink denial, block YAML, stale hashes, bad references, collisions, and estimates; GitHub Actions runs these plus the existing static contracts and fixture validator. No paid AI agent batch is needed for deterministic contracts.
+Verification uses Python unittest, standard Node built-ins, and POSIX shell/awk with no pip or npm dependencies. The CI matrix runs on Ubuntu and macOS, exercising macOS path aliases and BSD awk compatibility. The pre-existing Python validator remains the compatibility implementation. New cross-runtime tests check identical file results, script fallbacks, authorized-root protections, symlink denial, block YAML, stale hashes, bad references, collisions, and estimates; GitHub Actions runs these plus the existing static contracts and fixture validator. No paid AI agent batch is needed for deterministic contracts.
