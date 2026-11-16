@@ -67,16 +67,30 @@ scaffold() {
   sed "s/{{TITLE}}/$title/g" "$input" > "$tmp"
   put "$target" "$tmp"
 }
+emit_context_doc() {
+  f=$1
+  rel=$2
+  bytes=$(wc -c < "$f" | tr -d ' ')
+  status=$(sed -n 's/^status: //p' "$f" | head -1)
+  [ -n "$status" ] || status=-
+  if [ "$HASHES" = 1 ]; then
+    digest=$(git hash-object "$f") || die 'Git required for context fingerprints'
+    printf 'DOC %s\t%s\t%s\t%s\n' "$rel" "$bytes" "$status" "$digest"
+  else
+    printf 'DOC %s\t%s\t%s\n' "$rel" "$bytes" "$status"
+  fi
+  if [ "$ESTIMATE" = 1 ]; then printf '%s\n' "$bytes" >> "$SUMFILE";fi
+}
 family=help
 if [ "$#" -gt 0 ]; then family=$1;shift;fi
 case "$family" in help|--help|-h) echo 'brain-tool <init|doc|validate|git|record|context> [options]';exit 0;; esac
 case "${1:-}" in new|list|summary) shift;; esac
-PENDING=0 BRAIN= FEATURE= KIND= NAME= REPO=. AUTHORIZED= APPLY=0 TRACKING=ignored REVISION= DATE= MAIN=main PARENTS= SINCE= AFFECTED= HASHFILE= COVERAGE=0 EVENT= DETAIL= BRANCH= REPORTTYPE=
+PENDING=0 HASHES=0 ESTIMATE=0 SELECT= BRAIN= FEATURE= KIND= NAME= REPO=. AUTHORIZED= APPLY=0 TRACKING=ignored REVISION= DATE= MAIN=main PARENTS= SINCE= AFFECTED= HASHFILE= COVERAGE=0 EVENT= DETAIL= BRANCH= REPORTTYPE=
 while [ "$#" -gt 0 ]; do
   arg=$1;shift
   case "$arg" in
-    --apply) APPLY=1;; --check-coverage) COVERAGE=1;; --pending) PENDING=1;;
-    --brain|--feature|--kind|--slug|--repo|--authorized-root|--tracking|--revision|--at|--main-branch|--parent|--since|--affected|--show-parent-hashes|--event|--detail|--branch|--report-type)
+    --apply) APPLY=1;; --check-coverage) COVERAGE=1;; --pending) PENDING=1;; --estimate) ESTIMATE=1;; --hashes) HASHES=1;;
+    --brain|--feature|--kind|--slug|--repo|--authorized-root|--tracking|--revision|--at|--main-branch|--parent|--since|--affected|--show-parent-hashes|--event|--detail|--branch|--report-type|--select)
       [ "$#" -gt 0 ] || die "missing value for $arg"
       v=$1;shift
       case "$arg" in
@@ -84,7 +98,7 @@ while [ "$#" -gt 0 ]; do
         --repo) REPO=$v;; --authorized-root) AUTHORIZED=$v;; --tracking) TRACKING=$v;;
         --revision) REVISION=$v;; --at) DATE=$v;; --main-branch) MAIN=$v;;
         --parent) PARENTS="$PARENTS $v";; --since) SINCE=$v;; --affected) AFFECTED=$v;;
-        --show-parent-hashes) HASHFILE=$v;; --event) EVENT=$v;; --detail) DETAIL=$v;; --branch) BRANCH=$v;; --report-type) REPORTTYPE=$v;;
+        --show-parent-hashes) HASHFILE=$v;; --event) EVENT=$v;; --detail) DETAIL=$v;; --branch) BRANCH=$v;; --report-type) REPORTTYPE=$v;; --select) SELECT=$v;;
       esac;;
     *) die "unknown argument: $arg";;
   esac
@@ -225,28 +239,39 @@ record)
   ;;
 context)
   need brain "$BRAIN";[ -f "$BRAIN/00_index.md" ] || die "not a Brain: $BRAIN"
+  if [ -n "$SELECT" ]; then
+    case "$SELECT" in /*|..|../*|*/../*|*/..) die 'invalid context selection';; esac
+    target=$BRAIN/$SELECT
+    [ -f "$target" ] || die "context document missing: $SELECT"
+    root_real=$(CDPATH= cd -- "$BRAIN" && pwd -P) || die 'Brain inaccessible'
+    parent_real=$(CDPATH= cd -- "$(dirname "$target")" && pwd -P) || die 'document parent inaccessible'
+    case "$parent_real" in "$root_real"|"$root_real"/*) :;; *) die 'context selection escapes Brain';; esac
+    cat "$target";exit 0
+  fi
+  SUMFILE=$(mktemp);trap 'rm -f "$SUMFILE"' 0 HUP INT TERM
+  : > "$SUMFILE"
   for p in "$BRAIN"/*.md;do
     [ -f "$p" ] || continue
     case "$p" in */README.md|*/USAGE.md)continue;;esac
-    name=$(basename "$p");size=$(wc -c < "$p" | tr -d ' ')
-    status=$(sed -n 's/^status: //p' "$p" | head -1);[ -n "$status" ] || status=-
-    printf 'DOC %s\t%s\t%s\n' "$name" "$size" "$status"
+    emit_context_doc "$p" "$(basename "$p")"
   done
   if [ -n "$BRANCH" ]; then
-    safe=$(printf '%s' "$BRANCH" | sed 's|/|--|g');slug "$safe"
+    safe=$(printf '%s' "$BRANCH" | sed 's|/|--|g')
+    case "$safe" in ''|*..*|*[!a-zA-Z0-9._-]*) die 'invalid branch';; esac
     f=$BRAIN/pending/$safe.md
-    [ ! -f "$f" ] || printf 'DOC pending/%s.md\t%s\t-\n' "$safe" "$(wc -c < "$f" | tr -d ' ')"
+    [ ! -f "$f" ] || emit_context_doc "$f" "pending/$safe.md"
   fi
   if [ -n "$FEATURE" ]; then
     slug "$FEATURE";dir=$BRAIN/features/$FEATURE
     if [ -d "$dir" ]; then
       find "$dir" -type f -name '*.md' | LC_ALL=C sort | while IFS= read -r p;do
         n=$(printf '%s' "$p" | sed "s|^$BRAIN/||")
-        bytes=$(wc -c < "$p" | tr -d ' ')
-        status=$(sed -n 's/^status: //p' "$p" | head -1);[ -n "$status" ] || status=-
-        printf 'DOC %s\t%s\t%s\n' "$n" "$bytes" "$status"
+        emit_context_doc "$p" "$n"
       done
     fi
+  fi
+  if [ "$ESTIMATE" = 1 ]; then
+    awk '{total+=$1} END {printf "ESTIMATE bytes=%d tokens~=%d (approximate)\n",total,int((total+3)/4)}' "$SUMFILE"
   fi
   ;;
 validate)
