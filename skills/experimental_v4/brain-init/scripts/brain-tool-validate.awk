@@ -24,15 +24,18 @@ function entries(s,a, count) {
   return count
 }
 function add_error(s) {print "INVALID "s;bad=1}
-function check_duplicates(value, file, label, a, count, k, seen_values) {
-  delete seen_values
+function check_duplicates(value, file, label, a, count, k, scope, item) {
+  scope=++duplicate_epoch
   count=entries(value,a)
-  for(k=1;k<=count;k++)if(seen_values[a[k]]++)add_error(file ": duplicate " label ": " a[k])
+  for(k=1;k<=count;k++){
+    item=scope SUBSEP a[k]
+    if(duplicate_seen[item]++)add_error(file ": duplicate " label ": " a[k])
+  }
 }
 function reach(k, target, j,n,a,z,p,seen) {
   if(k==target)return 1
-  if(trail[k])return 0
-  trail[k]=1
+  if(trail[k]==visit_epoch)return 0
+  trail[k]=visit_epoch
   j=lookup[k]
   if(!j)return 0
   n=entries(parents[j],a)
@@ -58,11 +61,10 @@ END {
     check_duplicates(hashes[i],filename[i],"parent_hashes")
     m=entries(hashes[i],h)
     for(z=1;z<=m;z++){
-      split(h[z],pair,"@")
-      if(length(pair)!=2||pair[1]!~/^(BRF|SPEC|CMP|PLAN|TASK)-[0-9][0-9][0-9]$/||pair[2]!~/^[0-9a-f]{40}$/) {
-        # POSIX awk lacks portable counted regexp intervals: validate length explicitly.
-        if(length(pair[2])!=40||pair[2]!~/^[0-9a-f]+$/||length(pair)!=2||pair[1]!~/^(BRF|SPEC|CMP|PLAN|TASK)-[0-9][0-9][0-9]$/)add_error(filename[i]": malformed parent hash "h[z])
-      }
+      hash_parts=split(h[z],pair,"@")
+      if(hash_parts!=2||pair[1]!~/^(BRF|SPEC|CMP|PLAN|TASK)-[0-9][0-9][0-9]$/||
+         length(pair[2])!=40||pair[2]!~/^[0-9a-f]+$/)
+        add_error(filename[i]": malformed parent hash "h[z])
       allowed=0;n=entries(parents[i],ids)
       for(q=1;q<=n;q++)if(ids[q]==pair[1])allowed=1
       if(!allowed)add_error(filename[i]": parent hash for non-parent "pair[1])
@@ -88,8 +90,8 @@ END {
     }
     n=entries(requirements[i],a)
     for(j=1;j<=n;j++){
-      ref=a[j];split(ref,r,"#")
-      if(length(r)!=2||!((feature[i] SUBSEP r[1] SUBSEP r[2]) in declared))add_error(filename[i]": unknown requirement "ref)
+      ref=a[j];ref_parts=split(ref,r,"#")
+      if(ref_parts!=2||!((feature[i] SUBSEP r[1] SUBSEP r[2]) in declared))add_error(filename[i]": unknown requirement "ref)
       else if(level[i]>=3&&parents[i]!=""){
         supported=0;m=entries(parents[i],pids)
         for(z=1;z<=m;z++){
@@ -127,7 +129,7 @@ END {
     for(i=1;i<=count;i++)if(id[i]==affected){matches++;seed=feature[i] SUBSEP id[i];seed_i=i}
     if(matches!=1)add_error("ID not unique or unknown: "affected)
     else for(i=1;i<=count;i++)if(i!=seed_i&&feature[i]==feature[seed_i]){
-      delete trail
+      visit_epoch++
       if(reach(feature[i] SUBSEP id[i],seed))print "AFFECTED "id[i]" "filename[i]
     }
   }
