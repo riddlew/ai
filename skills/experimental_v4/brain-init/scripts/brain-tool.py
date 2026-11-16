@@ -225,12 +225,12 @@ def scaffold(options: dict, kind: str, brain: Path, feature: str, name: str) -> 
     elif kind == "planning-ticket":
         folder = brain / "planning" / feature
         numbers = [int(m.group(1)) for p in folder.glob("*.md")
-                   if (m := re.match(r"^(\\d+)-.+\\.md$", p.name))]
+                   if (m := re.match(r"^(\d+)-.+\.md$", p.name))]
         target = folder / f"{max(numbers, default=0)+1:03d}-{name}.md"
     elif kind == "diagnosis":
         folder = brain / "diagnoses"
         numbers = [int(m.group(1)) for p in folder.glob("*.md")
-                   if (m := re.match(r"^(\\d+)-.+\\.md$", p.name))]
+                   if (m := re.match(r"^(\d+)-.+\.md$", p.name))]
         target = folder / f"{max(numbers, default=0)+1:02d}-{name}.md"
     elif kind == "review":
         review_type = str(options.get("report-type", ""))
@@ -238,7 +238,7 @@ def scaffold(options: dict, kind: str, brain: Path, feature: str, name: str) -> 
             raise Problem("--report-type is required: architecture, code, merge-request, or security")
         folder = brain / "reviews" / review_type
         numbers = [int(m.group(1)) for p in folder.iterdir()
-                   if (m := re.match(r"^(\\d+)-.+(?:\\.md)?$", p.name))] if folder.is_dir() else []
+                   if (m := re.match(r"^(\d+)-.+(?:\.md)?$", p.name))] if folder.is_dir() else []
         target = folder / f"{max(numbers, default=0)+1:02d}-{name}" / "review.md"
     else:
         raise Problem(f"unsupported scaffold kind: {kind}")

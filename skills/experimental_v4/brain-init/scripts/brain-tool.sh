@@ -197,6 +197,10 @@ doc)
     done
   done
   awk '{if(seen[$1]++)exit 1}' "$tmp/ids" || die 'duplicate existing ID'
+  for parent in $PARENTS; do
+    [ "$(printf '%s\n' $PARENTS | grep -Fx -c "$parent")" -eq 1 ] ||
+      die "duplicate parent ID: $parent"
+  done
   for parent in $PARENTS;do
     prior=$(awk -v x="$parent" '$1==x {print $2}' "$tmp/ids")
     case "$prior:$num" in

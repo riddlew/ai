@@ -43,14 +43,14 @@ function scaffold(o,kind,b,feature,name){
  if(kind==='execution')target=path.join(b,'features',feature,'execution.md');
  else if(kind==='planning-index')target=path.join(b,'planning',feature,'INDEX.md');
  else if(kind==='planning-ticket'){
-   let dir=path.join(b,'planning',feature),nums=exists(dir)?fs.readdirSync(dir).map(x=>/^(\\d+)-.+\\.md$/.exec(x)?.[1]).filter(Boolean).map(Number):[];
+   let dir=path.join(b,'planning',feature),nums=exists(dir)?fs.readdirSync(dir).map(x=>/^(\d+)-.+\.md$/.exec(x)?.[1]).filter(Boolean).map(Number):[];
    target=path.join(dir,String(Math.max(0,...nums)+1).padStart(3,'0')+'-'+name+'.md');
  }else if(kind==='diagnosis'){
-   let dir=path.join(b,'diagnoses'),nums=exists(dir)?fs.readdirSync(dir).map(x=>/^(\\d+)-.+\\.md$/.exec(x)?.[1]).filter(Boolean).map(Number):[];
+   let dir=path.join(b,'diagnoses'),nums=exists(dir)?fs.readdirSync(dir).map(x=>/^(\d+)-.+\.md$/.exec(x)?.[1]).filter(Boolean).map(Number):[];
    target=path.join(dir,String(Math.max(0,...nums)+1).padStart(2,'0')+'-'+name+'.md');
  }else if(kind==='review'){
    let type=o['report-type'];if(!['architecture','code','merge-request','security'].includes(type))fail('invalid or missing --report-type');
-   let dir=path.join(b,'reviews',type),nums=exists(dir)?fs.readdirSync(dir).map(x=>/^(\\d+)-.+/.exec(x)?.[1]).filter(Boolean).map(Number):[];
+   let dir=path.join(b,'reviews',type),nums=exists(dir)?fs.readdirSync(dir).map(x=>/^(\d+)-.+/.exec(x)?.[1]).filter(Boolean).map(Number):[];
    target=path.join(dir,String(Math.max(0,...nums)+1).padStart(2,'0')+'-'+name,'review.md');
  }else fail('unknown kind: '+kind);
  if(exists(target))fail('existing document; refusing overwrite: '+target);
