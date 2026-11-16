@@ -426,9 +426,9 @@ def context(options: dict) -> None:
         status = re.search(rb"(?m)^status:\s*(\S+)", content)
         extra = ""
         if options.get("hashes"):
-            prefix = f"blob {len(content)}\\0".encode()
-            extra = "\\t" + hashlib.sha1(prefix + content).hexdigest()
-        print(f"DOC {file.relative_to(brain)}\\t{len(content)}\\t"
+            prefix = f"blob {len(content)}\0".encode()
+            extra = "\t" + hashlib.sha1(prefix + content).hexdigest()
+        print(f"DOC {file.relative_to(brain)}\t{len(content)}\t"
               f"{status.group(1).decode() if status else '-'}{extra}")
     if options.get("estimate"):
         print(f"ESTIMATE bytes={total} tokens~={(total+3)//4} (approximate)")
