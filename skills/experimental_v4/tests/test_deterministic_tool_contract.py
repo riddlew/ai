@@ -215,6 +215,25 @@ class DeterministicCliContract(unittest.TestCase):
                 self.assertNotEqual(read.returncode, 0)
 
 
+    def test_launcher_auto_falls_back_to_node_then_shell(self):
+        with tempfile.TemporaryDirectory() as temp:
+            tools_dir = Path(temp)
+            for command in ("sh", "dirname"):
+                (tools_dir / command).symlink_to(shutil.which(command))
+            env = {**os.environ, "PATH": str(tools_dir), "BRAIN_RUNTIME": "auto"}
+            shell = subprocess.run(["/bin/sh", str(TOOL), "--help"],
+                                   env=env, text=True, capture_output=True)
+            self.assertEqual(shell.returncode, 0, shell.stderr)
+            self.assertIn("brain-tool", shell.stdout)
+            node = tools_dir / "node"
+            node.write_text("#!/bin/sh\\necho NODE-FALLBACK\\n")
+            node.chmod(0o755)
+            fallback = subprocess.run(["/bin/sh", str(TOOL), "--help"],
+                                      env=env, text=True, capture_output=True)
+            self.assertEqual(fallback.returncode, 0, fallback.stderr)
+            self.assertIn("NODE-FALLBACK", fallback.stdout)
+
+
     def test_denied_write_and_preview(self):
         for runtime in ("python", "node", "sh"):
             with tempfile.TemporaryDirectory() as temp:
