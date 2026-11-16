@@ -46,7 +46,7 @@ Example fields, with literal tab separators:
 
 Each data row has four fields: Brain-relative path, mode (global/scoped), selectors, and content hash. Global uses "-" and always loads. Scoped needs feature:<slug>, path:<exact-file>, or path:<directory/>. Multiple selectors are separated with semicolons. Directory matching respects boundaries: src/payments/ does not match src/payments-old/.
 
-Map **every** root project-knowledge Markdown file and every ADR, source-map and knowledge Markdown file. Feature documents and pending files are loaded through the active feature and branch and need no map rows. Unknown or newly created documents, changed fingerprints, malformed/duplicate rows, absent maps or unknown task scope force full loading. A mapping is a reviewed assertion of which modules each document governs, not a guess. Use global when uncertain.
+Map **every** root project-knowledge Markdown file and every ADR, source map, technical knowledge, planning, diagnosis and review Markdown file. Feature documents and pending files are loaded through the active feature and branch and need no map rows. Unknown or newly created documents, changed fingerprints, malformed/duplicate rows, absent maps or unknown task scope force full loading. A mapping is a reviewed assertion of which modules each document governs, not a guess. Use global when uncertain.
 
 Do not refresh changed hashes merely to re-enable selective mode. Recheck content, scope, neighboring owners and links after meaningful changes. brain-update owns this map and **still reads all root project-knowledge files** during synchronization. Existing authoritativeness, approval and provenance rules are unchanged.
 
