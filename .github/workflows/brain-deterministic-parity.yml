@@ -1,7 +1,7 @@
 name: Brain deterministic tool parity
 on:
   push:
-    branches: [feature/deterministic-brain-tooling]
+    branches: [feature/deterministic-brain-tooling, feature/brain-safe-selective-context]
     paths:
       - "skills/experimental_v4/**"
       - ".github/workflows/brain-deterministic-parity.yml"
