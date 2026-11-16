@@ -146,6 +146,17 @@ init)
       printf 'REVIEW existing %s: differs from bundled guide; preserved\n' "$target"
     fi
   done
+  policy=$REPO/CLAUDE.local.md
+  if [ "$SAVELOCATION" = 1 ]; then
+    location="Project brain: $BRAIN"
+    if [ -f "$policy" ]; then
+      matches=$(grep -c '^Project brain:' "$policy" || :)
+      if [ "$matches" -gt 1 ] || { [ "$matches" -eq 1 ] && ! grep -Fx "$location" "$policy" >/dev/null; }; then
+        die 'conflicting saved Project brain location; review before applying'
+      fi
+      if [ "$matches" -eq 0 ] && [ "$APPLY" = 1 ]; then guard "$policy";fi
+    fi
+  fi
   # Preflight Git administrative writes before creating any Brain files.
   if [ "$APPLY" = 1 ] && [ "$TRACKING" = ignored ]; then
     common=$(git -C "$REPO" rev-parse --path-format=absolute --git-common-dir) ||
@@ -162,17 +173,6 @@ init)
       put "$target" "$REFS/$name"
     fi
   done
-  policy=$REPO/CLAUDE.local.md
-  if [ "$SAVELOCATION" = 1 ]; then
-    location="Project brain: $BRAIN"
-    if [ -f "$policy" ]; then
-      matches=$(grep -c '^Project brain:' "$policy" || :)
-      if [ "$matches" -gt 1 ] || { [ "$matches" -eq 1 ] && ! grep -Fx "$location" "$policy" >/dev/null; }; then
-        die 'conflicting saved Project brain location; review before applying'
-      fi
-      if [ "$matches" -eq 0 ] && [ "$APPLY" = 1 ]; then guard "$policy";fi
-    fi
-  fi
   if [ ! -e "$policy" ]; then
     if [ "$SAVELOCATION" = 1 ]; then
       cp "$REFS/CLAUDE.local.md" "$tmp/policy"
