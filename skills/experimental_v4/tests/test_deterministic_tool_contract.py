@@ -139,6 +139,36 @@ class DeterministicCliContract(unittest.TestCase):
                 self.assertNotEqual(result.returncode, 0)
 
 
+    def test_init_saves_location_without_rewriting_custom_policy(self):
+        for runtime in ("python", "node", "sh"):
+            with self.subTest(runtime=runtime), tempfile.TemporaryDirectory() as temp:
+                repo = Path(temp)
+                subprocess.run(["git", "init", "-q", str(repo)], check=True)
+                brain = repo / ".brain"
+                policy = repo / "CLAUDE.local.md"
+                policy.write_text("# Local project instructions\nKeep this custom rule.\n")
+                args = ("init", "--brain", brain, "--repo", repo,
+                        "--tracking", "tracked", "--at", "2026-01-01",
+                        "--revision", "a"*40, "--save-location",
+                        "--apply", "--authorized-root", repo)
+                invoke(runtime, *args)
+                current = policy.read_text()
+                expected = "Project brain: " + str(brain)
+                self.assertEqual(current.count(expected), 1)
+                self.assertIn("Keep this custom rule.", current)
+                invoke(runtime, *args)
+                self.assertEqual(current, policy.read_text())
+                other = repo / ".brain-other"
+                rejected = invoke(runtime, "init", "--brain", other,
+                    "--repo", repo, "--tracking", "tracked",
+                    "--at", "2026-01-01", "--revision", "a"*40,
+                    "--save-location", "--apply", "--authorized-root", repo,
+                    ok=False)
+                self.assertNotEqual(rejected.returncode, 0)
+                self.assertFalse(other.exists(),
+                                 "conflict should fail before any document installation")
+
+
     def test_fixture_validation_and_parent_hashes(self):
         expected = subprocess.run(["python3", str(VALIDATOR),
                          str(FIXTURE / "features"), "--check-coverage"],
