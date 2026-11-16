@@ -33,7 +33,7 @@ class SimplificationContract(unittest.TestCase):
         implement = (ROOT / "brain-implement/SKILL.md").read_text()
         update = (ROOT / "brain-update/SKILL.md").read_text()
         spec = (ROOT / "brain-write-spec/SKILL.md").read_text()
-        for key in ("§Worktrees and brain writes", "authorized filesystem boundaries",
+        for key in ("Worktrees and brain writes", "authorized filesystem boundaries",
                     "pending/<branch>.md", "consequential", "approval",
                     "read more", "context-map.tsv"):
             self.assertIn(key.lower(), policy.lower())
