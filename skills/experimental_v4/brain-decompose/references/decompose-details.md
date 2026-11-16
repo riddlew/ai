@@ -8,7 +8,7 @@
 **Mechanical component creation:** Use `sh "${CLAUDE_SKILL_DIR}/../brain-init/scripts/brain-tool" doc new --kind component` when a component document is warranted; provide the approved parent IDs and populate the generated draft with real responsibility and requirement coverage. Structural `validate` supplements, not replaces, semantic checks. See `${CLAUDE_SKILL_DIR}/../brain-init/references/deterministic-tooling.md` for the command contract, preview/authorization safeguards, and runtime fallbacks.
 
 
-**Project brain:** Follow `CLAUDE.local.md` for project-brain loading, branch context, source verification, and decision authority. Read the feature-document contract and templates in `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md` and `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-templates.md`.
+**Project context (current rule):** Follow `CLAUDE.local.md` §Project brain loading; read core decisions, applicable feature plans, related technical documents and authoritative sources. Search by behavior and source paths, follow links and broaden when uncertain. The old mandatory context-map/full-root instruction is superseded.
 
 Translate approved specifications into **coherent functional responsibilities**, not code. Specifications govern required behavior; applicable ADRs and approved user decisions govern architectural decisions. Own only `.brain/features/<feature-slug>/03-components/`. Do not edit specifications, plans, tasks, production code, or the execution record.
 

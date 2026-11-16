@@ -42,7 +42,7 @@ Run this step whenever §1 finds a **valid, writable brain** and after §2 step 
 3. Ensure `00_index.md` lists both guides under **Documents**, with purpose and status `reference`. This is the only exception allowing `brain-init` to modify an existing brain index after initial creation: add or correct **only these two inventory rows**; preserve the index header lines, all other rows, and `Last synced:`. Don't treat the guides as implementation knowledge or a new sync event.
 4. Report each guide as installed, already current, or different and preserved. If either guide couldn't be copied, do not report the documentation installation as complete.
 
-These are **workflow reference documents, not project-knowledge root files**. They are excluded from the mandatory full-root context read: skills must still load every project-knowledge root document, but consult only the relevant guide sections when choosing or explaining workflows. The policy in §0 references `.brain/USAGE.md` and `.brain/README.md` for the normal in-repository layout; when `Project brain:` points elsewhere, resolve both guide paths inside that selected brain.
+These are **workflow reference documents, not project-knowledge root files**. They are excluded from ordinary project-knowledge loading; consult relevant guide sections only, following the current collaboration policy for applicable project documents. The policy in §0 references `.brain/USAGE.md` and `.brain/README.md` for the normal in-repository layout; when `Project brain:` points elsewhere, resolve both guide paths inside that selected brain.
 
 ## 1. Start
 

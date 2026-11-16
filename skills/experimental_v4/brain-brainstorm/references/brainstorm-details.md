@@ -8,7 +8,7 @@
 **Mechanical brief creation:** When an approved feature brief should be saved, use `sh "${CLAUDE_SKILL_DIR}/../brain-init/scripts/brain-tool" doc new --kind brief` to allocate its path, draft ID and template. Supply the resolved Brain/feature and authorized root; preview before applying. You still write and confirm the actual brief content. See `${CLAUDE_SKILL_DIR}/../brain-init/references/deterministic-tooling.md` for the command contract, preview/authorization safeguards, and runtime fallbacks.
 
 
-**Project brain:** Follow `CLAUDE.local.md` §Project brain loading: read **all** root `.md` files once per session (again after compaction), plus the active branch's pending file when present. Inspect linked detail and verify task-critical facts against current source. Do not send the whole brain to subagents. If no brain exists, proceed and mention `/brain-init` once.
+**Project context (current rule):** Follow `CLAUDE.local.md` §Project brain loading; read core decisions, applicable feature plans, related technical documents and authoritative sources. Search by behavior and source paths, follow links and broaden when uncertain. The old mandatory context-map/full-root instruction is superseded.
 
 Help the user settle a sound direction. Investigate facts yourself, recommend, and let the user decide consequential choices (`CLAUDE.local.md`). Do not implement or change production code while brainstorming.
 

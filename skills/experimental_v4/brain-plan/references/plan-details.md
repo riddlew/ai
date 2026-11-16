@@ -8,7 +8,7 @@
 **Mechanical planning files:** When multi-session planning is justified, use `sh "${CLAUDE_SKILL_DIR}/../brain-init/scripts/brain-tool" doc new --kind planning-index` and `--kind planning-ticket` to create exactly the needed files and ticket numbering. You still decide questions, dependencies, evidence, and approval. See `${CLAUDE_SKILL_DIR}/../brain-init/references/deterministic-tooling.md` for the command contract, preview/authorization safeguards, and runtime fallbacks.
 
 
-**Project brain:** Follow `CLAUDE.local.md` §Project brain loading: read **all** root `.md` files once per session (again after compaction), plus the active branch's pending file when present. Inspect linked detail and verify task-critical facts against current source. Do not send the whole brain to subagents. If no brain exists, proceed and mention `/brain-init` once.
+**Project context (current rule):** Follow `CLAUDE.local.md` §Project brain loading; read core decisions, applicable feature plans, related technical documents and authoritative sources. Search by behavior and source paths, follow links and broaden when uncertain. The old mandatory context-map/full-root instruction is superseded.
 
 Track planning state for substantial or uncertain efforts across sessions. This skill owns planning scope, planning tickets and their dependencies, and cross-session continuation. It delegates interactive decisions to `brain-brainstorm` and executable implementation decomposition to `brain-write-tasks` after approved functional and technical design. Planning tickets remain bounded investigations or decisions, not implementation tasks. Follow `CLAUDE.local.md` for decision authority.
 
