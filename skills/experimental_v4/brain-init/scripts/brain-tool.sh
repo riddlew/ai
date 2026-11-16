@@ -63,7 +63,7 @@ next_number() {
 }
 scaffold() {
   kind=$1;feature=$2;name=$3
-  title=$(printf '%s' "$name" | awk -F- '{for(i=1;i<=NF;i++){w=$i;printf "%s%s",i==1?"":" ",toupper(substr(w,1,1)) substr(w,2)}printf "\n"}')
+  title=$(printf '%s' "$name" | awk -F- '{for(i=1;i<=NF;i++){w=$i;if(i>1)printf " ";printf "%s%s",toupper(substr(w,1,1)),substr(w,2)}printf "\n"}')
   case "$kind" in
     execution) target=$BRAIN/features/$feature/execution.md;;
     planning-index) target=$BRAIN/planning/$feature/INDEX.md;;
