@@ -26,7 +26,7 @@ When they exist, the following are always selected in selective mode:
 - 00_index.md, 01_about.md, 02_features.md, 03_architecture.md
 - 09_user_decisions.md, open_questions.md, state.md, glossary.md
 
-The planner selects the active branch's pending file, not other branches' pending files, plus the entire selected feature folder (brief, specs, components, approved plans, tasks, execution evidence), and explicitly scoped ADR/source-map/technical-knowledge documents. It follows exact document links in both directions, excluding purely navigational index/state links that would otherwise load everything. It also checks Brain text for exact source-path and feature-path mentions.
+The planner selects the active branch's pending file, not other branches' pending files, plus the entire selected feature folder (brief, specs, components, approved plans, tasks, execution evidence), and explicitly scoped ADR/source-map/technical-knowledge documents. It follows document-path and filename references in both directions, conservatively including multiple same-named candidates when ambiguous; purely navigational index/state links do not automatically load every listed document. It also checks Brain text for exact source-path and feature-path mentions.
 
 All task-relevant repository guidance, existing code owners, callers, tests, external specifications and documentation must still be read separately. A source map is a pointer to authority, not proof of protocol bytes or conformance. A verified hash proves unchanged bytes, not correct applicability.
 
