@@ -157,8 +157,19 @@ init)
       if [ "$matches" -eq 0 ] && [ "$APPLY" = 1 ]; then guard "$policy";fi
     fi
   fi
-  # Preflight Git administrative writes before creating any Brain files.
-  if [ "$APPLY" = 1 ] && [ "$TRACKING" = ignored ]; then
+  # Ignore an untracked personal policy even when the Brain itself is tracked.
+  exclude_entries=
+  if [ "$TRACKING" = ignored ] && [ "$BRAIN" = "$REPO/.brain" ] &&
+     ! git -C "$REPO" check-ignore -q -- .brain/ >/dev/null 2>&1; then
+    exclude_entries=".brain/"
+  fi
+  if ! git -C "$REPO" ls-files --error-unmatch -- CLAUDE.local.md >/dev/null 2>&1 &&
+     ! git -C "$REPO" check-ignore -q -- CLAUDE.local.md >/dev/null 2>&1; then
+    exclude_entries="${exclude_entries}${exclude_entries:+
+}CLAUDE.local.md"
+  fi
+  # Check Git admin authorization before creating or installing any Brain files.
+  if [ "$APPLY" = 1 ] && [ -n "$exclude_entries" ]; then
     common=$(git -C "$REPO" rev-parse --path-format=absolute --git-common-dir) ||
       die 'Git metadata unavailable'
     excluded=$common/info/exclude
@@ -190,12 +201,28 @@ init)
       else printf 'APPEND %s: Project brain location (dry-run)\n' "$policy";fi
     fi
   fi
-  if [ "$APPLY" = 1 ] && [ "$TRACKING" = ignored ]; then
-    common=$(git -C "$REPO" rev-parse --path-format=absolute --git-common-dir) || die 'Git metadata unavailable'
-    excluded=$common/info/exclude;guard "$excluded"
-    if [ ! -e "$excluded" ] || ! grep -Fx '.brain/' "$excluded" >/dev/null; then
-      mkdir -p "$(dirname "$excluded")";printf '.brain/\n' >> "$excluded";printf 'UPDATED %s\n' "$excluded"
+  if [ "$APPLY" = 1 ] && [ -n "$exclude_entries" ]; then
+    mkdir -p "$(dirname "$excluded")"
+    updated=0
+    oldend=
+    if [ -s "$excluded" ]; then
+      oldend=$(tail -c 1 "$excluded" | od -An -tu1 | tr -d ' ')
     fi
+    if [ -s "$excluded" ] && [ "$oldend" != 10 ]; then printf '\n' >> "$excluded";fi
+    oldIFS=$IFS
+    IFS='
+'
+    for entry in $exclude_entries; do
+      IFS=$oldIFS
+      if [ ! -e "$excluded" ] || ! grep -Fx "$entry" "$excluded" >/dev/null; then
+        printf '%s\n' "$entry" >> "$excluded"
+        updated=1
+      fi
+      IFS='
+'
+    done
+    IFS=$oldIFS
+    [ "$updated" -eq 0 ] || printf 'UPDATED %s\n' "$excluded"
   fi
   ;;
 doc)

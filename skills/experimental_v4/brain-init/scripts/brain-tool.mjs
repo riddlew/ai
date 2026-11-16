@@ -40,10 +40,15 @@ function init(o){let b=brain(o),repo=full(o.repo||'.'),mode=o.tracking||'ignored
        if(o.apply)scope(policy,o);else console.log('APPEND '+policy+': Project brain location (dry-run)')}
    }
  }else items.push([policy,bundled+(o['save-location']?(bundled.endsWith('\n')?'':'\n')+saved+'\n':'')]);
- let exclude=null;if(mode==='ignored'&&o.apply){let common=full(git(repo,'rev-parse','--path-format=absolute','--git-common-dir'));exclude=path.join(common,'info','exclude');scope(exclude,o)}
+ let ok=(...args)=>cp.spawnSync('git',['-C',repo,...args],{stdio:'ignore'}).status===0;
+ let entries=[];
+ if(mode==='ignored'&&b===path.join(repo,'.brain')&&!ok('check-ignore','-q','--','.brain/'))entries.push('.brain/');
+ if(!ok('ls-files','--error-unmatch','--','CLAUDE.local.md')&&!ok('check-ignore','-q','--','CLAUDE.local.md'))entries.push('CLAUDE.local.md');
+ let exclude=null;
+ if(entries.length&&o.apply){let common=full(git(repo,'rev-parse','--path-format=absolute','--git-common-dir'));exclude=path.join(common,'info','exclude');scope(exclude,o)}
  changes(items,o);
  if(append&&o.apply){fs.appendFileSync(policy,append);console.log('UPDATED '+policy+': Project brain location')}
- if(exclude){let p=exclude,old=exists(p)?read(p):'';if(!old.split('\n').includes('.brain/')){fs.mkdirSync(path.dirname(p),{recursive:true});fs.appendFileSync(p,(!old||old.endsWith('\n')?'':'\n')+'.brain/\n');console.log('UPDATED '+p)}}}
+ if(exclude){let old=exists(exclude)?read(exclude):'',missing=entries.filter(e=>!old.split('\n').includes(e));if(missing.length){fs.mkdirSync(path.dirname(exclude),{recursive:true});fs.appendFileSync(exclude,(!old||old.endsWith('\n')?'':'\n')+missing.map(e=>e+'\n').join(''));console.log('UPDATED '+exclude)}}}
 function docs(area){let found=new Map();for(let [,folder] of Object.values(kinds)){let dir=path.join(area,folder);if(!exists(dir))continue;for(let name of fs.readdirSync(dir).filter(x=>x.endsWith('.md'))){let file=path.join(dir,name),m=read(file).match(/^id:\s*((?:BRF|SPEC|CMP|PLAN|TASK)-\d{3})\s*$/m);if(m){if(found.has(m[1]))fail('duplicate existing ID: '+m[1]);found.set(m[1],{file,folder})}}}return found}
 function template(kind,id,parents,feature){let raw=read(path.join(refs,'feature-document-templates.md')),begin=raw.indexOf('## '+kinds[kind][0]+' ');if(begin<0)fail('template missing');let tick=String.fromCharCode(96),fence=tick.repeat(3)+'markdown\n',pos=raw.indexOf(fence,begin);if(pos<0)fail('template block missing');let end=raw.indexOf(tick.repeat(3),pos+fence.length);if(end<0)fail('unterminated template');let text=raw.slice(pos+fence.length,end);
  for(let [k,v] of Object.entries({id,status:'draft',parents:'['+parents.join(', ')+']',requirements:'[]',depends_on:'[]',parent_hashes:'[]'}))text=text.replace(new RegExp('^'+k+':.*$','m'),k+': '+v);

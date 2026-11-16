@@ -193,8 +193,19 @@ def init(options: dict) -> None:
         if options.get("save-location"):
             content += ("" if content.endswith("\n") else "\n") + saved_location + "\n"
         items.append((policy, content))
+    exclude_entries = []
+    def git_succeeds(*args: str) -> bool:
+        return subprocess.run(["git", "-C", str(repo), *args],
+                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                              check=False).returncode == 0
+    if mode == "ignored" and brain == repo / ".brain" and not git_succeeds(
+            "check-ignore", "-q", "--", ".brain/"):
+        exclude_entries.append(".brain/")
+    if not git_succeeds("ls-files", "--error-unmatch", "--", "CLAUDE.local.md") and not git_succeeds(
+            "check-ignore", "-q", "--", "CLAUDE.local.md"):
+        exclude_entries.append("CLAUDE.local.md")
     exclusion = None
-    if mode == "ignored" and options.get("apply"):
+    if exclude_entries and options.get("apply"):
         common = path(git(repo, "rev-parse", "--path-format=absolute", "--git-common-dir"))
         exclusion = common / "info" / "exclude"
         in_scope(exclusion, options)
@@ -205,10 +216,12 @@ def init(options: dict) -> None:
         print(f"UPDATED {policy}: Project brain location")
     if exclusion is not None:
         content = exclusion.read_text() if exclusion.exists() else ""
-        if ".brain/" not in content.splitlines():
+        missing = [entry for entry in exclude_entries if entry not in content.splitlines()]
+        if missing:
             exclusion.parent.mkdir(parents=True, exist_ok=True)
-            with exclusion.open("a", encoding="utf-8") as f:
-                f.write(("" if not content or content.endswith("\n") else "\n") + ".brain/\n")
+            with exclusion.open("a", encoding="utf-8") as stream:
+                stream.write(("" if not content or content.endswith("\n") else "\n") +
+                             "".join(f"{entry}\n" for entry in missing))
             print(f"UPDATED {exclusion}")
 
 
