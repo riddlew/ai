@@ -109,7 +109,8 @@ function plan(brain,docs,features,paths,branch){
    for(let [other,otherContent] of docs){
     if(other===name||(other.startsWith('pending/')&&!selected.has(other)))continue;
     if(name!=='00_index.md'&&name!=='state.md'&&other!=='00_index.md'&&other!=='state.md' &&
-       text.includes(other)&&(selected.has(name)||selected.has(other))){
+       (text.includes(other)||text.includes(path.posix.basename(other)))&&
+       (selected.has(name)||selected.has(other))){
      if(!selected.has(name)||!selected.has(other)){
       selected.add(name);selected.add(other);changed=true
      }

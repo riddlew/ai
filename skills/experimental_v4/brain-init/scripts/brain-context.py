@@ -193,7 +193,8 @@ def plan(brain: Path, docs: dict[str, bytes], features: list[str],
                 if other == name or (other.startswith("pending/") and other not in selected):
                     continue
                 if name not in CATALOGS and other not in CATALOGS and (
-                    other in text and (name in selected or other in selected)
+                    (other in text or other.rsplit("/", 1)[-1] in text)
+                    and (name in selected or other in selected)
                 ):
                     if name not in selected or other not in selected:
                         selected.update((name, other))

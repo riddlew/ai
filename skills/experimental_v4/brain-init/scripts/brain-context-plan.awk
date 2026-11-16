@@ -111,7 +111,8 @@ END {
             other=docs[j]
             if(other==name||(index(other,"pending/")==1&&!selected[other]))continue
             if(name!="00_index.md"&&name!="state.md"&&other!="00_index.md"&&other!="state.md" &&
-               index(text[name],other)>0&&(selected[name]||selected[other])){
+               (index(text[name],other)>0||index(text[name],base_name(other))>0)&&
+               (selected[name]||selected[other])){
               if(!selected[name]||!selected[other]){
                 selected[name]=1;selected[other]=1;changed=1
               }
@@ -137,3 +138,5 @@ function branch_to_file(value) {
  gsub(/\//,"--",value)
  return value
 }
+
+function base_name(value, n,a) {n=split(value,a,"/");return a[n]}
