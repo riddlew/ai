@@ -36,6 +36,17 @@ put() {
     printf 'CREATED %s\n' "$target"
   fi
 }
+next_number() {
+  dir=$1;max=0
+  for child in "$dir"/[0-9]*-*; do
+    [ -e "$child" ] || continue
+    name=$(basename "$child");digits=${name%%-*}
+    case "$digits" in ''|*[!0-9]*) continue;; esac
+    value=$(awk -v n="$digits" 'BEGIN{printf "%d",n+0}')
+    [ "$value" -le "$max" ] || max=$value
+  done
+  printf '%s\n' "$((max+1))"
+}
 scaffold() {
   kind=$1;feature=$2;name=$3
   title=$(printf '%s' "$name" | awk -F- '{for(i=1;i<=NF;i++){w=$i;printf "%s%s",i==1?"":" ",toupper(substr(w,1,1)) substr(w,2)}printf "\n"}')
@@ -44,18 +55,18 @@ scaffold() {
     planning-index) target=$BRAIN/planning/$feature/INDEX.md;;
     planning-ticket)
       dir=$BRAIN/planning/$feature
-      n=$(find "$dir" -maxdepth 1 -name '[0-9]*-*.md' -type f 2>/dev/null | awk -F/ '{split($NF,a,"-");if(a[1]+0>m)m=a[1]+0}END{print m+1}')
+      n=$(next_number "$dir")
       [ -n "$n" ] || n=1
       num=$(printf '%03d' "$n");target=$dir/$num-$name.md;;
     diagnosis)
       dir=$BRAIN/diagnoses
-      n=$(find "$dir" -maxdepth 1 -name '[0-9]*-*.md' -type f 2>/dev/null | awk -F/ '{split($NF,a,"-");if(a[1]+0>m)m=a[1]+0}END{print m+1}')
+      n=$(next_number "$dir")
       [ -n "$n" ] || n=1
       num=$(printf '%02d' "$n");target=$dir/$num-$name.md;;
     review)
       case "$REPORTTYPE" in architecture|code|merge-request|security) :;; *) die 'invalid or missing --report-type';; esac
       dir=$BRAIN/reviews/$REPORTTYPE
-      n=$(find "$dir" -maxdepth 1 -name '[0-9]*-*' 2>/dev/null | awk -F/ '{split($NF,a,"-");if(a[1]+0>m)m=a[1]+0}END{print m+1}')
+      n=$(next_number "$dir")
       [ -n "$n" ] || n=1
       num=$(printf '%02d' "$n");target=$dir/$num-$name/review.md;;
     *) die "unknown kind: $kind";;
