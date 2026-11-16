@@ -11,3 +11,7 @@
 The original deterministic `brain-context` planner, map generator and three runtime fallbacks **remain available**. They are optional candidate-discovery tools, **not mandatory**, and a reviewed fingerprinted map is **not an exclusion list**. They may still return `MODE=full` for stale or incomplete maps. The separate `safe-context-map-protocol.md` documents the existing four-field `context-map.tsv` format and planner flags for projects that already use it. Do not create or maintain a map just to follow the normal skill workflow.
 
 `brain-update` still reads **all** root project-knowledge files when synchronizing. Neither this procedure nor the optional planner changes user approval, authoritativeness, Brain write boundaries or source-document provenance.
+
+## Practical discovery (no scope map required)
+
+A feature can be governed by a document whose filename does not resemble the code path. After inspecting code owners/callers/tests, search both **paths and behavior terms**, including protocol IDs, error names, configuration keys and integration boundaries. For an ignored or external Brain, search its actual filesystem contents rather than assuming `git grep` can see them. For example, use `grep -RniE 'payment|timeout|src/payments/' "$BRAIN/knowledge" "$BRAIN/sources" "$BRAIN/adrs"` for directories that exist. Follow matching documents' references and inspect the original authoritative source for exact contracts. Do not treat zero matches as proof there is no governing document; broaden to root knowledge and adjacent modules when uncertain.

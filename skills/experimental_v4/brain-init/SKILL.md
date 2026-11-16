@@ -21,4 +21,6 @@ Create or reconnect **one** project Brain (`00_index.md` required), install the 
 
 ## Exceptions requiring detailed procedure
 
-Read `${CLAUDE_SKILL_DIR}/references/init-details.md` when reconciling an existing customized policy, a linked worktree or external Brain, a broken saved path, first-run interviews, or legacy document layouts. **Do not move, import, or translate legacy feature documents** as part of initialization. Never stage, commit or push. Do not dispatch subagents unless asked.
+Read `${CLAUDE_SKILL_DIR}/references/init-details.md` when reconciling an existing customized policy, a linked worktree or external Brain, a broken saved path, first-run interviews, or legacy document layouts.
+
+**Existing-project migration:** An installed `CLAUDE.local.md` may still enforce the old full-root read or mandatory context map. Compare it section-by-section with the newly bundled policy; propose replacement of only superseded shared rules **while preserving project-specific instructions and saved Brain paths**. Never concatenate an entire second policy, silently overwrite customized sections, or claim the new loading behavior is active before the installed file is reconciled. If reconciliation is ambiguous, ask for authorization before changing it. **Do not move, import, or translate legacy feature documents** as part of initialization. Never stage, commit or push. Do not dispatch subagents unless asked.

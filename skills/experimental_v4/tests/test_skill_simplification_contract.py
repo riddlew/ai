@@ -75,6 +75,9 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("explicit voice", writing.lower())
         self.assertIn("editing mode", writing.lower())
         self.assertIn("No test run", tester)
+        init = (ROOT / "brain-init/SKILL.md").read_text()
+        self.assertIn("Existing-project migration", init)
+        self.assertIn("preserving project-specific instructions", init)
 
     def test_detailed_workflows_still_exist(self):
         pairs = {
