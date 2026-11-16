@@ -73,9 +73,11 @@ function parseMap(brain,docs){
 }
 function plan(brain,docs,features,paths,branch){
  const [mapping,error]=parseMap(brain,docs);let reason=error;
+ const fallback=[...docs.keys()].filter(n=>!n.startsWith('pending/')||
+   (branch&&n==='pending/'+branch.replaceAll('/','--')+'.md')).sort();
  if(!features.length&&!paths.length)reason ||= 'unknown-scope';
  if(!branch)reason ||= 'unknown-branch';
- if(reason)return ['full',reason,[...docs.keys()].sort()];
+ if(reason)return ['full',reason,fallback];
  const selected=new Set([...docs.keys()].filter(n=>MANDATORY.has(n)));
  if(branch){let pending='pending/'+branch.replaceAll('/','--')+'.md';if(docs.has(pending))selected.add(pending)}
  for(let feature of features)for(let name of docs.keys())if(name.startsWith('features/'+feature+'/'))selected.add(name);
@@ -84,12 +86,12 @@ function plan(brain,docs,features,paths,branch){
  }
  for(let candidate of paths){
   if(![...mapping.values()].some(([mode,selectors])=>mode==='scoped'&&scopeMatch(selectors,[],[candidate])))
-   return ['full','unmapped-code-path',[...docs.keys()].sort()];
+   return ['full','unmapped-code-path',fallback];
  }
  for(let feature of features){
   if(![...docs.keys()].some(n=>n.startsWith('features/'+feature+'/'))&&
      ![...mapping.values()].some(([mode,selectors])=>mode==='scoped'&&scopeMatch(selectors,[feature],[])))
-   return ['full','unmapped-feature',[...docs.keys()].sort()];
+   return ['full','unmapped-feature',fallback];
  }
  const probes=[...paths,...features.map(x=>'features/'+x+'/')];
  for(let [name,content] of docs){

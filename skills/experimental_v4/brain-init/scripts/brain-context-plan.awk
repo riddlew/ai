@@ -124,6 +124,7 @@ END {
   amount=0
   for(i=1;i<=docs_count;i++){
     name=docs[i]
+    if(mode=="full"&&index(name,"pending/")==1&&name!="pending/"branch_to_file(branch)".md")continue
     if(mode=="full"||selected[name]){print "READ",name;amount+=size[name]}
   }
   print "BYTES",amount,total

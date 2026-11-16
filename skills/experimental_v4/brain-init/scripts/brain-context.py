@@ -126,13 +126,16 @@ def parse_map(brain: Path, docs: dict[str, bytes]) -> tuple[dict[str, tuple[str,
 def plan(brain: Path, docs: dict[str, bytes], features: list[str],
          paths: list[str], branch: str | None) -> tuple[str, str, list[str]]:
     mapping, reason = parse_map(brain, docs)
+    active_pending = "pending/" + branch.replace("/", "--") + ".md" if branch else None
+    full_docs = sorted(name for name in docs
+                       if not name.startswith("pending/") or name == active_pending)
     scoped = bool(features or paths)
     if not scoped:
         reason = reason or "unknown-scope"
     if not branch:
         reason = reason or "unknown-branch"
     if reason:
-        return "full", reason, sorted(docs)
+        return "full", reason, full_docs
 
     selected = {name for name in docs if name in MANDATORY}
     if branch:
@@ -155,13 +158,13 @@ def plan(brain: Path, docs: dict[str, bytes], features: list[str],
     for candidate in paths:
         if not any(mode == "scoped" and scope_match(selectors, [], [candidate])
                    for mode, selectors in mapping.values()):
-            return "full", "unmapped-code-path", sorted(docs)
+            return "full", "unmapped-code-path", full_docs
     for feature in features:
         if not any(name.startswith("features/" + feature + "/") for name in docs) and not any(
             mode == "scoped" and scope_match(selectors, [feature], [])
             for mode, selectors in mapping.values()
         ):
-            return "full", "unmapped-feature", sorted(docs)
+            return "full", "unmapped-feature", full_docs
 
     # Extra safety net: inspect text of *all* documents without feeding it to the AI.
     # Include a document that mentions an affected source or feature path, even
