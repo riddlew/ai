@@ -157,6 +157,26 @@ class DeterministicCliContract(unittest.TestCase):
                                         f"{runtime} accepted {name}: {got.stdout}")
 
 
+    def test_context_selection_fingerprints_and_estimates(self):
+        rel = "features/start-machine/02-specifications/start-machine.md"
+        expected = (FIXTURE / rel).read_text()
+        manifests = []
+        for runtime in ("python", "node", "sh"):
+            data = invoke(runtime, "context", "--brain", FIXTURE, "--feature",
+                          "start-machine", "--hashes", "--estimate").stdout
+            self.assertIn("ESTIMATE bytes=", data)
+            self.assertIn("DOC " + rel, data)
+            manifests.append(data)
+            selected = invoke(runtime, "context", "--brain", FIXTURE,
+                              "--select", rel).stdout
+            self.assertEqual(selected, expected)
+            bad = invoke(runtime, "context", "--brain", FIXTURE,
+                         "--select", "../README.md", ok=False)
+            self.assertNotEqual(bad.returncode, 0)
+        self.assertEqual(manifests[0], manifests[1])
+        self.assertEqual(manifests[0], manifests[2])
+
+
     def test_denied_write_and_preview(self):
         for runtime in ("python", "node", "sh"):
             with tempfile.TemporaryDirectory() as temp:
