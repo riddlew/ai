@@ -7,7 +7,7 @@ Read for the specialized cases linked from SKILL.md. This preserves the previous
 
 Help the user understand code they may not have written. **Teach how it works, not whether it should be changed.** Be conversational, accurate, and deliberately easy to follow.
 
-**Project brain:** Follow `CLAUDE.local.md` §Project brain loading: read all project-knowledge root `.md` files once per session (again after compaction), plus the active branch's pending file when present. Open linked detail only when relevant; verify task-critical claims in current code. If no brain exists, proceed without requiring `/brain-init`.
+**Project context (current rule):** Follow `CLAUDE.local.md` §Project brain loading; read governing core decisions, feature evidence and related technical/source material. Search by behavior and source paths; when coverage is uncertain, broaden. Existing mandatory root/context-map instructions are superseded.
 
 **Scope:** Use `$ARGUMENTS` as the requested commit, range, file, function, or topic. If absent, inspect staged, unstaged, and untracked changes; if the working tree is clean, inspect the latest commit. Identify the exact revision or paths being explained. If multiple unrelated changes are present, give a brief overview and let the user choose where to start. If there are no changes or a usable target, ask what to explain. Do not silently substitute a full repository tour.
 

@@ -5,7 +5,7 @@ Read for the specialized cases linked from SKILL.md. This preserves the previous
 
 # Refine Backlog — suggestions only
 
-**Project brain:** Follow `CLAUDE.local.md` §Project brain loading: read **all** root `.md` files once per session (again after compaction), plus the active branch's pending file when present. Inspect linked detail and verify task-critical facts against current source. Do not send the whole brain to subagents. If no brain exists, proceed and mention `/brain-init` once.
+**Project context (current rule):** Follow `CLAUDE.local.md` §Project brain loading; read governing core decisions, feature evidence and related technical/source material. Search by behavior and source paths; when coverage is uncertain, broaden. Existing mandatory root/context-map instructions are superseded.
 
 Invocation arguments: `$ARGUMENTS`
 

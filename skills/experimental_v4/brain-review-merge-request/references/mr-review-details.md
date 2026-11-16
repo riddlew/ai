@@ -8,7 +8,7 @@ Open only for the conditional modes identified in the current primary skill. Thi
 **Mechanical review storage:** Use `sh "${CLAUDE_SKILL_DIR}/../brain-init/scripts/brain-tool" doc new --kind review --report-type merge-request` only when this workflow requires a durable report; the CLI does not read online MR/PR data or provide review findings. See `${CLAUDE_SKILL_DIR}/../brain-init/references/deterministic-tooling.md` for the command contract, preview/authorization safeguards, and runtime fallbacks.
 
 
-**Project brain:** Follow `CLAUDE.local.md` §Project brain loading: read **all** root `.md` files once per session (again after compaction), plus the active branch's pending file when present. Inspect linked detail and verify task-critical facts against current source. Do not send the whole brain to subagents. If no brain exists, proceed and mention `/brain-init` once.
+**Project context (current rule):** Follow `CLAUDE.local.md` §Project brain loading; read governing core decisions, feature evidence and related technical/source material. Search by behavior and source paths; when coverage is uncertain, broaden. Existing mandatory root/context-map instructions are superseded.
 
 Produce one advisory assessment of the **current proposed change**. The analysis comes from `brain-review-code`; this skill owns the inputs, acceptance-criteria coverage, merge-specific checks, and the recommendation. Follow `CLAUDE.local.md`.
 
