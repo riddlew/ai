@@ -61,7 +61,24 @@ function doc(o){let b=brain(o),f=slug(req(o,'feature')),kind=req(o,'kind'),info=
  for(let p of parents){let x=known.get(p),prior=x?Object.values(kinds).find(k=>k[1]===x.folder)?.[0]:null;if(!prior||Number(prior)>=Number(info[0]))fail('unknown or invalid earlier-level parent: '+p)}
  let nums=[...known.keys()].filter(x=>x.startsWith(info[2]+'-')).map(x=>Number(x.split('-')[1])),n=Math.max(0,...nums)+1;if(n>999)fail('exhausted IDs');
  let id=info[2]+'-'+String(n).padStart(3,'0'),namefile=kind==='brief'?'brief.md':kind==='task'?id+'-'+name+'.md':name+'.md',target=path.join(area,info[1],namefile);if(exists(target))fail('existing document; preserve its ID: '+target);changes([[target,template(kind,id,parents,f)]],o)}
-function metadata(text){if(!text.startsWith('---\n'))fail('missing frontmatter');let e=text.indexOf('\n---',4);if(e<0)fail('unterminated frontmatter');let m={};for(let line of text.slice(4,e).split('\n')){let match=line.match(/^([a-z_]+):\s*(.*)$/);if(!match)fail('unsupported frontmatter line: '+line);let v=match[2].trim();if(v.startsWith('[')){if(!v.endsWith(']'))fail('unsupported list');v=v.slice(1,-1).split(',').map(x=>x.trim()).filter(Boolean)}m[match[1]]=v}return {meta:m,body:text.slice(e+4)}}
+function metadata(text){
+ if(!text.startsWith('---\n'))fail('missing frontmatter');
+ let e=text.indexOf('\n---',4);if(e<0)fail('unterminated frontmatter');
+ let m={},active=null;
+ const seq=['parents','requirements','depends_on','parent_hashes'];
+ for(let line of text.slice(4,e).split('\n')){
+  if(!line.trim()||line.trimStart().startsWith('#'))continue;
+  if(line.startsWith('  - ')&&active){m[active].push(line.slice(4).trim().replace(/^['"]|['"]$/g,''));continue}
+  let match=line.match(/^([a-z_]+):\s*(.*)$/);if(!match)fail('unsupported frontmatter line: '+line);
+  let key=match[1],value=match[2].trim();if(Object.hasOwn(m,key))fail('duplicate metadata key: '+key);
+  if(seq.includes(key)){
+   if(value===''||value==='[]'){m[key]=[];active=value===''?key:null}
+   else if(value.startsWith('[')&&value.endsWith(']')){m[key]=value.slice(1,-1).split(',').map(x=>x.trim().replace(/^['"]|['"]$/g,'')).filter(Boolean);active=null}
+   else fail('unsupported list syntax: '+key);
+  }else{m[key]=value.replace(/^['"]|['"]$/g,'');active=null}
+ }
+ return {meta:m,body:text.slice(e+4)}
+}
 function scan(b){let all=[],root=path.join(b,'features');if(!exists(root))return all;for(let feature of fs.readdirSync(root)){let area=path.join(root,feature);if(!fs.statSync(area).isDirectory())continue;for(let [kind,info] of Object.entries(kinds)){let dir=path.join(area,info[1]);if(!exists(dir))continue;for(let name of fs.readdirSync(dir).filter(x=>x.endsWith('.md'))){let file=path.join(dir,name),m=metadata(read(file));all.push({feature,file,kind,level:Number(info[0]),...m})}}}return all}
 function blob(s){let v=Buffer.from(s);return crypto.createHash('sha1').update(Buffer.concat([Buffer.from('blob '+v.length+'\0'),v])).digest('hex')}
 function validate(o){let all=scan(brain(o)),errors=[];for(let feature of new Set(all.map(x=>x.feature))){let arr=all.filter(x=>x.feature===feature),ids=new Map(),reqs=new Map();

@@ -6,8 +6,10 @@ errored {next}
 !header && $0=="---" {header=1;next}
 header && $0=="---" {header=0;inside=1;next}
 header {
-  if($0 ~ /^[a-z_]+: /){
-    split($0,k,": ");field=k[1];value=substr($0,length(field)+3)
+  if($0 ~ /^[ \t]*$/ || $0 ~ /^[ \t]*#/)next
+  if($0 ~ /^[a-z_]+:/){
+    field=$0;sub(/:.*/,"",field)
+    value=$0;sub(/^[a-z_]+:[ \t]*/,"",value)
     gsub(/^[ \t]+|[ \t]+$/,"",value)
     if(value=="[]")value=""
     else if(value ~ /^\[/ && value ~ /\]$/){value=substr(value,2,length(value)-2);gsub(/, */ ,",",value)}
@@ -35,7 +37,7 @@ header {
   print "ERROR\t"file": unsupported frontmatter: "$0;errored=1
   next
 }
-inside && kind=="specification" && $0 ~ /^- REQ-[0-9][0-9][0-9]:/ {
+inside && kind=="specification" && $0 ~ /^[-*] REQ-[0-9][0-9][0-9]:/ {
   value=$2;sub(/:$/,"",value);print "REQ\t"feature"\t"id"\t"value
 }
 END {
