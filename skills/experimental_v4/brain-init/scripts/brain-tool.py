@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import importlib.util
+import hashlib
 import os
 from pathlib import Path
 import re
@@ -30,7 +31,7 @@ class Problem(Exception):
 def opt(argv: list[str]) -> tuple[list[str], dict[str, object]]:
     pos: list[str] = []
     options: dict[str, object] = {"parent": []}
-    boolean = {"apply", "check-coverage", "pending"}
+    boolean = {"apply", "check-coverage", "pending", "estimate", "hashes"}
     i = 0
     while i < len(argv):
         token = argv[i]
@@ -393,6 +394,20 @@ def context(options: dict) -> None:
     brain = brain_path(options)
     if not (brain / "00_index.md").is_file():
         raise Problem(f"not a Brain: {brain}")
+    if options.get("select"):
+        name = str(options["select"])
+        rel = Path(name)
+        if rel.is_absolute() or ".." in rel.parts:
+            raise Problem("invalid context selection")
+        target = (brain / rel).resolve()
+        try:
+            target.relative_to(brain.resolve())
+        except ValueError as exc:
+            raise Problem("context selection escapes Brain") from exc
+        if not target.is_file():
+            raise Problem(f"context document missing: {name}")
+        print(target.read_text(encoding="utf-8"), end="")
+        return
     files = [f for f in brain.glob("*.md") if f.name not in ("README.md", "USAGE.md")]
     if options.get("branch"):
         branch = str(options["branch"]).replace("/", "--")
@@ -404,11 +419,19 @@ def context(options: dict) -> None:
     if options.get("feature"):
         feature = slug(str(options["feature"]))
         files += list((brain / "features" / feature).rglob("*.md"))
+    total = 0
     for file in sorted(set(files)):
-        content = file.read_text()
-        status = re.search(r"(?m)^status:\s*(\S+)", content)
-        print(f"DOC {file.relative_to(brain)}\t{len(content.encode('utf-8'))}\t"
-              f"{status.group(1) if status else '-'}")
+        content = file.read_bytes()
+        total += len(content)
+        status = re.search(rb"(?m)^status:\s*(\S+)", content)
+        extra = ""
+        if options.get("hashes"):
+            prefix = f"blob {len(content)}\\0".encode()
+            extra = "\\t" + hashlib.sha1(prefix + content).hexdigest()
+        print(f"DOC {file.relative_to(brain)}\\t{len(content)}\\t"
+              f"{status.group(1).decode() if status else '-'}{extra}")
+    if options.get("estimate"):
+        print(f"ESTIMATE bytes={total} tokens~={(total+3)//4} (approximate)")
 
 
 def main(argv: list[str] | None = None) -> int:
