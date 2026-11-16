@@ -146,6 +146,13 @@ init)
       printf 'REVIEW existing %s: differs from bundled guide; preserved\n' "$target"
     fi
   done
+  # Preflight Git administrative writes before creating any Brain files.
+  if [ "$APPLY" = 1 ] && [ "$TRACKING" = ignored ]; then
+    common=$(git -C "$REPO" rev-parse --path-format=absolute --git-common-dir) ||
+      die 'Git metadata unavailable'
+    excluded=$common/info/exclude
+    guard "$excluded"
+  fi
   [ -f "$index" ] || put "$index" "$tmp/index"
   for name in USAGE.md README.md; do
     target=$BRAIN/$name

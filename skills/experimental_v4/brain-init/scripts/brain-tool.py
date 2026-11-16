@@ -176,11 +176,13 @@ def init(options: dict) -> None:
             print("REVIEW existing CLAUDE.local.md; preserve custom policy")
     else:
         items.append((policy, (REFS / "CLAUDE.local.md").read_text()))
-    changes(items, options)
+    exclusion = None
     if mode == "ignored" and options.get("apply"):
         common = path(git(repo, "rev-parse", "--path-format=absolute", "--git-common-dir"))
         exclusion = common / "info" / "exclude"
         in_scope(exclusion, options)
+    changes(items, options)
+    if exclusion is not None:
         content = exclusion.read_text() if exclusion.exists() else ""
         if ".brain/" not in content.splitlines():
             exclusion.parent.mkdir(parents=True, exist_ok=True)
