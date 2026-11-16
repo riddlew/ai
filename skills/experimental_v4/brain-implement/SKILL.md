@@ -6,6 +6,9 @@ disable-model-invocation: true
 
 # Implement
 
+**Mechanical execution bookkeeping:** When a durable record is required, use `sh "${CLAUDE_SKILL_DIR}/../brain-init/scripts/brain-tool" doc new --kind execution` to scaffold `execution.md` without inventing a review base, and `record --event ... --detail ...` for verified factual checkpoints. Fill in real source/review/verification facts and obtain all required approvals independently. See `${CLAUDE_SKILL_DIR}/../brain-init/references/deterministic-tooling.md` for the command contract, preview/authorization safeguards, and runtime fallbacks.
+
+
 **Project brain:** Follow `CLAUDE.local.md` §Project brain loading: read **all** root `.md` files once per session (again after compaction), plus the active branch's pending file when present. Inspect linked detail and verify task-critical facts against current source. Do not send the whole brain to subagents. If no brain exists, proceed and mention `/brain-init` once.
 
 Implement an approved task set, specification, or well-established request **without silently changing the user's intended code structure**. Small, clear changes need no specification or separate blueprint. Follow `CLAUDE.local.md` for decision authority and consultation.

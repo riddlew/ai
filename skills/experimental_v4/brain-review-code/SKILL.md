@@ -5,6 +5,9 @@ description: Review a bounded Git change set for correctness, requirement fit, a
 
 # Code Review
 
+**Mechanical review preparation:** Use `sh "${CLAUDE_SKILL_DIR}/../brain-init/scripts/brain-tool" git` to collect a factual Git change inventory when appropriate. If a durable report is requested, use `doc new --kind review --report-type code` for safe numbering; reviews and findings remain your responsibility. See `${CLAUDE_SKILL_DIR}/../brain-init/references/deterministic-tooling.md` for the command contract, preview/authorization safeguards, and runtime fallbacks.
+
+
 **Project brain:** Follow `CLAUDE.local.md` §Project brain loading: read **all** root `.md` files once per session (again after compaction), plus the active branch's pending file when present. Inspect linked detail and verify task-critical facts against current source. Do not send the whole brain to subagents. If no brain exists, proceed and mention `/brain-init` once.
 
 Review a bounded change set in three assessments: **Correctness**, **Requirement fit**, and **Repository fit**. Follow `CLAUDE.local.md` for decision authority; a finding may recommend a change but does not authorize a redesign. **Read-only with respect to the reviewed code and existing project documentation:** do not edit, stage, commit, push, or apply fixes. A new durable review report is permitted only when explicitly requested or required by the invoking workflow (§7). If targeted tests create temporary artifacts, ensure they do not overwrite existing work and disclose any residual changes.

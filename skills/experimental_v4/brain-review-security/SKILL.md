@@ -5,6 +5,9 @@ description: Examine a specific security-sensitive change, data flow, or trust b
 
 # Security Review
 
+**Mechanical report storage:** When a durable security report is requested or required, use `sh "${CLAUDE_SKILL_DIR}/../brain-init/scripts/brain-tool" doc new --kind review --report-type security` for collision-free numbering and a blank report. Do not confuse file creation with evidence of security. See `${CLAUDE_SKILL_DIR}/../brain-init/references/deterministic-tooling.md` for the command contract, preview/authorization safeguards, and runtime fallbacks.
+
+
 **Project brain:** Follow `CLAUDE.local.md` §Project brain loading: read **all** root `.md` files once per session (again after compaction), plus the active branch's pending file when present. Inspect linked detail and verify task-critical facts against current source. Do not send the whole brain to subagents. If no brain exists, proceed and mention `/brain-init` once.
 
 Evaluate credible threats to a **bounded, real system**. Follow `CLAUDE.local.md`. This is a focused security assessment, not a general code review (`brain-review-code` owns that) and not permission to modify code, permissions, credentials, configuration, or deployed systems.
