@@ -159,22 +159,26 @@ class DeterministicCliContract(unittest.TestCase):
 
     def test_context_selection_fingerprints_and_estimates(self):
         rel = "features/start-machine/02-specifications/start-machine.md"
-        expected = (FIXTURE / rel).read_text()
-        manifests = []
-        for runtime in ("python", "node", "sh"):
-            data = invoke(runtime, "context", "--brain", FIXTURE, "--feature",
-                          "start-machine", "--hashes", "--estimate").stdout
-            self.assertIn("ESTIMATE bytes=", data)
-            self.assertIn("DOC " + rel, data)
-            manifests.append(data)
-            selected = invoke(runtime, "context", "--brain", FIXTURE,
-                              "--select", rel).stdout
-            self.assertEqual(selected, expected)
-            bad = invoke(runtime, "context", "--brain", FIXTURE,
-                         "--select", "../README.md", ok=False)
-            self.assertNotEqual(bad.returncode, 0)
-        self.assertEqual(manifests[0], manifests[1])
-        self.assertEqual(manifests[0], manifests[2])
+        with tempfile.TemporaryDirectory() as temp:
+            target = Path(temp) / ".brain"
+            shutil.copytree(FIXTURE, target)
+            (target / "00_index.md").write_text("# Project Brain Index\\n")
+            expected = (target / rel).read_text()
+            manifests = []
+            for runtime in ("python", "node", "sh"):
+                data = invoke(runtime, "context", "--brain", target, "--feature",
+                              "start-machine", "--hashes", "--estimate").stdout
+                self.assertIn("ESTIMATE bytes=", data)
+                self.assertIn("DOC " + rel, data)
+                manifests.append(data)
+                selected = invoke(runtime, "context", "--brain", target,
+                                  "--select", rel).stdout
+                self.assertEqual(selected, expected)
+                bad = invoke(runtime, "context", "--brain", target,
+                             "--select", "../README.md", ok=False)
+                self.assertNotEqual(bad.returncode, 0)
+            self.assertEqual(manifests[0], manifests[1])
+            self.assertEqual(manifests[0], manifests[2])
 
 
     def test_denied_write_and_preview(self):
