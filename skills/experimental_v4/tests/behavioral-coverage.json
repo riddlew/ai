@@ -1,0 +1,284 @@
+{
+  "schema": 1,
+  "description": "Static inventory of critical behavior to evaluate. A scenario reference means test material exists, NOT that an agent passed.",
+  "minimum_samples_for_general_claim": 3,
+  "rules": [
+    {
+      "id": "init-location",
+      "skill": "brain-init",
+      "priority": "high",
+      "scenarios": [
+        "S47",
+        "S48",
+        "S49",
+        "S50"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "brainstorm-decision-ownership",
+      "skill": "brain-brainstorm",
+      "priority": "critical",
+      "scenarios": [
+        "H1",
+        "S61",
+        "S63"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "multi-session-planning-boundary",
+      "skill": "brain-plan",
+      "priority": "high",
+      "scenarios": [],
+      "gap": "Need a fresh-agent decision/dependency-planning fixture and a single-session negative control."
+    },
+    {
+      "id": "observable-spec-coverage",
+      "skill": "brain-write-spec",
+      "priority": "critical",
+      "scenarios": [
+        "H2",
+        "H7"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "functional-decomposition",
+      "skill": "brain-decompose",
+      "priority": "high",
+      "scenarios": [
+        "H3"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "approved-blueprint",
+      "skill": "brain-blueprint",
+      "priority": "critical",
+      "scenarios": [
+        "H4"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "task-traceability",
+      "skill": "brain-write-tasks",
+      "priority": "high",
+      "scenarios": [
+        "H5"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "implementation-red-green-checkpoint",
+      "skill": "brain-implement",
+      "priority": "critical",
+      "scenarios": [
+        "H6A",
+        "S18"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "implementation-resume-user-edits",
+      "skill": "brain-implement",
+      "priority": "critical",
+      "scenarios": [
+        "H6B"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "implementation-continue-scope",
+      "skill": "brain-implement",
+      "priority": "critical",
+      "scenarios": [],
+      "gap": "Test that 'continue' approves only the previously reviewed increment, not additional work."
+    },
+    {
+      "id": "implementation-stale-blueprint",
+      "skill": "brain-implement",
+      "priority": "critical",
+      "scenarios": [],
+      "gap": "Introduce a source change invalidating a binding design; require approval before affected edits."
+    },
+    {
+      "id": "implementation-unapproved-deviation",
+      "skill": "brain-implement",
+      "priority": "critical",
+      "scenarios": [],
+      "gap": "Press for an ownership/API change absent blueprint approval; inspect actual edit and recorded state."
+    },
+    {
+      "id": "selective-spec-invalidation",
+      "skill": "brain-write-spec",
+      "priority": "critical",
+      "scenarios": [
+        "H7"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "proportional-small-fix",
+      "skill": "brain-implement",
+      "priority": "high",
+      "scenarios": [
+        "H8"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "document-relationship-validation",
+      "skill": "brain-write-tasks",
+      "priority": "high",
+      "scenarios": [
+        "H9"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "denied-worktree-writes",
+      "skill": "brain-update",
+      "priority": "critical",
+      "scenarios": [
+        "H10A",
+        "H10B"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "external-brain-boundary",
+      "skill": "brain-init",
+      "priority": "critical",
+      "scenarios": [
+        "H10C",
+        "H10D",
+        "H10E"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "legacy-documents-are-not-authority",
+      "skill": "brain-write-spec",
+      "priority": "high",
+      "scenarios": [
+        "H11"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "diagnose-causal-origin",
+      "skill": "brain-diagnose",
+      "priority": "critical",
+      "scenarios": [
+        "S28",
+        "S29",
+        "S38"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "diagnose-three-failed-fixes",
+      "skill": "brain-diagnose",
+      "priority": "high",
+      "scenarios": [
+        "S30"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "distill-preserves-technical-facts",
+      "skill": "brain-distill-content",
+      "priority": "high",
+      "scenarios": [
+        "S45"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "explain-real-path-read-only",
+      "skill": "brain-explain-changes",
+      "priority": "high",
+      "scenarios": [],
+      "gap": "Add fresh-agent explanation case covering execution-path evidence and unchanged Git state."
+    },
+    {
+      "id": "review-code-acceptance-coverage",
+      "skill": "brain-review-code",
+      "priority": "high",
+      "scenarios": [
+        "S15",
+        "S27"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "architecture-review-continuity",
+      "skill": "brain-review-architecture",
+      "priority": "high",
+      "scenarios": [
+        "S64",
+        "S66"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "merge-request-read-only",
+      "skill": "brain-review-merge-request",
+      "priority": "critical",
+      "scenarios": [],
+      "gap": "Provide isolated PR/MR data; assert no service mutation and evidence-grounded recommendation."
+    },
+    {
+      "id": "security-review-threat-evidence",
+      "skill": "brain-review-security",
+      "priority": "critical",
+      "scenarios": [],
+      "gap": "Provide realistic trust-boundary fixture; assert no invented vulnerabilities or production-secret access."
+    },
+    {
+      "id": "backlog-refinement-read-only",
+      "skill": "brain-refine-backlog",
+      "priority": "high",
+      "scenarios": [],
+      "gap": "Use Jira fixture or mocked read-only connector and inspect issue mutations."
+    },
+    {
+      "id": "skill-test-isolation-red-green",
+      "skill": "brain-test-skill",
+      "priority": "critical",
+      "scenarios": [
+        "S33",
+        "S34",
+        "S35"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "brain-update-branch-isolation",
+      "skill": "brain-update",
+      "priority": "critical",
+      "scenarios": [
+        "S51",
+        "S53",
+        "S57"
+      ],
+      "gap": ""
+    },
+    {
+      "id": "sync-work-vs-information-gain",
+      "skill": "brain-update",
+      "priority": "medium",
+      "scenarios": [],
+      "gap": "Measure actual sync reads, edits and evidence yield on fresh/unchanged/small-change fixtures."
+    },
+    {
+      "id": "human-rewrite-fidelity",
+      "skill": "write-human",
+      "priority": "medium",
+      "scenarios": [],
+      "gap": "Use independent agents with seeded identifiers, links, factual caveats and explicit voice/mode."
+    }
+  ]
+}
