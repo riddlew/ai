@@ -10,14 +10,18 @@ $1=="DOC" {
 $1=="MAP" {
   name=$2;mode=$3;selectors=$4;hash=$5
   if(name in mapping){map_error="duplicate-map-path";next}
-  if(name ~ /^\// || name ~ /(^|\/)\.\.(\/|$)/ || name ~ /(^|\/)\.(\/|$)/ || name !~ /^[A-Za-z0-9_./ -]+$/){map_error="invalid-map-path";next}
+  cleanname=name;gsub(/\//,"",cleanname)
+  if(name ~ /^\// || name ~ /(^|\/)\.\.(\/|$)/ || name ~ /(^|\/)\.(\/|$)/ || cleanname !~ /^[A-Za-z0-9_. -]+$/){map_error="invalid-map-path";next}
   if(mode=="global"){if(selectors!="-"){map_error="invalid-global-selector";next}}
   else if(mode=="scoped"){
     if(selectors==""||selectors=="-"){map_error="invalid-scope";next}
     count=split(selectors,parts,";")
     for(i=1;i<=count;i++){
       if(parts[i] ~ /^feature:[a-z0-9]+(-[a-z0-9]+)*$/)continue
-      if(parts[i] ~ /^path:[A-Za-z0-9_./ -]+$/ && parts[i] !~ /\.\./)continue
+      if(substr(parts[i],1,5)=="path:"){
+        cleanpath=substr(parts[i],6);gsub(/\//,"",cleanpath)
+        if(cleanpath ~ /^[A-Za-z0-9_. -]+$/ && parts[i] !~ /\.\./)continue
+      }
       map_error="invalid-scope"
     }
   }else{map_error="invalid-map-mode";next}
