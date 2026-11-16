@@ -1,71 +1,53 @@
 # Engineering Collaboration Policy
 
-This file defines decision authority across planning, implementation, debugging, testing, and reviews. Apply it alongside repository-specific guidance and the project brain (`.brain/`: specifications, ADRs, and project knowledge). Keep established project decisions in their existing authoritative records rather than duplicating them here.
+The user owns consequential product and architecture decisions. This policy applies to all Brain skills; follow applicable repository guidance, approved specifications and ADRs. Read detailed procedures only when the situation requires them.
 
 ## Decision authority
 
-Distinguish four things:
+- **Verify facts** from current source, tests, configuration, documentation and experiments. Distinguish implemented behavior from required behavior and disclose uncertainty.
+- **Honor established choices:** approved specifications, ADRs and `09_user_decisions.md` govern intent; don't reopen them silently. Source documents explicitly designated authoritative govern their contracts over derived summaries.
+- **Decide routine details:** low-risk, local, reversible implementation choices consistent with approved design need no user question.
+- **Consult for consequences:** changes to user-visible behavior, ownership/lifecycle, API/protocol/persistence/security, concurrency guarantees, important architecture or irreversible cost require explicit approval **before acting**. A recommendation, draft, test result or feature request is not approval.
+- First investigate discoverable facts and approved decisions. Ask only unresolved, material choices with a concise recommendation; wait for the answer. If approved records conflict without an explicit later supersession, stop the affected scope and consult.
 
-1. **Verified facts:** Discover independently from current source code, tests, configuration, documentation, and appropriate experiments. State uncertainty when evidence is insufficient.
-2. **Established decisions:** Follow requirements and architectural choices explicitly approved by the user or recorded in applicable authoritative project artifacts. Do not silently reopen them.
-3. **Routine implementation details:** Decide independently when local, low-risk, reversible, and consistent with established decisions. Examples: a private helper, a variable name, or an ordinary test assertion.
-4. **Consequential choices:** Consult the user before deciding product behavior, ownership, architecture, public contracts, or other changes with material cost or risk. A recommendation is not an approval.
-
-A feature request authorizes work within its agreed scope; it does not authorize unapproved redesign. The existing code is a starting point and evidence, not proof that its design is ideal.
+For decision tradeoffs and review discipline, consult `brain-init/references/engineering-details.md` only when relevant. Preserve project-specific instructions alongside this policy.
 
 ## Project brain loading
 
-When a skill needs project context, locate the brain from an explicitly supplied valid path, then the `Project brain:` line in loaded instructions, then `.brain/` at the current worktree root, then `.brain/` in the main checkout of a linked worktree (the parent of `git rev-parse --path-format=absolute --git-common-dir`). A brain must contain `00_index.md`. If no brain exists, proceed under the skill's no-brain policy and mention `/brain-init` once; never treat a folder with unrelated documents as a brain.
+Locate **one** Brain (must contain `00_index.md`) in order: explicitly supplied valid location; saved `Project brain:` path; current worktree's `.brain/`; main checkout's `.brain/` in a linked worktree. If none exists, follow the active skill's no-brain policy and mention `/brain-init` once.
 
-**Safe selective context loading:** For Brain-dependent work other than full-root synchronization by `brain-update`, establish the current branch, relevant feature slugs, and **all known affected source paths**, including owners, callers, tests and cross-module dependencies. Run the bundled `brain-context plan` command as described in the installed `brain-init/references/safe-context-loading.md`. **Actually read every returned `READ` document**, not just the filenames. A selective plan is allowed only with a complete, fingerprint-current, reviewed `.brain/context-map.tsv` and proven relevant feature/path mappings. The planner always includes core project orientation, architecture, recorded decisions, current branch pending notes and the selected feature's documents; it follows linked knowledge/source maps. If the plan fails, returns `full`, the scope is uncertain, a relevant source path is unmapped, or a new dependency is discovered, read the full returned context rather than silently omitting anything. After compaction, rerun and reload context you no longer retain. **The plan is a minimum read set, not permission to ignore discovered relevant documentation.** `brain-update` must still read **every** root project-knowledge file when synchronizing root knowledge, regardless of the planner.
+**Read context based on the actual task, not a mandatory context-map maintenance ritual:**
 
-The bundled `.brain/USAGE.md` and `.brain/README.md` are workflow references, **not** project-knowledge root files; read their relevant sections only as needed. On a branch other than the index's `Main branch:`, also read `pending/<branch>.md` when present (`/` in branch names becomes `--`). Read relevant linked subfolder documents, approved specifications, ADRs, plans, source-derived knowledge and original authoritative sources as required by the task. Never give subagents the whole Brain by default; provide relevant verified facts and source references. Write all Brain documents only to the single located Brain.
+1. Read available core project orientation (`00_index.md`, `01_about.md`, `02_features.md`, `03_architecture.md`, `09_user_decisions.md`, `state.md`, `open_questions.md`, `glossary.md`) and the active branch's `pending/<branch>.md` when present (`/` becomes `--`).
+2. Read the active feature's governing **approved** brief, specifications, components, implementation plans, tasks and execution state where applicable. Consult root topic knowledge and ADRs that govern the scope.
+3. Inspect actual code, owners, callers, tests and configuration. Search the Brain index, `adrs/`, `sources/`, `knowledge/` and linked files by feature, behavior, identifiers and **source paths**. Read matching documents and their references; verify exact contracts against original authoritative sources.
+4. Expand as new dependencies emerge. If naming or scope is ambiguous, or an important source map is stale or incomplete, **read more**, not less. After compaction, reload applicable context.
+
+The installed `brain-context plan` (Python / Node / POSIX shell) and reviewed `context-map.tsv` remain available as **optional discovery accelerators**, not a gate or an exclusion list. No matching row or successful fingerprint is proof that all relevant documentation has been found. See `brain-init/references/safe-context-loading.md` for the short discovery procedure. Never load an unrelated branch's pending facts as current. `brain-update` still reads **every** root project-knowledge file during main-branch synchronization.
+
+`README.md` and `USAGE.md` installed in the Brain are workflow guides, not authoritative project-knowledge root files; read only useful sections. Do not give subagents the whole Brain by default; provide verified, relevant facts and references.
 
 **Worktrees and brain writes.** Every Git worktree of the project uses the brain located above, so worktrees share one brain, whether it sits in the main checkout or outside the repository, and may update it when the session is authorized to write there. Before writing to a brain outside the active workspace, respect the session's authorized filesystem boundaries: technical writeability alone does not establish authorization. Never use shell commands, scripts, alternative tools, or a copy of the brain to get around those boundaries or a denied write; scripted brain maintenance within them is fine. If a required brain write is denied or outside those boundaries, say what could not be recorded and ask the user how to proceed. On a branch other than the index's `Main branch:`, unmerged branch-specific facts go in `pending/<branch>.md` (written by `brain-update`), not in the main-branch root files.
 
-The loaded Brain context provides orientation, **not proof that every statement remains current**. Verify task-critical implementation facts against current source, tests, and configuration; check branch-specific and uncommitted changes. For authoritative technical documents, `brain-update` maintains source maps in `.brain/sources/` and topic-specific knowledge in `.brain/knowledge/`. Read these subfolders selectively; consult the original source for exact protocol contracts and conformance. Keep source claims, approved decisions, and uncertain assumptions distinct.
+The Brain gives orientation, not proof of freshness. Check code, Git history and uncommitted changes before relying on implementation claims. Source maps and topic knowledge are retrieval aids; original authoritative source sections govern exact protocols and conformance.
 
-## Development workflow references
+## Feature documents and ownership
 
-`brain-init` installs `USAGE.md` and `README.md` at the root of the selected project brain (normally `.brain/`). When choosing or coordinating a workflow, consult the **relevant sections** of `.brain/USAGE.md` for examples, selection of `brain-brainstorm` versus `brain-plan`, blueprint collaboration, implementation checkpoints, and reviews. Consult `.brain/README.md` for the skill catalog and installation conventions when needed. If the brain is external, resolve both documents relative to its `Project brain:` path.
+Use `brain-init/references/feature-document-contract.md` for the exact hierarchy, metadata, approvals, requirements, dependency/coverage rules and parent fingerprints. Available levels: brief → specification → component → implementation plan → task; `execution.md` records mutable evidence **separately**. Skip unnecessary levels; a small, settled change can be implemented directly. Never create placeholders.
 
-These guides are examples and operational documentation, **not** binding project requirements or substitutes for skill instructions. Applicable `SKILL.md` procedures, this policy, approved specifications, ADRs, and recorded user decisions control actual behavior. Do not load either guide in full by default. The guarded Brain context plan and its full-read fallback remain mandatory when the task requires project context.
+`brain-brainstorm` owns briefs; `brain-write-spec` specifications; `brain-decompose` components; `brain-blueprint` binding plans; `brain-write-tasks` tasks; `brain-implement` execution state. `brain-update` alone maintains shared root knowledge, ADRs, source maps, technical knowledge and the index after initialization. `brain-plan` owns separate planning records.
 
-## Feature document hierarchy
+**Approval integrity:** a material revision to a governing approved document invalidates affected descendants until reviewed and renewed by their owning skills; unaffected work can proceed. Never silently refresh parent hashes or mark revised documents approved. Tasks are not permission to contradict specs or approved binding plans. If an authoritative conflict remains, consult.
 
-New feature work lives under `.brain/features/<feature-slug>/` using five levels: `01-brief/`, `02-specifications/`, `03-components/`, `04-implementation-plans/`, and `05-tasks/`. The feature's mutable implementation history is recorded separately in `execution.md`. When reading the policy from `brain-init`, use `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md` for metadata, traceability and readiness rules and `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-templates.md` for document shapes. No legacy feature-document paths are supported by this revision.
+## Implementation and reviews
 
-**Ownership:** `brain-brainstorm` writes briefs, `brain-write-spec` specifications, `brain-decompose` functional components, `brain-blueprint` approved implementation designs, `brain-write-tasks` executable tasks, and `brain-implement` execution state. `brain-update` maintains shared root knowledge, ADRs, source maps, and the index; it does not rewrite producer-owned feature documents. `brain-plan` continues owning independent multi-session decision/investigation tickets in `planning/`.
+Prefer the smallest verified change within agreed ownership. Inspect relevant code and tests. For substantial or design-sensitive work, obtain binding blueprint approval before editing. `brain-implement` defaults to **collaborative**, inline execution: after each coherent verified increment, show diff and tests and wait for approval; guided and autonomous modes require opt-in and never waive consequential decision approval. Maintain actual review-base and verification evidence; do not infer completion from checkboxes.
 
-**Authority:** the confirmed brief and specifications govern intent and behavior; approved ADRs and `09_user_decisions.md` govern durable consequential decisions; components map functional coverage; approved implementation plans govern binding code structure without overriding requirements; tasks direct actions without changing those plans; execution records observed work and verification, never normative intent. If governing documents conflict, identify the specific contradiction and consult rather than inventing precedence. Changes to approved parent requirements or binding design require validation of affected descendants, with impacted approvals set to `needs-revision` by their owning skills before affected work proceeds. Approved children record direct-parent content fingerprints (`parent_hashes`); if a fingerprint differs, re-review affected scope instead of silently regenerating it. Unaffected authorized work may continue. Every nontrivial task should trace to its governing requirement(s).
+Save reports when requested or required; **standalone `brain-review-architecture` saves a baseline by default** when the Brain is writable. A specialist invoked solely for another review does not save a report unless requested. Use the appropriate review or diagnosis skill for detailed evidence and response formats.
 
-**Proportionate workflow:** these are available levels of refinement, not a mandatory five-step gate. A trivial, settled change may be implemented directly and need no feature directory. Never create placeholder documents to satisfy numbering.
+## Development guides
 
-## When consultation is required
-
-Consult **before implementing or recording as decided** a choice that would materially:
-
-- Change requirements, scope, user-visible behavior, error handling, or recovery semantics not already specified.
-- Introduce, remove, or relocate ownership of responsibilities, state, resources, or lifecycles; for example, moving connection ownership from a `Session` class to a new manager.
-- Create a significant service, manager, abstraction, architectural layer, or dependency, or change dependency direction or context boundaries.
-- Change public APIs, protocols, serialization, persistence, data migrations, concurrency guarantees, security boundaries, or external compatibility.
-- Override an approved architectural decision, ADR, or specification; or create significant operational cost or difficult-to-reverse commitments.
-
-These are significance tests, not blanket bans. A minor helper class with no new architectural ownership is not automatically a consequential decision. Conversely, a small diff can still change a consequential contract. Consultation is for a **genuinely unresolved** consequential choice: first apply approved requirements and established decisions. Routine engineering details do not become approval questions merely because they involve state, architecture, or errors.
-
-**Do not ask the user for facts that can be discovered.** Do not ask again for a choice the user already approved. Do not manufacture design questions, requirements, future extension points, or approvals merely to follow a process.
-
-## How to consult
-
-When a consequential decision arises:
-
-1. Explain the concrete requirement, observed facts, and why the decision is necessary now.
-2. Start with the simplest approach consistent with existing ownership and approved requirements.
-3. Give only meaningful alternatives, explaining correctness, complexity, coupling, migration, testing, and maintenance tradeoffs.
-4. State a provisional recommendation and its evidence. Identify assumptions and uncertainties explicitly.
-5. Ask a focused question and **wait for the user's decision** before taking the consequential action.
-
-If the current architecture genuinely cannot support a requirement safely or correctly, explain why and propose a change; do not quietly force a poor fit. If a user-approved direction presents a concrete safety or correctness problem, surface it instead of silently substituting another design.
+`.brain/USAGE.md` describes example workflows; `.brain/README.md` is the catalog. Read relevant sections only. They never supersede applicable skills, this policy, approved decisions or authoritative contracts.
 
 ## Model tiers
 
@@ -87,18 +69,3 @@ Rules:
   - Opus while coordinating subagent-driven mode → suggest `/model sonnet`.
 - Inline implementation gets no suggestion (task difficulty varies); the inline final fix pass runs on the session model.
 - To change models later, edit only this table.
-
-## Implementation and review discipline
-
-- Prefer the smallest coherent solution satisfying **current** requirements. Do not optimize for speculative flexibility or abstract design ideals.
-- Inspect the relevant existing owners, callers, tests, and decision records before changing architecture.
-- Implement incrementally, verify observable behavior, and keep changes within scope. Do not introduce a new architecture merely to make a test convenient.
-- Treat reviews and research as evidence and proposals, not as authority to expand scope or change approved decisions.
-- Keep process proportional: routine changes may be implemented and verified directly; substantial features may need specs; long-running work may need planning and tickets.
-- `.brain/` is the project's single document store. `brain-init` creates it; after that, `brain-update` owns its root project-knowledge files, `adrs/`, `sources/`, and `knowledge/`; other skills write only their own documents into its subfolders, then invoke `brain-update`. In `.brain/features/<slug>/04-implementation-plans/`, `brain-blueprint` owns design documents; `brain-implement` separately owns that feature's `execution.md` and may not rewrite approved designs.
-- Deliver review and diagnosis results in the conversation. Save review reports only when requested or required by the workflow, **except** that standalone `brain-review-architecture` saves a baseline by default when a writable brain exists. Do not save a review invoked only as a specialist unless requested.
-- Record **approved** durable decisions through the project's existing documentation conventions when justified; do not turn unapproved recommendations into ADRs.
-- Implementation blueprints are **execution guidance**, not independent authority over the governing spec, ADRs, or approved user decisions. A blueprint explicitly approved by the user controls agreed implementation structure; clearly labeled illustrative signatures and pseudocode may be refined. `brain-implement` defaults to **collaborative** mode: for substantial or design-sensitive work, obtain blueprint approval before coding; after each verified, coherent increment, show the diff and pause for the user's review. Guided and autonomous modes are opt-in; none waives approval of unresolved consequential choices. Collaboration mode (review checkpoints) is distinct from execution mode (inline or subagent-driven); collaborative execution defaults to inline. For trivial, well-defined fixes, a separate blueprint is optional.
-- Implementation plans in `.brain/features/<slug>/04-implementation-plans/` are approved design guidance, distinct from execution evidence; descriptive `.brain` root files (`01`–`08`, `state.md`) are continuity aids that summarize other sources. Verify them against current code and tests; they never override specifications, ADRs, or recorded decisions. `.brain/09_user_decisions.md` is itself an authority on intent, alongside specifications and ADRs, and `.brain/glossary.md` is the authority on terminology. Documents explicitly designated authoritative for a protocol, API, or external contract remain authoritative over summaries derived from them in `.brain/knowledge/`. Current code determines what is implemented, not what the source requires; do not silently reconcile these disagreements. Record approved consequential changes in the governing specification, ADR, or `09_user_decisions.md` first. If authoritative records disagree, first check whether a later approved decision explicitly supersedes an earlier one. Otherwise surface the conflict and consult rather than inventing precedence.
-
-If blocked by a consequential open question, finish safe independent work, clearly identify the decision and affected scope, and do not proceed through the blocked choice.

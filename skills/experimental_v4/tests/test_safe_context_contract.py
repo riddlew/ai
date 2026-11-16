@@ -130,13 +130,14 @@ class SafeContextContract(unittest.TestCase):
         update = (ROOT / "brain-update/SKILL.md").read_text()
         guidance = (ROOT / "brain-init/references/safe-context-loading.md").read_text()
         self.assertIn("brain-context plan", policy)
-        self.assertIn("read every returned", policy.lower())
-        self.assertIn("READ", implement)
-        self.assertIn("full-read fallback", implement)
+        self.assertIn("optional discovery accelerators", policy)
+        self.assertIn("read more", policy.lower())
+        self.assertIn("active feature", implement.lower())
+        self.assertIn("read", implement.lower())
         self.assertIn("Read **every project-knowledge root file**", update)
         self.assertIn("Do not use selective context loading", update)
-        self.assertIn("map", guidance)
-        self.assertIn("source", guidance.lower())
+        self.assertIn("optional", guidance)
+        self.assertIn("original sources", guidance.lower())
 
     def test_unmapped_path_and_feature_force_full(self):
         mode, reason, files = self.selected("--path", "src/security/validator.py",
