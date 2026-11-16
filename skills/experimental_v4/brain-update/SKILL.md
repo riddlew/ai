@@ -46,7 +46,7 @@ The root files describe the main branch, and `Last synced` is always a commit on
 
 On the main branch:
 
-1. Read **every project-knowledge root file**, unless already loaded in this session and still in context; include the index. This full read is intentional so changes can be checked against the entire project model. Exclude only the `USAGE.md` and `README.md` workflow guides installed by `brain-init`; consult relevant guide sections when needed.
+1. Read **every project-knowledge root file**, unless already loaded in this session and still in context; include the index. **Do not use selective context loading to skip root files during brain-update synchronization.** This full read is intentional so changes can be checked against the entire project model. Exclude only the `USAGE.md` and `README.md` workflow guides installed by `brain-init`; consult relevant guide sections when needed.
 2. Gather what changed since `Last synced`:
    - committed work: enumerate **all** paths and renames with `git log --stat <sha>..HEAD` and `git diff --name-status <sha> HEAD`, then inspect the actual diffs and surrounding source for every change that could affect project knowledge. Do not rely on commit messages or path names alone; avoid dumping unrelated large/generated diffs into context without inspecting their effects;
    - uncommitted work: inspect `git status --short`, relevant staged changes (`git diff --cached`), unstaged changes (`git diff`), and relevant untracked files (`git ls-files --others --exclude-standard`). `git status` alone is not evidence of behavior;

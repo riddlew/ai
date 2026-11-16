@@ -15,6 +15,7 @@ All writes preview by default. After confirming the Brain path and **authorized*
 | `git` | `git --repo <repo> [--since SHA]` lists changes; `git --brain <brain> --pending --branch <branch> --at YYYY-MM-DD` creates an empty pending scaffold, not branch facts |
 | `record` | `record --brain <brain> --feature <slug> --event <slug> --detail <one-line fact>` appends a unique factual execution checkpoint |
 | `context` | `context --brain <brain> [--branch <branch>] [--feature <slug>] [--hashes] [--estimate]` lists paths, sizes, statuses, fingerprints and approximate token volume; `--select <relative-path>` reads an explicitly chosen Brain document without traversing outside it |
+| `brain-context` | `sh <installed-brain-init>/scripts/brain-context plan --brain <brain> --branch <branch> [--feature <slug>] [--path <source-path>]` produces the **mandatory** safe READ list for feature work; `map --brain <brain>` generates an all-global reviewed scope-map starter. See `safe-context-loading.md`. |
 
 Guardrails: preview before applying; never overwrite existing user content or silently assign approvals; never update approved child hashes simply because a parent changed; do not generate unrequested feature stages. Branch-only changes remain provisional in `pending/<branch>.md` pending verification on main. The CLI does not apply semantic pending entries, write root project facts, infer completion, or decide whether a design is valid.
 
