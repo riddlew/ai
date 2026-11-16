@@ -43,6 +43,11 @@ class DeterministicCliContract(unittest.TestCase):
                 common = ("--apply", "--authorized-root", repo)
                 invoke(runtime, "init", *opts, "--tracking", "tracked",
                        "--at", "2026-01-01", "--revision", "a"*40, *common)
+                ignored = subprocess.run(["git", "-C", str(repo),
+                                          "check-ignore", "-q",
+                                          "CLAUDE.local.md"], check=False)
+                self.assertEqual(ignored.returncode, 0,
+                                 "untracked personal policy must be excluded even when Brain is tracked")
                 first = snapshot(repo)
                 invoke(runtime, "init", *opts, "--tracking", "tracked", *common)
                 self.assertEqual(first, snapshot(repo), "init must be idempotent")
@@ -137,6 +142,32 @@ class DeterministicCliContract(unittest.TestCase):
                     "--feature", "demo", "--kind", "brief",
                     "--unrecognized-flag", "x", ok=False)
                 self.assertNotEqual(result.returncode, 0)
+
+
+    def test_ignored_brain_and_local_policy_exclusions(self):
+        for runtime in ("python", "node", "sh"):
+            with self.subTest(runtime=runtime), tempfile.TemporaryDirectory() as temp:
+                repo = Path(temp)
+                subprocess.run(["git", "init", "-q", str(repo)], check=True)
+                invoke(runtime, "init", "--repo", repo,
+                       "--brain", repo / ".brain", "--tracking", "ignored",
+                       "--revision", "a"*40, "--at", "2026-01-01",
+                       "--apply", "--authorized-root", repo)
+                for relative in (".brain/", "CLAUDE.local.md"):
+                    outcome = subprocess.run(["git", "-C", str(repo),
+                                              "check-ignore", "-q", relative],
+                                             check=False)
+                    self.assertEqual(outcome.returncode, 0, relative)
+                exclude = Path(subprocess.check_output(
+                    ["git", "-C", str(repo), "rev-parse",
+                     "--path-format=absolute", "--git-common-dir"],
+                    text=True).strip()) / "info/exclude"
+                initial = exclude.read_text()
+                invoke(runtime, "init", "--repo", repo,
+                       "--brain", repo / ".brain", "--tracking", "ignored",
+                       "--apply", "--authorized-root", repo)
+                self.assertEqual(initial, exclude.read_text(),
+                                 "Git exclusions must not be duplicated")
 
 
     def test_init_saves_location_without_rewriting_custom_policy(self):
