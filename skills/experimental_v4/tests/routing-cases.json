@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "description": "Unrun routing probes; do not interpret as passing tests",
+  "cases": [
+    {
+      "id": "bounded-decisions",
+      "request": "A few endpoint behavior decisions remain. Investigate facts and ask me only consequential questions.",
+      "expected": "brain-brainstorm",
+      "not": [
+        "brain-plan"
+      ]
+    },
+    {
+      "id": "multi-session-planning",
+      "request": "Coordinate a multi-session effort of prototypes, research and dependent decisions before implementation.",
+      "expected": "brain-plan",
+      "not": [
+        "brain-brainstorm"
+      ]
+    },
+    {
+      "id": "diagnose-failure",
+      "request": "The existing test intermittently fails. Diagnose the cause; don't modify files.",
+      "expected": "brain-diagnose",
+      "not": [
+        "brain-review-code"
+      ]
+    },
+    {
+      "id": "review-changes",
+      "request": "Review my branch diff against main and accepted requirements for correctness.",
+      "expected": "brain-review-code",
+      "not": [
+        "brain-diagnose"
+      ]
+    },
+    {
+      "id": "review-pr",
+      "request": "Review PR #42, its comments and CI, then advise whether to merge without posting anything.",
+      "expected": "brain-review-merge-request",
+      "not": [
+        "brain-review-code"
+      ]
+    },
+    {
+      "id": "technical-blueprint",
+      "request": "Design actual class ownership and method signatures for approved components; get my approval.",
+      "expected": "brain-blueprint",
+      "not": [
+        "brain-write-tasks"
+      ]
+    },
+    {
+      "id": "implementation-tasks",
+      "request": "Break the approved implementation design into small verifiable tasks.",
+      "expected": "brain-write-tasks",
+      "not": [
+        "brain-blueprint"
+      ]
+    },
+    {
+      "id": "explain-code",
+      "request": "Explain a real execution path of the code change without reviewing or modifying it.",
+      "expected": "brain-explain-changes",
+      "not": [
+        "brain-review-code"
+      ]
+    },
+    {
+      "id": "architecture-discovery",
+      "request": "Find the subsystem's architectural friction and propose options but implement nothing.",
+      "expected": "brain-review-architecture",
+      "not": [
+        "brain-blueprint"
+      ]
+    },
+    {
+      "id": "security-flow",
+      "request": "Review this untrusted input flow for authorization vulnerabilities without disruptive tests.",
+      "expected": "brain-review-security",
+      "not": [
+        "brain-review-code"
+      ]
+    },
+    {
+      "id": "synchronize-brain",
+      "request": "Sync our existing Brain from committed main branch source facts.",
+      "expected": "brain-update",
+      "not": [
+        "brain-init"
+      ]
+    },
+    {
+      "id": "initialize-brain",
+      "request": "Set up a new project Brain from repository source; don't edit product code.",
+      "expected": "brain-init",
+      "not": [
+        "brain-update"
+      ]
+    }
+  ]
+}
