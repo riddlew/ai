@@ -15,7 +15,7 @@ const read=p=>fs.readFileSync(p,'utf8'),exists=p=>fs.existsSync(p);
 const full=p=>path.resolve(p.startsWith('~')?path.join(os.homedir(),p.slice(1)):p);
 const isSlug=s=>/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s);
 function slug(s){if(!isSlug(s))fail('invalid slug: '+s);return s}
-function opts(args){let o={parent:[]};for(let i=0;i<args.length;i++)if(args[i].startsWith('--')){let k=args[i].slice(2);if(['apply','check-coverage','pending'].includes(k))o[k]=true;else{if(!args[i+1]||args[i+1].startsWith('--'))fail('missing value for --'+k);if(k==='parent')o.parent.push(args[++i]);else o[k]=args[++i]}}return o}
+function opts(args){let o={parent:[]};for(let i=0;i<args.length;i++)if(args[i].startsWith('--')){let k=args[i].slice(2);if(['apply','check-coverage','pending','estimate','hashes'].includes(k))o[k]=true;else{if(!args[i+1]||args[i+1].startsWith('--'))fail('missing value for --'+k);if(k==='parent')o.parent.push(args[++i]);else o[k]=args[++i]}}return o}
 function req(o,k){if(!o[k])fail('--'+k+' is required');return o[k]}
 const brain=o=>full(req(o,'brain'));
 function git(repo,...args){let r=cp.spawnSync('git',['-C',repo,...args],{encoding:'utf8'});if(r.status!==0)fail('git '+args.join(' ')+' failed: '+(r.stderr||'').trim());return r.stdout.trim()}
@@ -76,6 +76,20 @@ function validate(o){let all=scan(brain(o)),errors=[];for(let feature of new Set
  for(let e of errors)console.log('INVALID '+e);if(errors.length)fail(errors.length+' feature-document error(s)');console.log('VALID feature documents')}
 function gitState(o){let repo=full(o.repo||'.');if(o.pending){let b=brain(o),branch=o.branch||git(repo,'branch','--show-current');if(!/^[a-zA-Z0-9._/-]+$/.test(branch)||branch.includes('..'))fail('invalid branch');let target=path.join(b,'pending',branch.replaceAll('/','--')+'.md');if(exists(target)){if(!read(target).split('\n').includes('Branch: '+branch))fail('pending filename collision: '+target);console.log('UNCHANGED '+target);return}let day=o.at||new Date().toISOString().slice(0,10);changes([[target,read(path.join(root,'scaffolds/pending.md')).replaceAll('{{BRANCH}}',branch).replaceAll('{{DATE}}',day)]],o);return}console.log('BRANCH '+git(repo,'branch','--show-current'));console.log('HEAD '+git(repo,'rev-parse','HEAD'));for(let [label,args] of [['STATUS',['status','--porcelain','--untracked-files=all']],['STAGED',['diff','--cached','--name-status']],['UNSTAGED',['diff','--name-status']]])for(let l of git(repo,...args).split('\n').filter(Boolean))console.log(label+' '+l);if(o.since){git(repo,'cat-file','-e',o.since+'^{commit}');for(let l of git(repo,'diff','--name-status',o.since,'HEAD').split('\n').filter(Boolean))console.log('COMMITTED '+l)}}
 function record(o){let target=path.join(brain(o),'features',slug(req(o,'feature')),'execution.md');if(!exists(target))fail('execution.md does not exist; initialize through brain-implement first: '+target);let event=req(o,'event'),detail=req(o,'detail');if(!isSlug(event)||detail.includes('\n'))fail('invalid event or detail');let text=read(target),entry='- '+event+': '+detail+'\n';if(!text.includes('## Checkpoints'))fail('execution record has no ## Checkpoints heading');if(text.slice(text.indexOf('## Checkpoints')).includes(entry)){console.log('UNCHANGED '+target);return}if(!o.apply){console.log('APPEND '+target+' (dry-run)');return}scope(target,o);fs.appendFileSync(target,(text.endsWith('\n')?'':'\n')+entry);console.log('APPENDED '+target)}
-function context(o){let b=brain(o);if(!exists(path.join(b,'00_index.md')))fail('not a Brain: '+b);let files=fs.readdirSync(b).filter(x=>x.endsWith('.md')&&!['README.md','USAGE.md'].includes(x)).map(x=>path.join(b,x));if(o.branch){let p=path.join(b,'pending',slug(o.branch.replaceAll('/','--'))+'.md');if(exists(p))files.push(p)}if(o.feature){let name=slug(o.feature);files.push(...scan(b).filter(x=>x.feature===name).map(x=>x.file));let p=path.join(b,'features',name,'execution.md');if(exists(p))files.push(p)}for(let f of [...new Set(files)].sort()){let s=read(f),status=s.match(/^status:\s*(\S+)/m);console.log('DOC '+path.relative(b,f)+'\t'+Buffer.byteLength(s)+'\t'+(status?.[1]||'-'))}}
+function context(o){
+ let b=brain(o);if(!exists(path.join(b,'00_index.md')))fail('not a Brain: '+b);
+ if(o.select){let name=o.select;if(path.isAbsolute(name)||name.split(/[\\/]/).includes('..'))fail('invalid context selection');let p=path.join(b,name);
+ if(!exists(p)||!fs.statSync(p).isFile())fail('context document missing: '+name);
+ let actual=fs.realpathSync(p),base=fs.realpathSync(b);if(!actual.startsWith(base+path.sep))fail('context selection escapes Brain');
+ process.stdout.write(read(p));return}
+ let files=fs.readdirSync(b).filter(x=>x.endsWith('.md')&&!['README.md','USAGE.md'].includes(x)).map(x=>path.join(b,x));
+ if(o.branch){let p=path.join(b,'pending',slug(o.branch.replaceAll('/','--'))+'.md');if(exists(p))files.push(p)}
+ if(o.feature){let name=slug(o.feature);files.push(...scan(b).filter(x=>x.feature===name).map(x=>x.file));let p=path.join(b,'features',name,'execution.md');if(exists(p))files.push(p)}
+ let total=0;
+ for(let f of [...new Set(files)].sort()){let s=read(f),bytes=Buffer.byteLength(s),status=s.match(/^status:\s*(\S+)/m);total+=bytes;
+ let extra=o.hashes?'\t'+blob(s):'';
+ console.log('DOC '+path.relative(b,f)+'\t'+bytes+'\t'+(status?.[1]||'-')+extra)}
+ if(o.estimate)console.log('ESTIMATE bytes='+total+' tokens~='+Math.ceil(total/4)+' (approximate)')
+}
 function main(){let args=process.argv.slice(2);if(!args.length||['-h','--help'].includes(args[0])){console.log('brain-tool <init|doc|validate|git|record|context> [options]; writes require --apply --authorized-root PATH');return}let family=args.shift();if(['new','list','summary'].includes(args[0]))args.shift();let o=opts(args);let commands={init,doc,validate,git:gitState,record,context};if(!commands[family])fail('unknown command: '+family);commands[family](o)}
 try{main()}catch(e){console.error('ERROR '+e.message);process.exitCode=1}
