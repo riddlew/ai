@@ -99,6 +99,33 @@ class DeterministicCliContract(unittest.TestCase):
         self.assertEqual(outcomes[0], outcomes[1], "Node files differ from Python")
         self.assertEqual(outcomes[0], outcomes[2], "shell files differ from Python")
 
+    def test_init_preserves_customized_guide(self):
+        for runtime in ("python", "node", "sh"):
+            with self.subTest(runtime=runtime), tempfile.TemporaryDirectory() as temp:
+                repo = Path(temp)
+                subprocess.run(["git", "init", "-q", str(repo)], check=True)
+                brain = repo / ".brain"
+                brain.mkdir()
+                guide = brain / "README.md"
+                guide.write_text("# Custom project guide\n")
+                run = invoke(runtime, "init", "--repo", repo, "--brain", brain,
+                    "--tracking", "tracked", "--revision", "a"*40,
+                    "--at", "2026-01-01", "--apply", "--authorized-root",
+                    repo, ok=False)
+                self.assertEqual(run.returncode, 0, run.stderr)
+                self.assertEqual(guide.read_text(), "# Custom project guide\n")
+                self.assertTrue((brain / "USAGE.md").is_file())
+                self.assertIn("REVIEW", run.stdout)
+
+    def test_options_are_rejected_when_unknown(self):
+        for runtime in ("python", "node", "sh"):
+            with self.subTest(runtime=runtime):
+                result = invoke(runtime, "doc", "--brain", ".brain",
+                    "--feature", "demo", "--kind", "brief",
+                    "--unrecognized-flag", "x", ok=False)
+                self.assertNotEqual(result.returncode, 0)
+
+
     def test_fixture_validation_and_parent_hashes(self):
         expected = subprocess.run(["python3", str(VALIDATOR),
                          str(FIXTURE / "features"), "--check-coverage"],
@@ -149,7 +176,25 @@ class DeterministicCliContract(unittest.TestCase):
                 root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
             ).write_text((root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
                           ).read_text().replace("status: approved",
-                                                "status: approved\\nstatus: approved")),
+                                                "status: approved\nstatus: approved")),
+            "missing required list": lambda root: (
+                root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
+            ).write_text((root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
+                          ).read_text().replace("depends_on: []\n", "")),
+            "duplicate parent reference": lambda root: (
+                root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
+            ).write_text((root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
+                          ).read_text().replace("parents: [PLAN-002]",
+                                                "parents: [PLAN-002, PLAN-002]")),
+            "unexpected parent hash": lambda root: (
+                root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
+            ).write_text((root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
+                          ).read_text().replace("parent_hashes: [PLAN-002@",
+                                                "parent_hashes: [PLAN-999@" + "0"*40 + ", PLAN-002@")),
+            "wrong kind for folder": lambda root: (
+                root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
+            ).write_text((root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
+                          ).read_text().replace("kind: task", "kind: specification")),
             "unknown parent": lambda root: (
                 root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
             ).write_text((root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
