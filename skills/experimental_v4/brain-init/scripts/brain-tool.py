@@ -381,10 +381,10 @@ def record(options: dict) -> None:
         return
     if "## Checkpoints" not in text:
         raise Problem("execution record has no ## Checkpoints heading")
-    in_scope(target, options)
     if not options.get("apply"):
         print(f"APPEND {target} (dry-run)")
         return
+    in_scope(target, options)
     with target.open("a", encoding="utf-8") as f:
         f.write(("\n" if not text.endswith("\n") else "") + entry)
     print(f"APPENDED {target}")

@@ -8,6 +8,7 @@ need() { [ -n "$2" ] || die "--$1 is required"; }
 slug() { case "$1" in ''|*[!a-z0-9-]*|*-|-*|*--) die "invalid slug: $1";; esac; }
 abs() { case "$1" in /*) printf '%s\n' "$1";; *) printf '%s/%s\n' "$PWD" "$1";; esac; }
 guard() {
+  [ ! -L "$1" ] || die "symlink file is not an authorized write target: $1"
   [ -n "$AUTHORIZED" ] || die '--authorized-root is required for --apply'
   case "$1" in "$AUTHORIZED"|"$AUTHORIZED"/*) :;; *) die "outside authorized write root: $1";; esac
   root_real=$(CDPATH= cd -- "$AUTHORIZED" 2>/dev/null && pwd -P) ||
@@ -254,6 +255,7 @@ context)
     case "$SELECT" in /*|..|../*|*/../*|*/..) die 'invalid context selection';; esac
     target=$BRAIN/$SELECT
     [ -f "$target" ] || die "context document missing: $SELECT"
+    [ ! -L "$target" ] || die "context selection escapes Brain"
     root_real=$(CDPATH= cd -- "$BRAIN" && pwd -P) || die 'Brain inaccessible'
     parent_real=$(CDPATH= cd -- "$(dirname "$target")" && pwd -P) || die 'document parent inaccessible'
     case "$parent_real" in "$root_real"|"$root_real"/*) :;; *) die 'context selection escapes Brain';; esac
