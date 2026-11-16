@@ -9,6 +9,7 @@ header {
   if($0 ~ /^[ \t]*$/ || $0 ~ /^[ \t]*#/)next
   if($0 ~ /^[a-z_]+:/){
     field=$0;sub(/:.*/,"",field)
+    if(seen[field]++){print "ERROR\t"file": duplicate metadata key: "field;errored=1;next}
     value=$0;sub(/^[a-z_]+:[ \t]*/,"",value)
     gsub(/^[ \t]+|[ \t]+$/,"",value)
     if(value=="[]")value=""

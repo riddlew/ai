@@ -145,6 +145,11 @@ class DeterministicCliContract(unittest.TestCase):
             ).write_text((root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
                           ).read_text().replace("parents: [PLAN-002]",
                                                 "parents: PLAN-002")),
+            "duplicate metadata": lambda root: (
+                root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
+            ).write_text((root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
+                          ).read_text().replace("status: approved",
+                                                "status: approved\\nstatus: approved")),
             "unknown parent": lambda root: (
                 root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
             ).write_text((root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
