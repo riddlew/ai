@@ -117,6 +117,20 @@ class DeterministicCliContract(unittest.TestCase):
                          "--show-parent-hashes", doc)
             self.assertEqual(expected_hashes.stdout.strip(), got.stdout.strip())
 
+    def test_block_style_yaml_lists_work_in_all_runtimes(self):
+        with tempfile.TemporaryDirectory() as temp:
+            target = Path(temp) / ".brain"
+            shutil.copytree(FIXTURE, target)
+            doc = target / "features/start-machine/05-tasks/TASK-001-registry-start.md"
+            original = doc.read_text()
+            doc.write_text(original.replace("parents: [PLAN-002]",
+                                            "parents:\n  - PLAN-002"))
+            for runtime in ("python", "node", "sh"):
+                result = invoke(runtime, "validate", "--brain", target,
+                                "--check-coverage")
+                self.assertIn("VALID feature documents", result.stdout)
+
+
     def test_validation_rejects_structural_defects_in_every_runtime(self):
         changes = {
             "duplicate id": lambda root: shutil.copy2(
