@@ -1,6 +1,6 @@
 # Experimental v4 skill simplification plan
 
-**Status:** Proposal only — no skill, policy, script, or test behavior changed.  
+**Status:** Implemented on `feature/simplify-brain-skills`; static and CLI validation passed, agent-level behavioral evaluation not run. Pending review and merge.  
 **Base:** `main` at `4bd19eb5aafa56ef6e648f0770882bc351beb293`  
 **Working branch:** `feature/simplify-brain-skills`
 
@@ -124,4 +124,4 @@ Order work in **small reviewable commits**. The order of context versus central 
 
 The simplification is ready for review when the primary entry points clearly describe the happy path and only task-critical stops; shared rules have one authoritative home; complex references are loaded conditionally; all original invariants remain covered by tests; the retrieval strategy proves it can find difficult related technical documents; and measured instruction/token costs improve without an observed safety or quality regression.
 
-**This file is the plan, not an implementation or authorization to merge into `main`.**
+**Implementation:** See `SKILL_SIMPLIFICATION_REPORT.md` for the changed entry points, metrics, tests and limitations. Neither the plan nor implementation authorizes merging into `main`.
