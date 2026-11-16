@@ -5,6 +5,9 @@ description: Use when setting up or locating a project brain, or installing its 
 
 # Brain Init
 
+**Mechanical setup:** After resolving the authorized brain location and tracking choice, preview and use `sh "${CLAUDE_SKILL_DIR}/scripts/brain-tool" init` for directory/index creation, bundled guide copying, an absent policy, and local Git exclusions. Pass `--save-location` when the selected Brain path should be recorded in `CLAUDE.local.md`; the script preserves existing project-specific instructions and refuses a conflicting saved location. Do not widen authorized write scope for an external Brain; if an existing index or customized policy needs reconciliation, preserve it and follow this skill's review rules. See `${CLAUDE_SKILL_DIR}/references/deterministic-tooling.md`.
+
+
 Sets up a project's `.brain/`, or connects the project to an existing one. For new feature work, use the five-level structure described in `${CLAUDE_SKILL_DIR}/references/feature-document-contract.md` and the matching templates in `${CLAUDE_SKILL_DIR}/references/feature-document-templates.md`. No legacy feature-document migration or compatibility is required. Installs the shared `CLAUDE.local.md` policy and the bundled workflow guides (`USAGE.md` and `README.md`) without replacing project-specific instructions. `brain-update` maintains the brain afterward. For what goes where, read §4 (root files) and §5 (ADRs) of `${CLAUDE_SKILL_DIR}/../brain-update/SKILL.md`; read the file, don't invoke that skill. The templates are in `${CLAUDE_SKILL_DIR}/../brain-update/references/templates.md`. Follow `CLAUDE.local.md` for decision authority.
 
 **Always:**

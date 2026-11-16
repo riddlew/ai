@@ -6,6 +6,9 @@ disable-model-invocation: true
 
 # Write Tasks
 
+**Mechanical task creation:** Use `sh "${CLAUDE_SKILL_DIR}/../brain-init/scripts/brain-tool" doc new --kind task` to allocate stable IDs, names and initial draft frontmatter. Supply actual governing plan parents and write task actions, examples, and dependencies yourself; script success never grants approval. See `${CLAUDE_SKILL_DIR}/../brain-init/references/deterministic-tooling.md` for the command contract, preview/authorization safeguards, and runtime fallbacks.
+
+
 **Project brain:** Follow `CLAUDE.local.md` for project brain, decision authority, and source verification. Read `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md` and `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-templates.md`.
 
 Preserve rigorous coverage, genuine dependency checks, user approval, and builder review while generating **concrete implementation actions** from approved plans, rather than delivery tickets from specifications. Own only `.brain/features/<feature-slug>/05-tasks/`. Do not edit approved implementation plans, upstream documents, execution history, or production code. For one trivial action, direct implementation may be more proportionate.

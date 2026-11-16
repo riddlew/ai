@@ -6,6 +6,9 @@ disable-model-invocation: true
 
 # Blueprint — Implementation Plans
 
+**Mechanical plan creation:** Use `sh "${CLAUDE_SKILL_DIR}/../brain-init/scripts/brain-tool" doc new --kind plan` for newly approved-scope design work (the generated document remains `draft`); populate its actual technical design and inspected SHA. Use `validate --show-parent-hashes` to calculate fingerprints without silently changing approved documents. See `${CLAUDE_SKILL_DIR}/../brain-init/references/deterministic-tooling.md` for the command contract, preview/authorization safeguards, and runtime fallbacks.
+
+
 **Project brain:** Follow `CLAUDE.local.md` project-brain loading, branch context, decision authority, and source verification rules. Read the shared feature-document contract and templates from `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md` and `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-templates.md`.
 
 Define **how** approved functional components will be implemented in the inspected codebase. Preserve approved requirements, architecture, and explicit design preferences. This skill owns only `.brain/features/<feature-slug>/04-implementation-plans/`. `brain-implement` owns mutable `execution.md`; do not record task completion or execution status here. For small settled changes, a separate blueprint is optional.

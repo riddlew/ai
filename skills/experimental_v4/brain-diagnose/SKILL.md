@@ -5,6 +5,9 @@ description: Investigate software failures through observable evidence and discr
 
 # Diagnose
 
+**Mechanical diagnosis storage:** Only when a durable diagnosis is warranted, use `sh "${CLAUDE_SKILL_DIR}/../brain-init/scripts/brain-tool" doc new --kind diagnosis` for collision-free numbering and a blank report; produce the evidence-backed diagnosis yourself. See `${CLAUDE_SKILL_DIR}/../brain-init/references/deterministic-tooling.md` for the command contract, preview/authorization safeguards, and runtime fallbacks.
+
+
 **Project brain:** Follow `CLAUDE.local.md` §Project brain loading: read **all** root `.md` files once per session (again after compaction), plus the active branch's pending file when present. Inspect linked detail and verify task-critical facts against current source. Do not send the whole brain to subagents. If no brain exists, proceed and mention `/brain-init` once.
 
 Find the cause of a failure before choosing a correction. Follow `CLAUDE.local.md` for decisions requiring consultation.

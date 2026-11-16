@@ -5,6 +5,9 @@ description: Discover architectural friction across a codebase, or assess a sele
 
 # Architecture Review
 
+**Mechanical report storage:** When saving the required durable baseline, use `sh "${CLAUDE_SKILL_DIR}/../brain-init/scripts/brain-tool" doc new --kind review --report-type architecture` for numbered paths and a blank report; fill in verified findings yourself. See `${CLAUDE_SKILL_DIR}/../brain-init/references/deterministic-tooling.md` for the command contract, preview/authorization safeguards, and runtime fallbacks.
+
+
 **Project brain:** Follow `CLAUDE.local.md` §Project brain loading: read **all** root `.md` files once per session (again after compaction), plus the active branch's pending file when present. Inspect linked detail and verify task-critical facts against current source. Do not send the whole brain to subagents. If no brain exists, proceed and mention `/brain-init` once.
 
 Find or assess architectural improvements using concrete evidence. Follow `CLAUDE.local.md`: a recommendation or selected review topic is not approval to redesign. Do not modify production code.
