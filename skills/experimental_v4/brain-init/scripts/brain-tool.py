@@ -32,6 +32,10 @@ def opt(argv: list[str]) -> tuple[list[str], dict[str, object]]:
     pos: list[str] = []
     options: dict[str, object] = {"parent": []}
     boolean = {"apply", "check-coverage", "pending", "estimate", "hashes"}
+    values = {"brain", "repo", "tracking", "revision", "at", "main-branch",
+              "feature", "kind", "slug", "authorized-root", "affected",
+              "show-parent-hashes", "since", "event", "detail", "branch",
+              "report-type", "select"}
     i = 0
     while i < len(argv):
         token = argv[i]
@@ -44,11 +48,13 @@ def opt(argv: list[str]) -> tuple[list[str], dict[str, object]]:
                     raise Problem(f"missing value for --{key}")
                 options["parent"].append(argv[i + 1])
                 i += 1
-            else:
+            elif key in values:
                 if i + 1 >= len(argv) or argv[i + 1].startswith("--"):
                     raise Problem(f"missing value for --{key}")
                 options[key] = argv[i + 1]
                 i += 1
+            else:
+                raise Problem(f"unknown option: --{key}")
         else:
             pos.append(token)
         i += 1
@@ -148,8 +154,14 @@ def init(options: dict) -> None:
     for filename, purpose in guide_rows:
         if not re.search(r"(?m)^\|\s*\`?" + re.escape(filename) + r"\`?\s*\|", index):
             index += f"| `{filename}` | {purpose} | reference |\n"
-    items = [(brain / file, (REFS / file).read_text())
-             for file, _ in guide_rows]
+    items = []
+    for filename, _ in guide_rows:
+        target = brain / filename
+        bundled = (REFS / filename).read_text()
+        if target.exists() and target.read_text() != bundled:
+            print(f"REVIEW existing {target}: differs from bundled guide; preserved")
+        else:
+            items.append((target, bundled))
     if not existing.is_file() or index != existing.read_text():
         if existing.is_file():
             # Existing index edits require a separate command or human review.

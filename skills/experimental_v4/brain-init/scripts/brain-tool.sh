@@ -142,11 +142,19 @@ init)
   fi
   for name in README.md USAGE.md; do
     target=$BRAIN/$name
-    [ ! -e "$target" ] || cmp -s "$REFS/$name" "$target" || die "existing content differs: $target"
+    if [ -e "$target" ] && ! cmp -s "$REFS/$name" "$target"; then
+      printf 'REVIEW existing %s: differs from bundled guide; preserved\n' "$target"
+    fi
   done
   [ -f "$index" ] || put "$index" "$tmp/index"
-  put "$BRAIN/USAGE.md" "$REFS/USAGE.md"
-  put "$BRAIN/README.md" "$REFS/README.md"
+  for name in USAGE.md README.md; do
+    target=$BRAIN/$name
+    if [ -e "$target" ] && ! cmp -s "$REFS/$name" "$target"; then
+      : # Differing user guide is preserved and reported in preflight.
+    else
+      put "$target" "$REFS/$name"
+    fi
+  done
   if [ ! -e "$REPO/CLAUDE.local.md" ]; then put "$REPO/CLAUDE.local.md" "$REFS/CLAUDE.local.md"
   elif ! cmp -s "$REPO/CLAUDE.local.md" "$REFS/CLAUDE.local.md"; then
     echo 'REVIEW existing CLAUDE.local.md; preserve custom policy'

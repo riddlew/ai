@@ -24,6 +24,11 @@ function entries(s,a, count) {
   return count
 }
 function add_error(s) {print "INVALID "s;bad=1}
+function check_duplicates(value, file, label, a, count, k, seen_values) {
+  delete seen_values
+  count=entries(value,a)
+  for(k=1;k<=count;k++)if(seen_values[a[k]]++)add_error(file ": duplicate " label ": " a[k])
+}
 function reach(k, target, j,n,a,z,p,seen) {
   if(k==target)return 1
   if(trail[k])return 0
@@ -47,6 +52,21 @@ function cycle(k, a,n,j,z,d) {
 END {
   for(i=1;i<=count;i++) {
     k=feature[i] SUBSEP id[i]
+    check_duplicates(parents[i],filename[i],"parents")
+    check_duplicates(deps[i],filename[i],"depends_on")
+    check_duplicates(requirements[i],filename[i],"requirements")
+    check_duplicates(hashes[i],filename[i],"parent_hashes")
+    m=entries(hashes[i],h)
+    for(z=1;z<=m;z++){
+      split(h[z],pair,"@")
+      if(length(pair)!=2||pair[1]!~/^(BRF|SPEC|CMP|PLAN|TASK)-[0-9][0-9][0-9]$/||pair[2]!~/^[0-9a-f]{40}$/) {
+        # POSIX awk lacks portable counted regexp intervals: validate length explicitly.
+        if(length(pair[2])!=40||pair[2]!~/^[0-9a-f]+$/||length(pair)!=2||pair[1]!~/^(BRF|SPEC|CMP|PLAN|TASK)-[0-9][0-9][0-9]$/)add_error(filename[i]": malformed parent hash "h[z])
+      }
+      allowed=0;n=entries(parents[i],ids)
+      for(q=1;q<=n;q++)if(ids[q]==pair[1])allowed=1
+      if(!allowed)add_error(filename[i]": parent hash for non-parent "pair[1])
+    }
     n=entries(parents[i],a)
     for(j=1;j<=n;j++){
       p=a[j];parent=lookup[feature[i] SUBSEP p]

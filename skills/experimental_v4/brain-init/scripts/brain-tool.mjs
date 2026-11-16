@@ -15,7 +15,7 @@ const read=p=>fs.readFileSync(p,'utf8'),exists=p=>fs.existsSync(p);
 const full=p=>path.resolve(p.startsWith('~')?path.join(os.homedir(),p.slice(1)):p);
 const isSlug=s=>/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s);
 function slug(s){if(!isSlug(s))fail('invalid slug: '+s);return s}
-function opts(args){let o={parent:[]};for(let i=0;i<args.length;i++)if(args[i].startsWith('--')){let k=args[i].slice(2);if(['apply','check-coverage','pending','estimate','hashes'].includes(k))o[k]=true;else{if(!args[i+1]||args[i+1].startsWith('--'))fail('missing value for --'+k);if(k==='parent')o.parent.push(args[++i]);else o[k]=args[++i]}}return o}
+function opts(args){let o={parent:[]};const flags=new Set(['apply','check-coverage','pending','estimate','hashes']);const values=new Set(['brain','repo','tracking','revision','at','main-branch','parent','feature','kind','slug','authorized-root','affected','show-parent-hashes','since','event','detail','branch','report-type','select']);for(let i=0;i<args.length;i++){if(!args[i].startsWith('--'))fail('unexpected argument: '+args[i]);let k=args[i].slice(2);if(flags.has(k)){o[k]=true;continue}if(!values.has(k))fail('unknown option: --'+k);if(!args[i+1]||args[i+1].startsWith('--'))fail('missing value for --'+k);if(k==='parent')o.parent.push(args[++i]);else o[k]=args[++i]}return o}
 function req(o,k){if(!o[k])fail('--'+k+' is required');return o[k]}
 const brain=o=>full(req(o,'brain'));
 function git(repo,...args){let r=cp.spawnSync('git',['-C',repo,...args],{encoding:'utf8'});if(r.status!==0)fail('git '+args.join(' ')+' failed: '+(r.stderr||'').trim());return r.stdout.trim()}
@@ -27,7 +27,7 @@ function init(o){let b=brain(o),repo=full(o.repo||'.'),mode=o.tracking||'ignored
  let index=original??('# Project Brain Index\n\nLast synced: '+(o.revision||git(repo,'rev-parse','HEAD'))+' ('+day+')\nGit: '+mode+'\nMain branch: '+(o['main-branch']||'main')+'\n\n## Root files\n\n| File | Purpose | Status |\n|---|---|---|\n\n## Documents\n\n| Path | Purpose | Status |\n|---|---|---|\n');
  let guides=[['USAGE.md','Brain Skills workflow examples and selection guide'],['README.md','Brain Skills catalog and installation reference']],tick=String.fromCharCode(96);
  for(let [f,p] of guides)if(!index.split('\n').some(l=>l.startsWith('| '+tick+f+tick+' |')))index+='| '+tick+f+tick+' | '+p+' | reference |\n';
- let items=guides.map(([f])=>[path.join(b,f),read(path.join(refs,f))]);
+ let items=[];for(let [f] of guides){let p=path.join(b,f),bundled=read(path.join(refs,f));if(exists(p)&&read(p)!==bundled)console.log('REVIEW existing '+p+': differs from bundled guide; preserved');else items.push([p,bundled])}
  if(original===null)items.unshift([idx,index]);else if(original!==index){if(o.apply)fail('index needs new guide rows; review update before applying');console.log('REVIEW index guide registration (existing index differs)')}
  let policy=path.join(repo,'CLAUDE.local.md');if(exists(policy)){if(read(policy)!==read(path.join(refs,'CLAUDE.local.md')))console.log('REVIEW existing CLAUDE.local.md; preserve custom policy')}else items.push([policy,read(path.join(refs,'CLAUDE.local.md'))]);
  changes(items,o);

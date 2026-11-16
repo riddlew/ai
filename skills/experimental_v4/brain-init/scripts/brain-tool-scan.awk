@@ -1,6 +1,6 @@
 # Normalize one feature document into TSV for the POSIX awk graph validator.
 # Parameters: -v file=... -v feature=... -v hash=...
-BEGIN {inside=0;header=0;errored=0;id="";kind="";status="";parents="";requirements="";depends_on="";parent_hashes="";field=""}
+BEGIN {inside=0;header=0;errored=0;id="";kind="";status="";parents="";requirements="";depends_on="";parent_hashes="";field="";keys=0}
 FNR==1 && $0!="---" {print "ERROR\t"file": missing opening frontmatter";errored=1}
 errored {next}
 !header && $0=="---" {header=1;next}
@@ -43,6 +43,6 @@ inside && kind=="specification" && $0 ~ /^[-*] REQ-[0-9][0-9][0-9]:/ {
 }
 END {
  if(errored)exit
- if(!inside||id==""||kind==""||status==""){print "ERROR\t"file": missing required frontmatter";exit}
+ if(!inside||id==""||kind==""||status==""||!seen["parents"]||!seen["requirements"]||!seen["depends_on"]||!seen["parent_hashes"]){print "ERROR\t"file": missing required frontmatter";exit}
  print "DOC\t"feature"\t"id"\t"kind"\t"status"\t"parents"\t"requirements"\t"depends_on"\t"parent_hashes"\t"hash"\t"file
 }
