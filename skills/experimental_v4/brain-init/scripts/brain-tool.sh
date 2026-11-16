@@ -10,6 +10,18 @@ abs() { case "$1" in /*) printf '%s\n' "$1";; *) printf '%s/%s\n' "$PWD" "$1";; 
 guard() {
   [ -n "$AUTHORIZED" ] || die '--authorized-root is required for --apply'
   case "$1" in "$AUTHORIZED"|"$AUTHORIZED"/*) :;; *) die "outside authorized write root: $1";; esac
+  root_real=$(CDPATH= cd -- "$AUTHORIZED" 2>/dev/null && pwd -P) ||
+    die "authorized write root missing: $AUTHORIZED"
+  parent=$(dirname "$1")
+  while [ ! -d "$parent" ]; do
+    next=$(dirname "$parent")
+    [ "$next" != "$parent" ] || die "invalid destination: $1"
+    parent=$next
+  done
+  parent_real=$(CDPATH= cd -- "$parent" 2>/dev/null && pwd -P) ||
+    die "invalid destination parent: $parent"
+  case "$parent_real" in "$root_real"|"$root_real"/*) :;;
+    *) die "symlink escapes authorized root: $1";; esac
 }
 put() {
   target=$1; source=$2
