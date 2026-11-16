@@ -15,7 +15,7 @@ const read=p=>fs.readFileSync(p,'utf8'),exists=p=>fs.existsSync(p);
 const full=p=>path.resolve(p.startsWith('~')?path.join(os.homedir(),p.slice(1)):p);
 const isSlug=s=>/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s);
 function slug(s){if(!isSlug(s))fail('invalid slug: '+s);return s}
-function opts(args){let o={parent:[]};const flags=new Set(['apply','check-coverage','pending','estimate','hashes']);const values=new Set(['brain','repo','tracking','revision','at','main-branch','parent','feature','kind','slug','authorized-root','affected','show-parent-hashes','since','event','detail','branch','report-type','select']);for(let i=0;i<args.length;i++){if(!args[i].startsWith('--'))fail('unexpected argument: '+args[i]);let k=args[i].slice(2);if(flags.has(k)){o[k]=true;continue}if(!values.has(k))fail('unknown option: --'+k);if(!args[i+1]||args[i+1].startsWith('--'))fail('missing value for --'+k);if(k==='parent')o.parent.push(args[++i]);else o[k]=args[++i]}return o}
+function opts(args){let o={parent:[]};const flags=new Set(['apply','check-coverage','pending','estimate','hashes','save-location']);const values=new Set(['brain','repo','tracking','revision','at','main-branch','parent','feature','kind','slug','authorized-root','affected','show-parent-hashes','since','event','detail','branch','report-type','select']);for(let i=0;i<args.length;i++){if(!args[i].startsWith('--'))fail('unexpected argument: '+args[i]);let k=args[i].slice(2);if(flags.has(k)){o[k]=true;continue}if(!values.has(k))fail('unknown option: --'+k);if(!args[i+1]||args[i+1].startsWith('--'))fail('missing value for --'+k);if(k==='parent')o.parent.push(args[++i]);else o[k]=args[++i]}return o}
 function req(o,k){if(!o[k])fail('--'+k+' is required');return o[k]}
 const brain=o=>full(req(o,'brain'));
 function git(repo,...args){let r=cp.spawnSync('git',['-C',repo,...args],{encoding:'utf8'});if(r.status!==0)fail('git '+args.join(' ')+' failed: '+(r.stderr||'').trim());return r.stdout.trim()}
@@ -29,9 +29,20 @@ function init(o){let b=brain(o),repo=full(o.repo||'.'),mode=o.tracking||'ignored
  for(let [f,p] of guides)if(!index.split('\n').some(l=>l.startsWith('| '+tick+f+tick+' |')))index+='| '+tick+f+tick+' | '+p+' | reference |\n';
  let items=[];for(let [f] of guides){let p=path.join(b,f),bundled=read(path.join(refs,f));if(exists(p)&&read(p)!==bundled)console.log('REVIEW existing '+p+': differs from bundled guide; preserved');else items.push([p,bundled])}
  if(original===null)items.unshift([idx,index]);else if(original!==index){if(o.apply)fail('index needs new guide rows; review update before applying');console.log('REVIEW index guide registration (existing index differs)')}
- let policy=path.join(repo,'CLAUDE.local.md');if(exists(policy)){if(read(policy)!==read(path.join(refs,'CLAUDE.local.md')))console.log('REVIEW existing CLAUDE.local.md; preserve custom policy')}else items.push([policy,read(path.join(refs,'CLAUDE.local.md'))]);
+ let policy=path.join(repo,'CLAUDE.local.md'),bundled=read(path.join(refs,'CLAUDE.local.md')),append=null,saved='Project brain: '+b;
+ if(exists(policy)){
+   let current=read(policy);
+   if(current!==bundled)console.log('REVIEW existing CLAUDE.local.md; preserve custom policy');
+   if(o['save-location']){
+     let lines=current.split('\n').filter(x=>x.startsWith('Project brain:'));
+     if(lines.length>1||(lines.length===1&&lines[0]!==saved))fail('conflicting saved Project brain location; review before applying');
+     if(!lines.length){append=(current&&!current.endsWith('\n')?'\n':'')+saved+'\n';
+       if(o.apply)scope(policy,o);else console.log('APPEND '+policy+': Project brain location (dry-run)')}
+   }
+ }else items.push([policy,bundled+(o['save-location']?(bundled.endsWith('\n')?'':'\n')+saved+'\n':'')]);
  let exclude=null;if(mode==='ignored'&&o.apply){let common=full(git(repo,'rev-parse','--path-format=absolute','--git-common-dir'));exclude=path.join(common,'info','exclude');scope(exclude,o)}
  changes(items,o);
+ if(append&&o.apply){fs.appendFileSync(policy,append);console.log('UPDATED '+policy+': Project brain location')}
  if(exclude){let p=exclude,old=exists(p)?read(p):'';if(!old.split('\n').includes('.brain/')){fs.mkdirSync(path.dirname(p),{recursive:true});fs.appendFileSync(p,(!old||old.endsWith('\n')?'':'\n')+'.brain/\n');console.log('UPDATED '+p)}}}
 function docs(area){let found=new Map();for(let [,folder] of Object.values(kinds)){let dir=path.join(area,folder);if(!exists(dir))continue;for(let name of fs.readdirSync(dir).filter(x=>x.endsWith('.md'))){let file=path.join(dir,name),m=read(file).match(/^id:\s*((?:BRF|SPEC|CMP|PLAN|TASK)-\d{3})\s*$/m);if(m){if(found.has(m[1]))fail('duplicate existing ID: '+m[1]);found.set(m[1],{file,folder})}}}return found}
 function template(kind,id,parents,feature){let raw=read(path.join(refs,'feature-document-templates.md')),begin=raw.indexOf('## '+kinds[kind][0]+' ');if(begin<0)fail('template missing');let tick=String.fromCharCode(96),fence=tick.repeat(3)+'markdown\n',pos=raw.indexOf(fence,begin);if(pos<0)fail('template block missing');let end=raw.indexOf(tick.repeat(3),pos+fence.length);if(end<0)fail('unterminated template');let text=raw.slice(pos+fence.length,end);

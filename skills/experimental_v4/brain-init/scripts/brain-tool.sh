@@ -97,11 +97,11 @@ family=help
 if [ "$#" -gt 0 ]; then family=$1;shift;fi
 case "$family" in help|--help|-h) echo 'brain-tool <init|doc|validate|git|record|context> [options]';exit 0;; esac
 case "${1:-}" in new|list|summary) shift;; esac
-PENDING=0 HASHES=0 ESTIMATE=0 SELECT= BRAIN= FEATURE= KIND= NAME= REPO=. AUTHORIZED= APPLY=0 TRACKING=ignored REVISION= DATE= MAIN=main PARENTS= SINCE= AFFECTED= HASHFILE= COVERAGE=0 EVENT= DETAIL= BRANCH= REPORTTYPE=
+SAVELOCATION=0 PENDING=0 HASHES=0 ESTIMATE=0 SELECT= BRAIN= FEATURE= KIND= NAME= REPO=. AUTHORIZED= APPLY=0 TRACKING=ignored REVISION= DATE= MAIN=main PARENTS= SINCE= AFFECTED= HASHFILE= COVERAGE=0 EVENT= DETAIL= BRANCH= REPORTTYPE=
 while [ "$#" -gt 0 ]; do
   arg=$1;shift
   case "$arg" in
-    --apply) APPLY=1;; --check-coverage) COVERAGE=1;; --pending) PENDING=1;; --estimate) ESTIMATE=1;; --hashes) HASHES=1;;
+    --apply) APPLY=1;; --save-location) SAVELOCATION=1;; --check-coverage) COVERAGE=1;; --pending) PENDING=1;; --estimate) ESTIMATE=1;; --hashes) HASHES=1;;
     --brain|--feature|--kind|--slug|--repo|--authorized-root|--tracking|--revision|--at|--main-branch|--parent|--since|--affected|--show-parent-hashes|--event|--detail|--branch|--report-type|--select)
       [ "$#" -gt 0 ] || die "missing value for $arg"
       v=$1;shift
@@ -162,9 +162,33 @@ init)
       put "$target" "$REFS/$name"
     fi
   done
-  if [ ! -e "$REPO/CLAUDE.local.md" ]; then put "$REPO/CLAUDE.local.md" "$REFS/CLAUDE.local.md"
-  elif ! cmp -s "$REPO/CLAUDE.local.md" "$REFS/CLAUDE.local.md"; then
-    echo 'REVIEW existing CLAUDE.local.md; preserve custom policy'
+  policy=$REPO/CLAUDE.local.md
+  if [ "$SAVELOCATION" = 1 ]; then
+    location="Project brain: $BRAIN"
+    if [ -f "$policy" ]; then
+      matches=$(grep -c '^Project brain:' "$policy" || :)
+      if [ "$matches" -gt 1 ] || { [ "$matches" -eq 1 ] && ! grep -Fx "$location" "$policy" >/dev/null; }; then
+        die 'conflicting saved Project brain location; review before applying'
+      fi
+      if [ "$matches" -eq 0 ] && [ "$APPLY" = 1 ]; then guard "$policy";fi
+    fi
+  fi
+  if [ ! -e "$policy" ]; then
+    if [ "$SAVELOCATION" = 1 ]; then
+      cp "$REFS/CLAUDE.local.md" "$tmp/policy"
+      printf '\n%s\n' "$location" >> "$tmp/policy"
+      put "$policy" "$tmp/policy"
+    else put "$policy" "$REFS/CLAUDE.local.md";fi
+  else
+    if ! cmp -s "$policy" "$REFS/CLAUDE.local.md"; then
+      echo 'REVIEW existing CLAUDE.local.md; preserve custom policy'
+    fi
+    if [ "$SAVELOCATION" = 1 ] && [ "$matches" -eq 0 ]; then
+      if [ "$APPLY" = 1 ]; then
+        printf '\n%s\n' "$location" >> "$policy"
+        printf 'UPDATED %s: Project brain location\n' "$policy"
+      else printf 'APPEND %s: Project brain location (dry-run)\n' "$policy";fi
+    fi
   fi
   if [ "$APPLY" = 1 ] && [ "$TRACKING" = ignored ]; then
     common=$(git -C "$REPO" rev-parse --path-format=absolute --git-common-dir) || die 'Git metadata unavailable'

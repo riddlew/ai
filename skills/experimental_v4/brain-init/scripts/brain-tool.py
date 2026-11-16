@@ -31,7 +31,7 @@ class Problem(Exception):
 def opt(argv: list[str]) -> tuple[list[str], dict[str, object]]:
     pos: list[str] = []
     options: dict[str, object] = {"parent": []}
-    boolean = {"apply", "check-coverage", "pending", "estimate", "hashes"}
+    boolean = {"apply", "check-coverage", "pending", "estimate", "hashes", "save-location"}
     values = {"brain", "repo", "tracking", "revision", "at", "main-branch",
               "feature", "kind", "slug", "authorized-root", "affected",
               "show-parent-hashes", "since", "event", "detail", "branch",
@@ -171,17 +171,38 @@ def init(options: dict) -> None:
         else:
             items.insert(0, (existing, index))
     policy = repo / "CLAUDE.local.md"
+    policy_append = None
+    bundled_policy = (REFS / "CLAUDE.local.md").read_text()
+    saved_location = f"Project brain: {brain}"
     if policy.exists():
-        if policy.read_text() != (REFS / "CLAUDE.local.md").read_text():
+        existing_policy = policy.read_text()
+        if existing_policy != bundled_policy:
             print("REVIEW existing CLAUDE.local.md; preserve custom policy")
+        if options.get("save-location"):
+            present = re.findall(r"(?m)^Project brain:.*$", existing_policy)
+            if len(present) > 1 or (present and present[0] != saved_location):
+                raise Problem("conflicting saved Project brain location; review before applying")
+            if not present:
+                policy_append = ("\n" if existing_policy and not existing_policy.endswith("\n") else "") + saved_location + "\n"
+                if options.get("apply"):
+                    in_scope(policy, options)
+                else:
+                    print(f"APPEND {policy}: Project brain location (dry-run)")
     else:
-        items.append((policy, (REFS / "CLAUDE.local.md").read_text()))
+        content = bundled_policy
+        if options.get("save-location"):
+            content += ("" if content.endswith("\n") else "\n") + saved_location + "\n"
+        items.append((policy, content))
     exclusion = None
     if mode == "ignored" and options.get("apply"):
         common = path(git(repo, "rev-parse", "--path-format=absolute", "--git-common-dir"))
         exclusion = common / "info" / "exclude"
         in_scope(exclusion, options)
     changes(items, options)
+    if policy_append is not None and options.get("apply"):
+        with policy.open("a", encoding="utf-8") as stream:
+            stream.write(policy_append)
+        print(f"UPDATED {policy}: Project brain location")
     if exclusion is not None:
         content = exclusion.read_text() if exclusion.exists() else ""
         if ".brain/" not in content.splitlines():
