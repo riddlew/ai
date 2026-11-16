@@ -181,6 +181,40 @@ class DeterministicCliContract(unittest.TestCase):
             self.assertEqual(manifests[0], manifests[2])
 
 
+    def test_symlink_escape_is_rejected_in_every_runtime(self):
+        for runtime in ("python", "node", "sh"):
+            with self.subTest(runtime=runtime), tempfile.TemporaryDirectory() as temp:
+                repo = Path(temp) / "repo"
+                outside = Path(temp) / "outside"
+                repo.mkdir()
+                outside.mkdir()
+                brain = repo / ".brain"
+                brain.mkdir()
+                (brain / "00_index.md").write_text("# Index\\n")
+                (outside / "demo").mkdir()
+                (brain / "features").symlink_to(outside, target_is_directory=True)
+                write = invoke(runtime, "doc", "--brain", brain,
+                    "--feature", "demo", "--kind", "brief", "--apply",
+                    "--authorized-root", repo, ok=False)
+                self.assertNotEqual(write.returncode, 0)
+                self.assertFalse((outside / "demo/01-brief").exists())
+                (brain / "features").unlink()
+                slot = brain / "features/demo"
+                slot.mkdir(parents=True)
+                external = outside / "execution.md"
+                external.write_text("## Checkpoints\\n")
+                (slot / "execution.md").symlink_to(external)
+                edit = invoke(runtime, "record", "--brain", brain,
+                    "--feature", "demo", "--event", "verified",
+                    "--detail", "some result", "--apply",
+                    "--authorized-root", repo, ok=False)
+                self.assertNotEqual(edit.returncode, 0)
+                self.assertEqual(external.read_text(), "## Checkpoints\\n")
+                read = invoke(runtime, "context", "--brain", brain,
+                    "--select", "features/demo/execution.md", ok=False)
+                self.assertNotEqual(read.returncode, 0)
+
+
     def test_denied_write_and_preview(self):
         for runtime in ("python", "node", "sh"):
             with tempfile.TemporaryDirectory() as temp:
