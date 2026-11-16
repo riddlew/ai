@@ -72,10 +72,23 @@ class DeterministicCliContract(unittest.TestCase):
                 invoke(runtime, "doc", "--brain", brain, "--feature", "demo",
                        "--kind", "planning-ticket", "--slug", "risk-review", *common)
                 invoke(runtime, "doc", "--brain", brain, "--feature", "demo",
+                       "--kind", "planning-ticket", "--slug", "permission-check", *common)
+                self.assertTrue((brain / "planning/demo/001-risk-review.md").is_file())
+                self.assertTrue((brain / "planning/demo/002-permission-check.md").is_file())
+                invoke(runtime, "doc", "--brain", brain, "--feature", "demo",
                        "--kind", "diagnosis", "--slug", "lost-update", *common)
+                invoke(runtime, "doc", "--brain", brain, "--feature", "demo",
+                       "--kind", "diagnosis", "--slug", "retry-storm", *common)
+                self.assertTrue((brain / "diagnoses/01-lost-update.md").is_file())
+                self.assertTrue((brain / "diagnoses/02-retry-storm.md").is_file())
                 invoke(runtime, "doc", "--brain", brain, "--feature", "demo",
                        "--kind", "review", "--slug", "data-flow",
                        "--report-type", "architecture", *common)
+                invoke(runtime, "doc", "--brain", brain, "--feature", "demo",
+                       "--kind", "review", "--slug", "error-handling",
+                       "--report-type", "architecture", *common)
+                self.assertTrue((brain / "reviews/architecture/01-data-flow/review.md").is_file())
+                self.assertTrue((brain / "reviews/architecture/02-error-handling/review.md").is_file())
                 invoke(runtime, "git", "--repo", repo, "--brain", brain,
                        "--pending", "--branch", "feature/demo",
                        "--at", "2026-01-01", *common)
