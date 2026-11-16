@@ -117,6 +117,46 @@ class DeterministicCliContract(unittest.TestCase):
                          "--show-parent-hashes", doc)
             self.assertEqual(expected_hashes.stdout.strip(), got.stdout.strip())
 
+    def test_validation_rejects_structural_defects_in_every_runtime(self):
+        changes = {
+            "duplicate id": lambda root: shutil.copy2(
+                root / "features/start-machine/05-tasks/TASK-001-registry-start.md",
+                root / "features/start-machine/05-tasks/copy.md"),
+            "stale parent": lambda root: (
+                root / "features/start-machine/04-implementation-plans/machine-start.md"
+            ).write_text((root / "features/start-machine/04-implementation-plans/machine-start.md"
+                          ).read_text() + "\\nChanged design.\\n"),
+            "unsupported list": lambda root: (
+                root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
+            ).write_text((root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
+                          ).read_text().replace("parents: [PLAN-002]",
+                                                "parents: PLAN-002")),
+            "unknown parent": lambda root: (
+                root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
+            ).write_text((root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
+                          ).read_text().replace("parents: [PLAN-002]",
+                                                "parents: [PLAN-999]")),
+            "unknown requirement": lambda root: (
+                root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
+            ).write_text((root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
+                          ).read_text().replace("SPEC-001#REQ-002",
+                                                "SPEC-999#REQ-001")),
+        }
+        for name, change in changes.items():
+            with self.subTest(defect=name), tempfile.TemporaryDirectory() as temp:
+                target = Path(temp) / ".brain"
+                shutil.copytree(FIXTURE, target)
+                change(target)
+                expected = subprocess.run(
+                    ["python3", str(VALIDATOR), str(target / "features")],
+                    text=True, capture_output=True)
+                self.assertNotEqual(expected.returncode, 0, name)
+                for runtime in ("python", "node", "sh"):
+                    got = invoke(runtime, "validate", "--brain", target, ok=False)
+                    self.assertNotEqual(got.returncode, 0,
+                                        f"{runtime} accepted {name}: {got.stdout}")
+
+
     def test_denied_write_and_preview(self):
         for runtime in ("python", "node", "sh"):
             with tempfile.TemporaryDirectory() as temp:
