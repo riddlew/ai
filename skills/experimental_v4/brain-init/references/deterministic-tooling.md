@@ -8,7 +8,7 @@ All writes preview by default. After confirming the Brain path and **authorized*
 
 | Family | Deterministic operation |
 |---|---|
-| `init` | `init --repo <repo> --brain <brain> --tracking ignored|tracked`; create index, install bundled guides and absent policy; preserve conflicting files |
+| `init` | `init --repo <repo> --brain <brain> --tracking ignored|tracked [--save-location]`; create index, install bundled guides and absent policy, exclude untracked personal policy from Git; preserve conflicting files and refuse a mismatched saved Brain path |
 | `doc` | `doc new --brain <brain> --feature <slug> --kind brief|specification|component|plan|task --slug <slug> [--parent ID]`; stable IDs, canonical metadata, draft status |
 | `doc` | `--kind execution|planning-index|planning-ticket|diagnosis|review`; optional record; review requires `--report-type architecture|code|merge-request|security` |
 | `validate` | `validate --brain <brain> [--check-coverage]`, `--affected ID`, or `--show-parent-hashes <file>`; reports only, no writes |
