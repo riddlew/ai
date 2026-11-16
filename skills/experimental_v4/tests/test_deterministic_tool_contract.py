@@ -125,7 +125,7 @@ class DeterministicCliContract(unittest.TestCase):
             "stale parent": lambda root: (
                 root / "features/start-machine/04-implementation-plans/machine-start.md"
             ).write_text((root / "features/start-machine/04-implementation-plans/machine-start.md"
-                          ).read_text() + "\\nChanged design.\\n"),
+                          ).read_text() + "\nChanged design.\n"),
             "unsupported list": lambda root: (
                 root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
             ).write_text((root / "features/start-machine/05-tasks/TASK-001-registry-start.md"
@@ -162,7 +162,7 @@ class DeterministicCliContract(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             target = Path(temp) / ".brain"
             shutil.copytree(FIXTURE, target)
-            (target / "00_index.md").write_text("# Project Brain Index\\n")
+            (target / "00_index.md").write_text("# Project Brain Index\n")
             expected = (target / rel).read_text()
             manifests = []
             for runtime in ("python", "node", "sh"):
@@ -190,7 +190,7 @@ class DeterministicCliContract(unittest.TestCase):
                 outside.mkdir()
                 brain = repo / ".brain"
                 brain.mkdir()
-                (brain / "00_index.md").write_text("# Index\\n")
+                (brain / "00_index.md").write_text("# Index\n")
                 (outside / "demo").mkdir()
                 (brain / "features").symlink_to(outside, target_is_directory=True)
                 write = invoke(runtime, "doc", "--brain", brain,
@@ -202,14 +202,14 @@ class DeterministicCliContract(unittest.TestCase):
                 slot = brain / "features/demo"
                 slot.mkdir(parents=True)
                 external = outside / "execution.md"
-                external.write_text("## Checkpoints\\n")
+                external.write_text("## Checkpoints\n")
                 (slot / "execution.md").symlink_to(external)
                 edit = invoke(runtime, "record", "--brain", brain,
                     "--feature", "demo", "--event", "verified",
                     "--detail", "some result", "--apply",
                     "--authorized-root", repo, ok=False)
                 self.assertNotEqual(edit.returncode, 0)
-                self.assertEqual(external.read_text(), "## Checkpoints\\n")
+                self.assertEqual(external.read_text(), "## Checkpoints\n")
                 read = invoke(runtime, "context", "--brain", brain,
                     "--select", "features/demo/execution.md", ok=False)
                 self.assertNotEqual(read.returncode, 0)
@@ -226,7 +226,7 @@ class DeterministicCliContract(unittest.TestCase):
             self.assertEqual(shell.returncode, 0, shell.stderr)
             self.assertIn("brain-tool", shell.stdout)
             node = tools_dir / "node"
-            node.write_text("#!/bin/sh\\necho NODE-FALLBACK\\n")
+            node.write_text("#!/bin/sh\necho NODE-FALLBACK\n")
             node.chmod(0o755)
             fallback = subprocess.run(["/bin/sh", str(TOOL), "--help"],
                                       env=env, text=True, capture_output=True)
