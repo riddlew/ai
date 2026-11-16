@@ -184,7 +184,7 @@ class DeterministicCliContract(unittest.TestCase):
                         "--apply", "--authorized-root", repo)
                 invoke(runtime, *args)
                 current = policy.read_text()
-                expected = "Project brain: " + str(brain)
+                expected = "Project brain: " + str(brain.resolve())
                 self.assertEqual(current.count(expected), 1)
                 self.assertIn("Keep this custom rule.", current)
                 invoke(runtime, *args)

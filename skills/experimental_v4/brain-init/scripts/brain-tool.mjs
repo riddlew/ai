@@ -12,7 +12,17 @@ const refs=path.resolve(root,'../references');
 const kinds={brief:['01','01-brief','BRF','brief'],specification:['02','02-specifications','SPEC','specification'],component:['03','03-components','CMP','component'],plan:['04','04-implementation-plans','PLAN','implementation-plan'],task:['05','05-tasks','TASK','task']};
 function fail(s){throw Error(s)}
 const read=p=>fs.readFileSync(p,'utf8'),exists=p=>fs.existsSync(p);
-const full=p=>path.resolve(p.startsWith('~')?path.join(os.homedir(),p.slice(1)):p);
+const full=p=>{
+ let current=path.resolve(p.startsWith('~')?path.join(os.homedir(),p.slice(1)):p);
+ let suffix=[];
+ while(!fs.existsSync(current)){
+   let parent=path.dirname(current);
+   if(parent===current)fail('cannot resolve path: '+p);
+   suffix.unshift(path.basename(current));
+   current=parent;
+ }
+ return path.join(fs.realpathSync(current),...suffix)
+};
 const isSlug=s=>/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s);
 function slug(s){if(!isSlug(s))fail('invalid slug: '+s);return s}
 function opts(args){let o={parent:[]};const flags=new Set(['apply','check-coverage','pending','estimate','hashes','save-location']);const values=new Set(['brain','repo','tracking','revision','at','main-branch','parent','feature','kind','slug','authorized-root','affected','show-parent-hashes','since','event','detail','branch','report-type','select']);for(let i=0;i<args.length;i++){if(!args[i].startsWith('--'))fail('unexpected argument: '+args[i]);let k=args[i].slice(2);if(flags.has(k)){o[k]=true;continue}if(!values.has(k))fail('unknown option: --'+k);if(!args[i+1]||args[i+1].startsWith('--'))fail('missing value for --'+k);if(k==='parent')o.parent.push(args[++i]);else o[k]=args[++i]}return o}

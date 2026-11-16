@@ -6,7 +6,20 @@ REFS=$HERE/../references
 die() { printf 'ERROR %s\n' "$*" >&2; exit 1; }
 need() { [ -n "$2" ] || die "--$1 is required"; }
 slug() { case "$1" in ''|*[!a-z0-9-]*|*-|-*|*--) die "invalid slug: $1";; esac; }
-abs() { case "$1" in /*) printf '%s\n' "$1";; *) printf '%s/%s\n' "$PWD" "$1";; esac; }
+abs() {
+  case "$1" in /*) target=$1;; *) target=$PWD/$1;; esac
+  suffix=
+  ancestor=$target
+  while [ ! -d "$ancestor" ]; do
+    tail_name=$(basename "$ancestor")
+    suffix="/$tail_name$suffix"
+    next=$(dirname "$ancestor")
+    [ "$next" != "$ancestor" ] || die "cannot canonicalize path: $1"
+    ancestor=$next
+  done
+  physical=$(CDPATH= cd -- "$ancestor" && pwd -P) || die "cannot canonicalize path: $1"
+  printf '%s%s\n' "$physical" "$suffix"
+}
 guard() {
   [ ! -L "$1" ] || die "symlink file is not an authorized write target: $1"
   [ -n "$AUTHORIZED" ] || die '--authorized-root is required for --apply'
