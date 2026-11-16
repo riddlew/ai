@@ -111,6 +111,31 @@ class SafeContextContract(unittest.TestCase):
         self.assertEqual(mode, "selective")
         self.assertNotIn("pending/feature--payments.md", files)
 
+    def test_full_fallback_avoids_other_branch_pending(self):
+        mode, reason, files = self.selected(
+            "--path", "src/unmapped/module.py", "--branch", "main")
+        self.assertEqual((mode, reason), ("full", "unmapped-code-path"))
+        self.assertIn("11_search.md", files)
+        self.assertNotIn("pending/feature--payments.md", files)
+        mode, reason, files = self.selected(
+            "--path", "src/unmapped/module.py", "--branch", "feature/payments")
+        self.assertEqual((mode, reason), ("full", "unmapped-code-path"))
+        self.assertIn("pending/feature--payments.md", files)
+
+    def test_policy_and_implement_skill_load_planned_context(self):
+        policy = (ROOT / "brain-init/references/CLAUDE.local.md").read_text()
+        implement = (ROOT / "brain-implement/SKILL.md").read_text()
+        update = (ROOT / "brain-update/SKILL.md").read_text()
+        guidance = (ROOT / "brain-init/references/safe-context-loading.md").read_text()
+        self.assertIn("brain-context plan", policy)
+        self.assertIn("read every returned", policy.lower())
+        self.assertIn("READ", implement)
+        self.assertIn("full-read fallback", implement)
+        self.assertIn("Read **every project-knowledge root file**", update)
+        self.assertIn("Do not use selective context loading", update)
+        self.assertIn("map", guidance)
+        self.assertIn("source", guidance.lower())
+
     def test_unmapped_path_and_feature_force_full(self):
         mode, reason, files = self.selected("--path", "src/security/validator.py",
                                              "--branch", "main")
