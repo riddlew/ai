@@ -298,6 +298,27 @@ class DeterministicCliContract(unittest.TestCase):
             self.assertIn("NODE-FALLBACK", fallback.stdout)
 
 
+    def test_init_preflights_external_git_common_dir(self):
+        for runtime in ("python", "node", "sh"):
+            with self.subTest(runtime=runtime), tempfile.TemporaryDirectory() as temp:
+                source = Path(temp) / "main"
+                linked = Path(temp) / "linked"
+                subprocess.run(["git", "init", "-q", str(source)], check=True)
+                subprocess.run(["git", "-C", str(source), "-c", "user.name=CI",
+                                "-c", "user.email=ci@example.com", "commit",
+                                "--allow-empty", "-qm", "base"], check=True)
+                subprocess.run(["git", "-C", str(source), "worktree",
+                                "add", "-q", "-b", "test-worktree", str(linked)], check=True)
+                result = invoke(runtime, "init", "--repo", linked,
+                    "--brain", linked / ".brain", "--tracking", "ignored",
+                    "--apply", "--authorized-root", linked, ok=False)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertFalse((linked / ".brain").exists(),
+                                 "unauthorized Git exclude must not leave a partial Brain")
+                self.assertFalse((linked / "CLAUDE.local.md").exists(),
+                                 "preflight must run before installing a policy")
+
+
     def test_denied_write_and_preview(self):
         for runtime in ("python", "node", "sh"):
             with tempfile.TemporaryDirectory() as temp:
