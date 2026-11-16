@@ -15,8 +15,9 @@ import sys
 VERSION = "# brain-context-map v1"
 EXCLUDED_ROOT = {"README.md", "USAGE.md"}
 CATALOGS = {"00_index.md", "state.md"}
-MANDATORY = {"00_index.md", "03_architecture.md", "09_user_decisions.md",
-             "open_questions.md", "state.md"}
+MANDATORY = {"00_index.md", "01_about.md", "02_features.md",
+             "03_architecture.md", "09_user_decisions.md",
+             "open_questions.md", "state.md", "glossary.md"}
 FEATURE = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*\Z")
 PATH = re.compile(r"[A-Za-z0-9_./ -]+\Z")
 
@@ -45,6 +46,9 @@ def inventory(brain: Path) -> dict[str, bytes]:
     if not (brain / "00_index.md").is_file():
         die("brain index missing")
     docs: dict[str, bytes] = {}
+    for node in brain.rglob("*"):
+        if node.is_symlink():
+            die("unsafe symlink in Brain: " + node.relative_to(brain).as_posix())
     for file in sorted(brain.rglob("*.md")):
         rel = file.relative_to(brain).as_posix()
         if file.is_symlink() or not file.is_file() or not file.resolve().is_relative_to(brain):

@@ -55,7 +55,7 @@ function relevant(selectors, j) {
   return 0
 }
 function root_mandatory(name) {
- return name=="00_index.md"||name=="03_architecture.md"||name=="09_user_decisions.md"||name=="open_questions.md"||name=="state.md"
+ return name=="00_index.md"||name=="01_about.md"||name=="02_features.md"||name=="03_architecture.md"||name=="09_user_decisions.md"||name=="open_questions.md"||name=="state.md"||name=="glossary.md"
 }
 function read_text(name, file, line, text) {
   file=brain "/" name;text=""

@@ -7,7 +7,7 @@ import crypto from 'node:crypto';
 
 const VERSION='# brain-context-map v1';
 const EXCLUDED=new Set(['README.md','USAGE.md']);
-const MANDATORY=new Set(['00_index.md','03_architecture.md','09_user_decisions.md','open_questions.md','state.md']);
+const MANDATORY=new Set(['00_index.md','01_about.md','02_features.md','03_architecture.md','09_user_decisions.md','open_questions.md','state.md','glossary.md']);
 const slug=/^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const supported=/^[A-Za-z0-9_./ -]+$/;
 function fail(message){throw Error(message)}
