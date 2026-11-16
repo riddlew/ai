@@ -106,7 +106,8 @@ END {
           for(j=1;j<=docs_count;j++){
             other=docs[j]
             if(other==name||(index(other,"pending/")==1&&!selected[other]))continue
-            if((selected[name]&&index(text[name],other)>0)||(selected[other]&&index(text[other],name)>0)){
+            if(name!="00_index.md"&&name!="state.md"&&other!="00_index.md"&&other!="state.md" &&
+               index(text[name],other)>0&&(selected[name]||selected[other])){
               if(!selected[name]||!selected[other]){
                 selected[name]=1;selected[other]=1;changed=1
               }

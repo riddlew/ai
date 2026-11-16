@@ -106,8 +106,8 @@ function plan(brain,docs,features,paths,branch){
    let text=content.toString('utf8');
    for(let [other,otherContent] of docs){
     if(other===name||(other.startsWith('pending/')&&!selected.has(other)))continue;
-    if((selected.has(name)&&text.includes(other))||
-       (selected.has(other)&&otherContent.toString('utf8').includes(name))){
+    if(name!=='00_index.md'&&name!=='state.md'&&other!=='00_index.md'&&other!=='state.md' &&
+       text.includes(other)&&(selected.has(name)||selected.has(other))){
      if(!selected.has(name)||!selected.has(other)){
       selected.add(name);selected.add(other);changed=true
      }
@@ -136,7 +136,7 @@ function main(){
  const docs=inventory(brain);
  if(args.action==='map'){
   console.log(VERSION);console.log('# Review scope declarations before using selective loading.');
-  for(let [name,content] of [...docs].sort(([a],[b])=>a.localeCompare(b,'en')))if(governed(name))console.log(name+'\tglobal\t-\t'+blob(content));
+  for(let [name,content] of [...docs].sort(([a],[b])=>a<b?-1:a>b?1:0))if(governed(name))console.log(name+'\tglobal\t-\t'+blob(content));
   return
  }
  const [mode,reason,files]=plan(brain,docs,args.features,args.paths,args.branch);

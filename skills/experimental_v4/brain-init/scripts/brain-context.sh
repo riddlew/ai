@@ -35,7 +35,7 @@ brain=$(CDPATH= cd -- "$brain" && pwd -P) || fail 'Brain inaccessible'
 [ -f "$brain/00_index.md" ] || fail 'brain index missing'
 
 # Reject links instead of accidentally omitting potentially applicable documents.
-if [ -n "$(find "$brain" -type l -print -quit)" ];then fail 'unsafe symlink in Brain';fi
+if find "$brain" -type l -print | grep -q .;then fail 'unsafe symlink in Brain';fi
 
 : > "$tmp/docs"
 find "$brain" -type f -name '*.md' | LC_ALL=C sort | while IFS= read -r full;do

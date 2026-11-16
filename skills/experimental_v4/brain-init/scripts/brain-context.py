@@ -14,6 +14,7 @@ import sys
 
 VERSION = "# brain-context-map v1"
 EXCLUDED_ROOT = {"README.md", "USAGE.md"}
+CATALOGS = {"00_index.md", "state.md"}
 MANDATORY = {"00_index.md", "03_architecture.md", "09_user_decisions.md",
              "open_questions.md", "state.md"}
 FEATURE = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*\Z")
@@ -184,8 +185,8 @@ def plan(brain: Path, docs: dict[str, bytes], features: list[str],
             for other in docs:
                 if other == name or (other.startswith("pending/") and other not in selected):
                     continue
-                if (name in selected and other in text) or (
-                    other in selected and name in docs[other].decode("utf-8", errors="replace")
+                if name not in CATALOGS and other not in CATALOGS and (
+                    other in text and (name in selected or other in selected)
                 ):
                     if name not in selected or other not in selected:
                         selected.update((name, other))
