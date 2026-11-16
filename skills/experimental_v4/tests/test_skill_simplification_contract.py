@@ -1,0 +1,109 @@
+"""Contracts for concise primary skill instructions and preserved on-demand detail.
+
+These check packaging and critical instructions; they are not agent behavior tests.
+"""
+from pathlib import Path
+import re
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+SKILLS = sorted([*ROOT.glob("brain-*/SKILL.md"), ROOT / "write-human/SKILL.md"])
+POLICY = ROOT / "brain-init/references/CLAUDE.local.md"
+
+
+class SimplificationContract(unittest.TestCase):
+    def test_every_entrypoint_has_a_valid_purpose_and_on_demand_details(self):
+        self.assertEqual(19, len(SKILLS))
+        for skill in SKILLS:
+            with self.subTest(skill=skill.parent.name):
+                content = skill.read_text(encoding="utf-8")
+                self.assertTrue(content.startswith("---\nname: "))
+                self.assertIn("\n---\n", content)
+                self.assertIn("# ", content)
+                self.assertLess(len(content.encode("utf-8")), 6500)
+                self.assertIn("references/", content,
+                              "Entry point must link to applicable details, checks or templates")
+                self.assertNotIn("read **all** root", content.lower(),
+                                 "No unconditional full-root read in every skill")
+                self.assertNotIn("brain-context plan", content,
+                                 "The context map must not become a mandatory skill gate")
+
+    def test_cross_cutting_safety_is_visible_in_primary_instructions(self):
+        policy = POLICY.read_text(encoding="utf-8")
+        implement = (ROOT / "brain-implement/SKILL.md").read_text()
+        update = (ROOT / "brain-update/SKILL.md").read_text()
+        spec = (ROOT / "brain-write-spec/SKILL.md").read_text()
+        for key in ("§Worktrees and brain writes", "authorized filesystem boundaries",
+                    "pending/<branch>.md", "consequential", "approval",
+                    "read more", "context-map.tsv"):
+            self.assertIn(key.lower(), policy.lower())
+        for key in ("collaborative", "wait", "review base", "do not copy brain",
+                    "approved", "tests", "execution.md", "brain-update"):
+            self.assertIn(key.lower(), implement.lower())
+        for key in ("Read **every project-knowledge root file**",
+                    "Do not use selective context loading",
+                    "never route around the restriction",
+                    "pending/<branch>.md", "Last synced"):
+            self.assertIn(key, update)
+        for key in ("status: needs-revision", "not approval of the written revision",
+                    "parent_hashes", "Unaffected:"):
+            self.assertIn(key, spec)
+
+    def test_context_discovery_is_not_a_scope_exclusion_or_map_gate(self):
+        policy = POLICY.read_text(encoding="utf-8")
+        guidance = (ROOT / "brain-init/references/safe-context-loading.md").read_text()
+        details = (ROOT / "brain-init/references/safe-context-map-protocol.md").read_text()
+        self.assertIn("optional discovery accelerators", policy)
+        self.assertIn("not a gate or an exclusion list", policy)
+        self.assertIn("Read matching documents and their references", policy)
+        self.assertIn("read more", policy.lower())
+        self.assertIn("not mandatory", guidance)
+        self.assertIn("original sources", guidance)
+        self.assertIn("context-map.tsv", details)
+        for ext in ("brain-context.py", "brain-context.mjs", "brain-context.sh"):
+            self.assertTrue((ROOT / "brain-init/scripts" / ext).exists())
+
+    def test_separate_workflows_and_read_only_guards(self):
+        review = (ROOT / "brain-review-merge-request/SKILL.md").read_text()
+        architecture = (ROOT / "brain-review-architecture/SKILL.md").read_text()
+        backlog = (ROOT / "brain-refine-backlog/SKILL.md").read_text()
+        writing = (ROOT / "write-human/SKILL.md").read_text()
+        tester = (ROOT / "brain-test-skill/SKILL.md").read_text()
+        self.assertIn("read-only", review.lower())
+        self.assertIn("standalone architecture review", architecture)
+        self.assertIn("Strictly read-only", backlog)
+        self.assertIn("explicit voice", writing.lower())
+        self.assertIn("editing mode", writing.lower())
+        self.assertIn("No test run", tester)
+
+    def test_detailed_workflows_still_exist(self):
+        pairs = {
+            "brain-init": "init-details.md",
+            "brain-brainstorm": "brainstorm-details.md",
+            "brain-write-spec": "spec-details.md",
+            "brain-decompose": "decompose-details.md",
+            "brain-blueprint": "blueprint-details.md",
+            "brain-write-tasks": "task-details.md",
+            "brain-implement": "implement-details.md",
+            "brain-update": "update-details.md",
+            "brain-plan": "plan-details.md",
+            "brain-review-code": "code-review-details.md",
+            "brain-review-architecture": "architecture-review-details.md",
+            "brain-review-security": "security-review-details.md",
+            "brain-review-merge-request": "mr-review-details.md",
+            "brain-diagnose": "diagnose-details.md",
+            "brain-explain-changes": "explain-details.md",
+            "brain-distill-content": "distill-details.md",
+            "brain-refine-backlog": "refine-details.md",
+            "brain-test-skill": "skill-testing-details.md",
+            "write-human": "human-writing-details.md",
+        }
+        for skill, name in pairs.items():
+            with self.subTest(skill=skill):
+                doc = ROOT / skill / "references" / name
+                self.assertTrue(doc.is_file())
+                self.assertGreater(len(doc.read_text(encoding="utf-8")), 500)
+
+
+if __name__ == "__main__":
+    unittest.main()
