@@ -23,6 +23,7 @@ function blob(value){
 }
 function walk(folder,base,docs){
  for(const ent of fs.readdirSync(folder,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name,'en'))){
+  if(folder===base&&ent.name==='.notes')continue;
   const p=path.join(folder,ent.name),rel=path.relative(base,p).split(path.sep).join('/');
   if(ent.isSymbolicLink())fail('unsafe Brain document: '+rel);
   if(ent.isDirectory()){walk(p,base,docs);continue}

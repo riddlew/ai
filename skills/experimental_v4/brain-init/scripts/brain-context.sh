@@ -35,10 +35,10 @@ brain=$(CDPATH= cd -- "$brain" && pwd -P) || fail 'Brain inaccessible'
 [ -f "$brain/00_index.md" ] || fail 'brain index missing'
 
 # Reject links instead of accidentally omitting potentially applicable documents.
-if find "$brain" -type l -print | grep -q .;then fail 'unsafe symlink in Brain';fi
+if find "$brain" -path "$brain/.notes" -prune -o -type l -print | grep -q .;then fail 'unsafe symlink in Brain';fi
 
 : > "$tmp/docs"
-find "$brain" -type f -name '*.md' | LC_ALL=C sort | while IFS= read -r full;do
+find "$brain" -path "$brain/.notes" -prune -o -type f -name '*.md' -print | LC_ALL=C sort | while IFS= read -r full;do
   rel=${full#"$brain"/}
   case "$rel" in README.md|USAGE.md) continue;; esac
   sha=$(git hash-object "$full") || fail 'Git required for content fingerprints'

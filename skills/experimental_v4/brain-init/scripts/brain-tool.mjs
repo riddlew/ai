@@ -135,7 +135,7 @@ function gitState(o){let repo=full(o.repo||'.');if(o.pending){let b=brain(o),bra
 function record(o){let target=path.join(brain(o),'features',slug(req(o,'feature')),'execution.md');if(!exists(target))fail('execution.md does not exist; initialize through brain-implement first: '+target);let event=req(o,'event'),detail=req(o,'detail');if(!isSlug(event)||detail.includes('\n'))fail('invalid event or detail');let text=read(target),entry='- '+event+': '+detail+'\n';if(!text.includes('## Checkpoints'))fail('execution record has no ## Checkpoints heading');if(text.slice(text.indexOf('## Checkpoints')).includes(entry)){console.log('UNCHANGED '+target);return}if(!o.apply){console.log('APPEND '+target+' (dry-run)');return}scope(target,o);fs.appendFileSync(target,(text.endsWith('\n')?'':'\n')+entry);console.log('APPENDED '+target)}
 function context(o){
  let b=brain(o);if(!exists(path.join(b,'00_index.md')))fail('not a Brain: '+b);
- if(o.select){let name=o.select;if(path.isAbsolute(name)||name.split(/[\\/]/).includes('..'))fail('invalid context selection');let p=path.join(b,name);
+ if(o.select){let name=o.select;if(path.isAbsolute(name)||name.split(/[\\/]/).includes('..')||name.split(/[\\/]/)[0]==='.notes')fail('invalid context selection');let p=path.join(b,name);
  if(!exists(p)||!fs.statSync(p).isFile())fail('context document missing: '+name);
  let actual=fs.realpathSync(p),base=fs.realpathSync(b);if(!actual.startsWith(base+path.sep))fail('context selection escapes Brain');
  process.stdout.write(read(p));return}

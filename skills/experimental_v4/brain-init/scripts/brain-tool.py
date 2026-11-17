@@ -445,7 +445,7 @@ def context(options: dict) -> None:
     if options.get("select"):
         name = str(options["select"])
         rel = Path(name)
-        if rel.is_absolute() or ".." in rel.parts:
+        if rel.is_absolute() or ".." in rel.parts or (rel.parts and rel.parts[0] == ".notes"):
             raise Problem("invalid context selection")
         target = (brain / rel).resolve()
         try:

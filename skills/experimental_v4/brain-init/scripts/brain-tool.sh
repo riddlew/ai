@@ -335,7 +335,7 @@ record)
 context)
   need brain "$BRAIN";[ -f "$BRAIN/00_index.md" ] || die "not a Brain: $BRAIN"
   if [ -n "$SELECT" ]; then
-    case "$SELECT" in /*|..|../*|*/../*|*/..) die 'invalid context selection';; esac
+    case "$SELECT" in /*|..|../*|*/../*|*/..|.notes|.notes/*) die 'invalid context selection';; esac
     target=$BRAIN/$SELECT
     [ -f "$target" ] || die "context document missing: $SELECT"
     [ ! -L "$target" ] || die "context selection escapes Brain"

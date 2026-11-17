@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 from pathlib import Path
 import re
 import sys
@@ -46,16 +47,24 @@ def inventory(brain: Path) -> dict[str, bytes]:
     if not (brain / "00_index.md").is_file():
         die("brain index missing")
     docs: dict[str, bytes] = {}
-    for node in brain.rglob("*"):
-        if node.is_symlink():
-            die("unsafe symlink in Brain: " + node.relative_to(brain).as_posix())
-    for file in sorted(brain.rglob("*.md")):
-        rel = file.relative_to(brain).as_posix()
-        if file.is_symlink() or not file.is_file() or not file.resolve().is_relative_to(brain):
-            die("unsafe Brain document: " + rel)
-        if rel not in EXCLUDED_ROOT:
-            docs[rel] = file.read_bytes()
-    return docs
+    for folder, directories, filenames in os.walk(brain, followlinks=False):
+        current = Path(folder)
+        if current == brain:
+            directories[:] = [name for name in directories if name != ".notes"]
+        for name in directories + filenames:
+            node = current / name
+            if node.is_symlink():
+                die("unsafe symlink in Brain: " + node.relative_to(brain).as_posix())
+        for name in sorted(filenames):
+            file = current / name
+            if file.suffix != ".md":
+                continue
+            rel = file.relative_to(brain).as_posix()
+            if not file.is_file() or not file.resolve().is_relative_to(brain):
+                die("unsafe Brain document: " + rel)
+            if rel not in EXCLUDED_ROOT:
+                docs[rel] = file.read_bytes()
+    return dict(sorted(docs.items()))
 
 
 def governed(rel: str) -> bool:
