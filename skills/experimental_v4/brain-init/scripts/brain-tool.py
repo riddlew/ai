@@ -398,17 +398,19 @@ def git_state(options: dict) -> None:
         return
     print("BRANCH " + git(repo, "branch", "--show-current"))
     print("HEAD " + git(repo, "rev-parse", "HEAD"))
+    # Exclude private notes from all Git inventories, including tracked changes.
+    excluded = ("--", ".", ":(exclude).brain/.notes/**")
     for label, args in (
         ("STATUS", ("status", "--porcelain", "--untracked-files=all")),
         ("STAGED", ("diff", "--cached", "--name-status")),
         ("UNSTAGED", ("diff", "--name-status")),
     ):
-        for line in git(repo, *args).splitlines():
+        for line in git(repo, *args, *excluded).splitlines():
             print(f"{label} {line}")
     if options.get("since"):
         since = str(options["since"])
         git(repo, "cat-file", "-e", since + "^{commit}")
-        for line in git(repo, "diff", "--name-status", since, "HEAD").splitlines():
+        for line in git(repo, "diff", "--name-status", since, "HEAD", *excluded).splitlines():
             print(f"COMMITTED {line}")
 
 

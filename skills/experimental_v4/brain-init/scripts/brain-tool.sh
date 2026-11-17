@@ -313,12 +313,12 @@ git)
   fi
   printf 'BRANCH %s\n' "$(git -C "$REPO" branch --show-current)"
   printf 'HEAD %s\n' "$(git -C "$REPO" rev-parse HEAD)"
-  git -C "$REPO" status --porcelain --untracked-files=all | sed 's/^/STATUS /'
-  git -C "$REPO" diff --cached --name-status | sed 's/^/STAGED /'
-  git -C "$REPO" diff --name-status | sed 's/^/UNSTAGED /'
+  git -C "$REPO" status --porcelain --untracked-files=all -- . ':(exclude).brain/.notes/**' | sed 's/^/STATUS /'
+  git -C "$REPO" diff --cached --name-status -- . ':(exclude).brain/.notes/**' | sed 's/^/STAGED /'
+  git -C "$REPO" diff --name-status -- . ':(exclude).brain/.notes/**' | sed 's/^/UNSTAGED /'
   if [ -n "$SINCE" ]; then
     git -C "$REPO" cat-file -e "$SINCE^{commit}" || die 'invalid revision'
-    git -C "$REPO" diff --name-status "$SINCE" HEAD | sed 's/^/COMMITTED /'
+    git -C "$REPO" diff --name-status "$SINCE" HEAD -- . ':(exclude).brain/.notes/**' | sed 's/^/COMMITTED /'
   fi
   ;;
 record)
