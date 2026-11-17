@@ -110,10 +110,10 @@ class SimplificationContract(unittest.TestCase):
 
     def test_model_tier_readme_covers_every_skill_once(self):
         readme = (ROOT / "brain-init/references/README.md").read_text(encoding="utf-8")
-        heading = "## Model tiers and recommended models\\n"
+        heading = "## Model tiers and recommended models\n"
         self.assertEqual(1, readme.count(heading))
-        section = readme.split(heading, 1)[1].split("\\n## ", 1)[0]
-        entries = re.findall(r"^\\| \\x60([^\\x60]+)\\x60 \\| \\*\\*(Sonnet|Opus)\\*\\* \\|", section, re.M)
+        section = readme.split(heading, 1)[1].split("\n## ", 1)[0]
+        entries = re.findall(r"^\| `([^`]+)` \| \*\*(Sonnet|Opus)\*\* \|", section, re.M)
         names = [name for name, _ in entries]
         self.assertEqual(len(SKILLS), len(names))
         self.assertEqual(len(names), len(set(names)), "Each skill must appear exactly once")
