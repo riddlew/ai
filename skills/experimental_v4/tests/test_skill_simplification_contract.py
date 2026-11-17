@@ -95,6 +95,19 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("user explicitly requests implementation", implement)
         self.assertIn("Approval of a specification, blueprint, or task list", implement)
 
+    def test_all_skills_provide_a_non_executing_next_step(self):
+        for skill in SKILLS:
+            with self.subTest(skill=skill.parent.name):
+                content = skill.read_text(encoding="utf-8")
+                self.assertEqual(1, content.count("**Recommended next step:**"))
+                recommendation = content.split("**Recommended next step:**", 1)[1]
+                for required in ("final user-facing reply", "If blocked",
+                                 "if complete", "not authorization",
+                                 "outside copy-ready deliverables"):
+                    self.assertIn(required, recommendation)
+        writing = (ROOT / "write-human/SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("without inserting commentary into it", writing)
+
     def test_detailed_workflows_still_exist(self):
         pairs = {
             "brain-init": "init-details.md",
