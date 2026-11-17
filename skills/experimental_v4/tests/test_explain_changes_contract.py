@@ -8,11 +8,12 @@ SKILL = ROOT / "brain-explain-changes" / "SKILL.md"
 
 
 class ExplainChangesContract(unittest.TestCase):
-    def test_manual_skill_with_argument_support(self):
+    def test_auto_invocable_skill_with_manual_argument_support(self):
         content = SKILL.read_text(encoding="utf-8")
         self.assertTrue(content.startswith("---\nname: brain-explain-changes\n"))
-        self.assertIn("disable-model-invocation: true", content)
-        self.assertIn("argument-hint:", content)
+        frontmatter = content.split("\n---\n", 1)[0]
+        self.assertNotIn("disable-model-invocation: true", frontmatter)
+        self.assertIn("argument-hint:", frontmatter)
         self.assertIn("$ARGUMENTS", content)
 
     def test_scopes_actual_changes_and_application_execution(self):
