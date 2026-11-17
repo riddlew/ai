@@ -17,3 +17,5 @@ Teach **how changed code works**, not whether it should be redesigned. Read-only
 **Read-only:** Never edit code, docs, or Brain; don't run them unless the user asks (tests included). Do not claim an execution path was executed or verified unless it actually was. **Not a review:** Never grade, suggest refactors or invoke review skills unprompted. Do not invoke `brain-update`.
 
 **Read when needed:** `${CLAUDE_SKILL_DIR}/references/explain-details.md` for comparison modes, teaching patterns and edge cases. This is an explanation, not a defect review.
+
+**Recommended next step:** End the final user-facing reply with one concise, evidence-based next action, naming the appropriate skill or command when useful. If blocked, identify the missing information, prerequisite, or approval instead of advancing; if complete, say no further action is needed. A recommendation is not authorization to execute another step. Keep it outside copy-ready deliverables.

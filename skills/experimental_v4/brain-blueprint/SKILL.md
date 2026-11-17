@@ -16,3 +16,5 @@ Turn approved behavior into a **user-approved, code-specific binding design**, w
 5. Report design approval, decisions, open issues and handoff to tasks or `brain-implement`.
 
 Use `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md`. **Read on demand:** `${CLAUDE_SKILL_DIR}/references/blueprint-details.md` and `${CLAUDE_SKILL_DIR}/references/blueprint-template.md` for collaborative design iterations and full document shape; CLI details live in `../brain-init/references/deterministic-tooling.md`.
+
+**Recommended next step:** End the final user-facing reply with one concise, evidence-based next action, naming the appropriate skill or command when useful. If blocked, identify the missing information, prerequisite, or approval instead of advancing; if complete, say no further action is needed. A recommendation is not authorization to execute another step. Keep it outside copy-ready deliverables.

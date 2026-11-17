@@ -18,3 +18,5 @@ Use for substantial uncertainty requiring **multi-session decision/investigation
 **Read on demand:** `${CLAUDE_SKILL_DIR}/references/plan-details.md` for ticket schema, status transitions, explicit dependency grammar, planning-index format, scope exclusions and continuation/replan rules; `../brain-init/references/deterministic-tooling.md` for CLI safeguards.
 
 **Plan, do not implement.** Planning or a prototype does not authorize product code changes or consequential architecture decisions.
+
+**Recommended next step:** End the final user-facing reply with one concise, evidence-based next action, naming the appropriate skill or command when useful. If blocked, identify the missing information, prerequisite, or approval instead of advancing; if complete, say no further action is needed. A recommendation is not authorization to execute another step. Keep it outside copy-ready deliverables.
