@@ -36,3 +36,5 @@ Locate a valid `00_index.md` Brain from user path, saved `Project brain:`, curre
 - `${CLAUDE_SKILL_DIR}/../brain-init/references/deterministic-tooling.md`: file scaffolds, factual Git inventories and authorized write scope.
 
 Keep the root schema and source/ADR semantics intact. The user—not synchronization—approves consequential decisions.
+
+**Recommended next step:** End the final user-facing reply with one concise, evidence-based next action, naming the appropriate skill or command when useful. If blocked, identify the missing information, prerequisite, or approval instead of advancing; if complete, say no further action is needed. A recommendation is not authorization to execute another step. Keep it outside copy-ready deliverables.

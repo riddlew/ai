@@ -16,3 +16,5 @@ Translate approved requirements and binding implementation plans into the **smal
 5. Report the executable task order, skipped levels and handoff to `brain-implement`. Invoke `brain-update` when records change.
 
 Use `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md`. **Read on demand:** `${CLAUDE_SKILL_DIR}/references/task-details.md` for nuanced decomposition/approval and full task examples, or `../brain-init/references/deterministic-tooling.md` for CLI.
+
+**Recommended next step:** End the final user-facing reply with one concise, evidence-based next action, naming the appropriate skill or command when useful. If blocked, identify the missing information, prerequisite, or approval instead of advancing; if complete, say no further action is needed. A recommendation is not authorization to execute another step. Keep it outside copy-ready deliverables.
