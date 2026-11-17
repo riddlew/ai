@@ -18,3 +18,5 @@ Settle genuinely consequential behavior and design decisions **before** writing 
 See `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md` for document rules and `${CLAUDE_SKILL_DIR}/../brain-init/references/deterministic-tooling.md` for safe CLI invocation.
 
 **Read on demand:** `${CLAUDE_SKILL_DIR}/references/brainstorm-details.md` for dependency-order tables, complete output shape, architecture/data/API/failure decision lenses, complex behavioral coverage or the optional visual companion. Brainstorming never authorizes production code changes.
+
+**Recommended next step:** End the final user-facing reply with one concise, evidence-based next action, naming the appropriate skill or command when useful. If blocked, identify the missing information, prerequisite, or approval instead of advancing; if complete, say no further action is needed. A recommendation is not authorization to execute another step. Keep it outside copy-ready deliverables.

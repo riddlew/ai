@@ -1,7 +1,6 @@
 ---
 name: brain-write-spec
 description: Synthesize established decisions and repository evidence into a feature specification with concrete examples, without inventing or reopening requirements.
-disable-model-invocation: true
 ---
 
 # Write Spec
@@ -19,3 +18,5 @@ Specify **what observable behavior and invariants must hold**, grounded in the u
 **Revising an approved spec.** On material behavior changes, set `status: needs-revision` in the same edit; never renumber stable IDs and a request to revise is not approval of the written revision. The producing skills `brain-decompose`, `brain-blueprint`, `brain-write-tasks` must review affected descendants; do not change their status or `parent_hashes` yourself. **Unaffected:** leave independent descendants and approvals intact. Editorial changes without material meaning need no blanket invalidation.
 
 **Read on demand:** `${CLAUDE_SKILL_DIR}/references/spec-details.md` for full example template, technical decisions, verification strategy and nuanced revision handling. For safe CLI invocation see `${CLAUDE_SKILL_DIR}/../brain-init/references/deterministic-tooling.md`.
+
+**Recommended next step:** End the final user-facing reply with one concise, evidence-based next action, naming the appropriate skill or command when useful. If blocked, identify the missing information, prerequisite, or approval instead of advancing; if complete, say no further action is needed. A recommendation is not authorization to execute another step. Keep it outside copy-ready deliverables.

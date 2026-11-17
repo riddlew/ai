@@ -113,6 +113,7 @@ For example, a request to extend communication in an existing `Session` does not
 | `brain-init` | **Sonnet** | **Opus** for a large or unfamiliar repository, contradictory legacy documentation, or tricky project/brain migration decisions. |
 | `brain-update` | **Sonnet** | **Opus** for importing a large, dense multi-system specification, reconciling conflicting authoritative records, complex rebases, or broad re-verification after history changes. |
 | `brain-brainstorm` | **Opus** | **Sonnet** if requirements and ownership are already settled and only a narrow, low-risk choice remains. |
+| `brain-decompose` | **Sonnet** | **Opus** when component boundaries, requirement ownership, or cross-system dependencies are unusually ambiguous or consequential; preserve existing ownership unless a change is approved. |
 | `brain-diagnose` | **Sonnet** | **Opus** for intermittent concurrency bugs, distributed client/server failures, intricate lifecycle issues, or evidence supporting several competing root causes. |
 | `brain-distill-content` | **Sonnet** | **Opus** for lengthy, deeply interdependent technical or protocol material where losing a qualification could change the meaning. Check exact contractual wording regardless of model. |
 | `brain-blueprint` | **Opus** | **Sonnet** for a small, familiar change with established architecture and straightforward interfaces; use Opus for consequential ownership, API, or cross-service design. |
@@ -127,6 +128,7 @@ For example, a request to extend communication in an existing `Session` does not
 | `brain-test-skill` | **Sonnet** | **Opus** when designing subtle adversarial scenarios or interpreting ambiguous, high-impact behavior failures. Test agents should still run at the tier of the role being tested, as defined in the policy. |
 | `brain-write-spec` | **Opus** | **Sonnet** when transcribing fully settled, unambiguous requirements with no consequential decisions remaining. |
 | `brain-write-tasks` | **Sonnet** | **Opus** when dividing tightly coupled, multi-system work into safe increments requires difficult dependency or protocol reasoning. |
+| `write-human` | **Sonnet** | **Opus** for lengthy, high-stakes, or technically dense prose where preserving nuanced qualifications and exact meaning requires careful cross-reference checks. Neither tier may invent or alter facts. |
 
 **Selection rule:** Prefer Sonnet for bounded execution, mechanical documentation, and routine review; use Opus when a mistake is costly and success requires reconciling ambiguous requirements, architecture, or interacting subsystems. Escalate for **reasoning difficulty and consequence**, not just feature size or file count. For a fixed task, a stronger model does not replace exact specifications, golden-vector tests, appropriate tool checks, or independent review. Keep the skill's collaborative approval checkpoints regardless of model. See [Anthropic's model-selection guidance](https://platform.claude.com/docs/en/about-claude/models/choosing-a-model) for current model capabilities.
 

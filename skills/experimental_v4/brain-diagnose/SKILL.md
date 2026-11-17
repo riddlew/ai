@@ -16,3 +16,5 @@ Find the cause of a real symptom with **minimal discriminating evidence**, then 
 5. Report symptom, cause/confidence, fix or proposal, tests and attempts. In diagnosis-only mode, confirm source files weren't changed. Save a durable report only when useful/required at `.brain/diagnoses/<NN>-<short-slug>.md` via `brain-tool doc new --kind diagnosis`; invoke `brain-update` after authorized recorded changes.
 
 **Read when needed:** `${CLAUDE_SKILL_DIR}/references/diagnose-details.md` for complete evidence templates, flaky-failure methodology, causal tracing and defense-in-depth; also see `tracing.md`, `flaky-failures.md`, `defense-in-depth.md`.
+
+**Recommended next step:** End the final user-facing reply with one concise, evidence-based next action, naming the appropriate skill or command when useful. If blocked, identify the missing information, prerequisite, or approval instead of advancing; if complete, say no further action is needed. A recommendation is not authorization to execute another step. Keep it outside copy-ready deliverables.

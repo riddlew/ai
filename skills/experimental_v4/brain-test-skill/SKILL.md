@@ -14,3 +14,5 @@ A **skill test is a fresh agent acting in a throwaway fixture**, scored against 
 5. If RED already passes, strengthen pressure once; if GREEN fails, revise the failure mechanism and rerun. Report model, samples, evidence, RED/GREEN outcomes, prior-scenario regressions and limitations. Never invent run results or commit unrequested edits.
 
 **Read when needed:** `${CLAUDE_SKILL_DIR}/references/scenario-format.md` and `${CLAUDE_SKILL_DIR}/references/skill-testing-details.md` for fixture setup, red-flag analysis, runner limits, grading and full report shape.
+
+**Recommended next step:** End the final user-facing reply with one concise, evidence-based next action, naming the appropriate skill or command when useful. If blocked, identify the missing information, prerequisite, or approval instead of advancing; if complete, say no further action is needed. A recommendation is not authorization to execute another step. Keep it outside copy-ready deliverables.

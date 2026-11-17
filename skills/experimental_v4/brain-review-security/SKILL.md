@@ -16,3 +16,5 @@ Assess an explicit security concern or a change affecting trust boundaries, auth
 5. Deliver findings in the conversation. Save only if requested/required at `.brain/reviews/security/<NN>-<short-slug>/review.md` using `${CLAUDE_SKILL_DIR}/../brain-review-code/references/report-storage.md` and `brain-tool doc new --kind review --report-type security`; invoke `brain-update` when saved.
 
 **Read when needed:** `${CLAUDE_SKILL_DIR}/references/security-review-details.md` for detailed threat modeling, vulnerability classes and report shape. Do not report an unverified hypothesis as a defect.
+
+**Recommended next step:** End the final user-facing reply with one concise, evidence-based next action, naming the appropriate skill or command when useful. If blocked, identify the missing information, prerequisite, or approval instead of advancing; if complete, say no further action is needed. A recommendation is not authorization to execute another step. Keep it outside copy-ready deliverables.

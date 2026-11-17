@@ -79,6 +79,46 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("Existing-project migration", init)
         self.assertIn("preserving project-specific instructions", init)
 
+    def test_selected_workflow_skills_allow_automatic_invocation_without_waiving_approval(self):
+        automatically_invocable = {
+            "brain-blueprint", "brain-decompose", "brain-explain-changes",
+            "brain-write-spec", "brain-write-tasks", "brain-implement",
+        }
+        intentionally_manual = {"brain-distill-content", "brain-review-merge-request", "write-human"}
+        for name in sorted(automatically_invocable | intentionally_manual):
+            with self.subTest(skill=name):
+                header = (ROOT / name / "SKILL.md").read_text(encoding="utf-8").split("\n---\n", 1)[0]
+                self.assertEqual(name in intentionally_manual,
+                                 "disable-model-invocation: true" in header)
+        implement = (ROOT / "brain-implement/SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("Automatic skill invocation is not authorization to modify code", implement)
+        self.assertIn("user explicitly requests implementation", implement)
+        self.assertIn("Approval of a specification, blueprint, or task list", implement)
+
+    def test_all_skills_provide_a_non_executing_next_step(self):
+        for skill in SKILLS:
+            with self.subTest(skill=skill.parent.name):
+                content = skill.read_text(encoding="utf-8")
+                self.assertEqual(1, content.count("**Recommended next step:**"))
+                recommendation = content.split("**Recommended next step:**", 1)[1]
+                for required in ("final user-facing reply", "If blocked",
+                                 "if complete", "not authorization",
+                                 "outside copy-ready deliverables"):
+                    self.assertIn(required, recommendation)
+        writing = (ROOT / "write-human/SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("without inserting commentary into it", writing)
+
+    def test_model_tier_readme_covers_every_skill_once(self):
+        readme = (ROOT / "brain-init/references/README.md").read_text(encoding="utf-8")
+        heading = "## Model tiers and recommended models\n"
+        self.assertEqual(1, readme.count(heading))
+        section = readme.split(heading, 1)[1].split("\n## ", 1)[0]
+        entries = re.findall(r"^\| `([^`]+)` \| \*\*(Sonnet|Opus)\*\* \|", section, re.M)
+        names = [name for name, _ in entries]
+        self.assertEqual(len(SKILLS), len(names))
+        self.assertEqual(len(names), len(set(names)), "Each skill must appear exactly once")
+        self.assertEqual({skill.parent.name for skill in SKILLS}, set(names))
+
     def test_detailed_workflows_still_exist(self):
         pairs = {
             "brain-init": "init-details.md",

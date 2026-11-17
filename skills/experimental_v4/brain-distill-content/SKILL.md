@@ -19,3 +19,5 @@ Turn specified technical text into a concise, information-dense version. **Remov
 6. Deliver readable, appropriately structured distilled content with materially important original facts and qualifications intact. Note meaningful losses/ambiguities or partial coverage.
 
 **Read when needed:** `${CLAUDE_SKILL_DIR}/references/distill-details.md` for specialized formatting, completeness rubric, long multi-source processing or examples.
+
+**Recommended next step:** End the final user-facing reply with one concise, evidence-based next action, naming the appropriate skill or command when useful. If blocked, identify the missing information, prerequisite, or approval instead of advancing; if complete, say no further action is needed. A recommendation is not authorization to execute another step. Keep it outside copy-ready deliverables.
