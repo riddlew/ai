@@ -1,7 +1,6 @@
 ---
 name: brain-write-spec
 description: Synthesize established decisions and repository evidence into a feature specification with concrete examples, without inventing or reopening requirements.
-disable-model-invocation: true
 ---
 
 # Write Spec

@@ -79,6 +79,22 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("Existing-project migration", init)
         self.assertIn("preserving project-specific instructions", init)
 
+    def test_selected_workflow_skills_allow_automatic_invocation_without_waiving_approval(self):
+        automatically_invocable = {
+            "brain-blueprint", "brain-decompose", "brain-explain-changes",
+            "brain-write-spec", "brain-write-tasks", "brain-implement",
+        }
+        intentionally_manual = {"brain-distill-content", "brain-review-merge-request", "write-human"}
+        for name in sorted(automatically_invocable | intentionally_manual):
+            with self.subTest(skill=name):
+                header = (ROOT / name / "SKILL.md").read_text(encoding="utf-8").split("\n---\n", 1)[0]
+                self.assertEqual(name in intentionally_manual,
+                                 "disable-model-invocation: true" in header)
+        implement = (ROOT / "brain-implement/SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("Automatic skill invocation is not authorization to modify code", implement)
+        self.assertIn("user explicitly requests implementation", implement)
+        self.assertIn("Approval of a specification, blueprint, or task list", implement)
+
     def test_detailed_workflows_still_exist(self):
         pairs = {
             "brain-init": "init-details.md",

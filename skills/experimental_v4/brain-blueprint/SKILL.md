@@ -1,7 +1,6 @@
 ---
 name: brain-blueprint
 description: Collaboratively design and approve concrete code-level implementation plans for approved feature components before implementation.
-disable-model-invocation: true
 ---
 
 # Blueprint — Implementation Plans

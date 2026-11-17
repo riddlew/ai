@@ -1,7 +1,6 @@
 ---
 name: brain-write-tasks
 description: Decompose approved technical implementation plans into small, verifiable executable tasks with grounded dependencies, requirement coverage, and user-approved task boundaries.
-disable-model-invocation: true
 ---
 
 # Write Tasks

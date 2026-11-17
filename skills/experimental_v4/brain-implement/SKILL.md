@@ -1,7 +1,6 @@
 ---
 name: brain-implement
 description: Implement approved requirements and code-level design in verified, test-first increments, using collaborative review checkpoints by default and resumable per-feature progress when needed.
-disable-model-invocation: true
 ---
 
 # Implement
@@ -9,6 +8,8 @@ disable-model-invocation: true
 Implement approved requirements within the agreed architecture. Small settled changes can proceed directly; substantial or design-sensitive work needs an approved blueprint. Honor `CLAUDE.local.md` for decisions, context loading and write scope.
 
 ## Collaboration and design boundary
+
+**Automatic skill invocation is not authorization to modify code.** Begin implementation only when the user explicitly requests implementation. Approval of a specification, blueprint, or task list does not independently authorize implementation. Preserve all existing design-approval and collaborative review checkpoints.
 
 **Collaborative is the default**, inline execution. For substantial work, obtain explicit approval of the binding `brain-blueprint` before editing; after **each verified, coherent increment**, show the diff and verification and **wait for user approval**. **Guided** reviews larger increments; **autonomous** skips routine checkpoints only when the user opts in. No mode waives approval for an unresolved consequential change. Subagent-driven is a separate opt-in execution mode; use `${CLAUDE_SKILL_DIR}/references/subagent-driven.md` and keep the main coordinator out of production edits.
 

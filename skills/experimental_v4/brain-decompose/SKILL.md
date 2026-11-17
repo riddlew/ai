@@ -1,7 +1,6 @@
 ---
 name: brain-decompose
 description: Decompose approved specifications into coherent functional components with complete, traceable requirement coverage before code-level design.
-disable-model-invocation: true
 ---
 
 # Decompose

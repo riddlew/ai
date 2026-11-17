@@ -2,7 +2,6 @@
 name: brain-explain-changes
 description: Walk through code changes or a component interactively in plain language, using real application paths to build understanding. Not a code review or implementation.
 argument-hint: "[commit/range, file, symbol, or topic]"
-disable-model-invocation: true
 ---
 
 # Explain Changes
