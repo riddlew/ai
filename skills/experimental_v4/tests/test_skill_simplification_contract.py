@@ -119,6 +119,34 @@ class SimplificationContract(unittest.TestCase):
         self.assertEqual(len(names), len(set(names)), "Each skill must appear exactly once")
         self.assertEqual({skill.parent.name for skill in SKILLS}, set(names))
 
+    def test_usage_step_models_match_readme_tiers(self):
+        readme = (ROOT / "brain-init/references/README.md").read_text(encoding="utf-8")
+        section = readme.split("## Model tiers and recommended models\n", 1)[1].split("\n## ", 1)[0]
+        tiers = dict(re.findall(r"^\| `([^`]+)` \| \*\*(Sonnet|Opus)\*\* \|", section, re.M))
+        usage = (ROOT / "brain-init/references/USAGE.md").read_text(encoding="utf-8")
+        steps = re.findall(r"(?m)^## Step \d+:.*$", usage)
+        self.assertEqual(25, len(steps), "Documented steps must remain model-annotated")
+        lines = usage.splitlines()
+        for i, line in enumerate(lines):
+            if not re.match(r"^## Step \d+:", line):
+                continue
+            with self.subTest(step=line):
+                following = next((value for value in lines[i + 1:] if value.strip()), "")
+                self.assertTrue(following.startswith("**Model (main session):**") or
+                                following.startswith("**Models (main session):**"), line)
+        annotations = [line for line in lines
+                       if line.startswith(("**Model (main session):**",
+                                           "**Models (main session):**"))]
+        self.assertGreaterEqual(len(annotations), len(steps))
+        checked = 0
+        for annotation in annotations:
+            for tier, skill in re.findall(r"\*\*(Sonnet|Opus)\*\* \(\x60([^\x60]+)\x60\)", annotation):
+                with self.subTest(skill=skill, tier=tier):
+                    self.assertIn(skill, tiers)
+                    self.assertEqual(tiers[skill], tier)
+                checked += 1
+        self.assertGreaterEqual(checked, 40, "Verify examples and session model labels")
+
     def test_renamed_skills_and_guides_are_consistent(self):
         renames = {
             "brain-blueprint": "brain-design-implementation",

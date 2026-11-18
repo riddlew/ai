@@ -4,6 +4,8 @@ This guide explains when to use `brain-brainstorm` versus `brain-plan`, then dem
 
 The prompts, file names, code examples, review findings, and test results are **illustrative**, not results from a real repository. Adapt them to your codebase and the capabilities of your installed skills.
 
+**Model labels** below are the README's **default main-session recommendations**, not automatic model switches or mandatory requirements. Deviate for task difficulty as the README describes; delegated subagents follow `CLAUDE.local.md` role assignments.
+
 ---
 
 # Choosing `brain-brainstorm` vs. `brain-plan`
@@ -15,15 +17,15 @@ The distinction is **what you're trying to resolve**:
 
 They're complementary, not necessarily sequential.
 
-| Situation | Use |
-|---|---|
-| Exploring several possible architectures | `brain-brainstorm` |
-| Deciding component ownership or design patterns | `brain-brainstorm` |
-| Clarifying ambiguous requirements or behavior | `brain-brainstorm` |
-| Understanding dependencies across several modules | `brain-plan` |
-| Organizing a large feature into stages and deliverables | `brain-plan` |
-| Coordinating work over multiple sessions | `brain-plan` |
-| Designing exact classes, APIs, and method signatures | `brain-design-implementation` |
+| Situation | Use | Default model |
+|---|---|---|
+| Exploring several possible architectures | `brain-brainstorm` | **Opus** |
+| Deciding component ownership or design patterns | `brain-brainstorm` | **Opus** |
+| Clarifying ambiguous requirements or behavior | `brain-brainstorm` | **Opus** |
+| Understanding dependencies across several modules | `brain-plan` | **Opus** |
+| Organizing a large feature into stages and deliverables | `brain-plan` | **Opus** |
+| Coordinating work over multiple sessions | `brain-plan` | **Opus** |
+| Designing exact classes, APIs, and method signatures | `brain-design-implementation` | **Opus** |
 
 ## Example: TCP messaging with unsettled architecture
 
@@ -56,6 +58,8 @@ For nontrivial features, use `.brain/features/<slug>/01-brief/` → `02-specific
 
 ## Understand changes after implementation
 
+**Model (main session):** **Sonnet** (`brain-explain-changes`).
+
 Run `/brain-explain-changes` to walk through the working-tree changes (or the latest commit if the tree is clean). Pass a file, symbol, or commit range to focus it, for example `/brain-explain-changes connection_manager`. Claude starts with a plain-language overview, traces actual application calls in small steps, and pauses for questions rather than giving a full code review. This skill reads files but does not edit them or create reports.
 
 ---
@@ -76,6 +80,8 @@ The applications already exist and their architecture, APIs, and established dec
 **Goal:** Implement bidirectional TCP messaging across the client and server. Frame layouts, message identifiers, byte order, and per-message payload formats are fixed **before** brainstorming begins. The protocol is non-negotiable; Claude may design the implementation but cannot modify the wire contract to simplify it.
 
 ## Step 0: Establish authoritative requirements before brainstorming
+
+**Model (main session):** No skill-specific tier for reviewing source material; the following `brain-brainstorm` step defaults to **Opus**.
 
 Suppose `protocol/wire-v1.md` defines the following **12-byte header**:
 
@@ -105,6 +111,8 @@ CA FE 01 10 00 00 00 06 00 00 00 2A
 There are **18 bytes total**: 12 header bytes and 6 payload bytes. A different byte sequence is incorrect even if the client and server happen to communicate successfully with one another.
 
 ## Step 1: `/brain-brainstorm` — Set architectural direction
+
+**Model (main session):** **Opus** (`brain-brainstorm`).
 
 **Example prompt:**
 
@@ -145,6 +153,8 @@ Claude should **not** ask whether fields are little-endian or big-endian: the pr
 
 ## Step 2: `/brain-write-spec` — Define correctness
 
+**Model (main session):** **Opus** (`brain-write-spec`).
+
 **Example prompt:**
 
 > `/brain-write-spec`
@@ -172,9 +182,13 @@ Also spell out stream behavior: one TCP receive call may return part of a frame,
 
 ## Step 3: `/brain-decompose-feature` — Define functional components
 
+**Model (main session):** **Sonnet** (`brain-decompose-feature`).
+
 For a substantial TCP messaging feature, first map the approved requirements to functional components such as message contract, framing/stream handling, dispatch, and lifecycle behavior. Produce `03-components/` documents with `CMP-` identifiers and qualified `SPEC-...#REQ-...` coverage; get approval of functional boundaries. Do not assume each functional component becomes a software class or service.
 
 ## Step 4: `/brain-design-implementation` — Agree on the actual code design
+
+**Model (main session):** **Opus** (`brain-design-implementation`).
 
 **Example prompt:**
 
@@ -233,9 +247,13 @@ The blueprint should label **binding decisions** separately from **suggested sig
 
 ## Step 5: `/brain-write-tasks` — Define executable work
 
+**Model (main session):** **Sonnet** (`brain-write-tasks`).
+
 From the approved code-level plans, create `05-tasks/` files with `TASK-` IDs, concrete technical actions, genuine dependencies, and verification criteria. Preserve the plan's decisions and map each requirement to the tasks that implement it. Skip task files when one small change can be implemented directly.
 
 ## Step 6: `/brain-implement` — Build and review coherent increments
+
+**Model (main session):** **Sonnet** (`brain-implement`).
 
 In collaborative mode, Claude implements a small testable behavior, verifies it, presents the actual code changes, and **waits for approval** before advancing.
 
@@ -281,6 +299,8 @@ Claude makes the correction and presents the revised increment. Only after you a
 
 ## Step 7: `/brain-review-code` — Independent final review
 
+**Model (main session):** **Sonnet** (`brain-review-code`).
+
 **Example prompt:**
 
 > `/brain-review-code`
@@ -317,6 +337,8 @@ Finally, `brain-update` records durable verified knowledge according to the proj
 
 ## Step 1: Go directly to `/brain-implement`
 
+**Model (main session):** **Sonnet** (`brain-implement`).
+
 **Example prompt:**
 
 > `/brain-implement`
@@ -335,6 +357,8 @@ Finally, `brain-update` records durable verified knowledge according to the proj
 Claude reads relevant project knowledge and inspects the heartbeat receiver, connection state, status panel, and tests. Suppose `lastHeartbeatReceivedAt` already exists but is not displayed. Claude should reuse it rather than redesign heartbeat handling.
 
 ## Step 2: Implement one reviewable increment
+
+**Model (main session):** **Sonnet** (`brain-implement`).
 
 Illustrative files:
 
@@ -355,6 +379,10 @@ You might respond:
 Claude adjusts the code, reruns verification, and presents the revised diff.
 
 ## Step 3: Finish
+
+**Models (main session):** **Sonnet** (`brain-implement`); **Sonnet** (`brain-update`).
+
+`brain-update` is optional when durable project knowledge needs synchronization.
 
 After approval, Claude checks relevant regressions and reports the result. `brain-update` is appropriate only if the work introduces meaningful durable project knowledge.
 
@@ -382,6 +410,8 @@ For sequence 42 and status 0:
 
 ## Step 1: `/brain-diagnose` — Trace the fault before editing
 
+**Model (main session):** **Sonnet** (`brain-diagnose`).
+
 **Example prompt:**
 
 > `/brain-diagnose`
@@ -407,6 +437,10 @@ An appropriate diagnosis is that ACK payload encoding uses the wrong byte order 
 
 ## Step 2: Apply the smallest fix with a literal regression test
 
+**Models (main session):** **Sonnet** (`brain-diagnose`); **Sonnet** (`brain-implement`).
+
+A bounded authorized repair can stay in `brain-diagnose`; use `brain-implement` if implementation is handed off.
+
 **Example prompt:**
 
 > Apply the minimal fix. Add a regression test asserting the exact expected bytes. Don't change the codec API or other message types.
@@ -427,6 +461,10 @@ Claude checks related message encoders for the same defect, runs verification, a
 
 ## Step 3: Decide whether broader review is warranted
 
+**Models (main session):** **Sonnet** (`brain-diagnose`); **Sonnet** (`brain-review-code`); **Sonnet** (`brain-update`).
+
+Code review and Brain synchronization are conditional; they are not required for every isolated fix.
+
 For an isolated one-line defect with a strong regression test, proportional self-review may suffice. If multiple message types have inconsistent byte ordering, expand the scope deliberately and consider `brain-review-code`.
 
 **Skills:** `brain-diagnose` → focused implementation/fix → optional `brain-review-code` → `brain-update` if durable knowledge needs recording. Do not require brainstorming or a blueprint for a well-understood isolated repair.
@@ -438,6 +476,8 @@ For an isolated one-line defect with a strong regression test, proportional self
 **Goal:** Improve a client/server design with tangled networking, serialization, business logic, logging, retry behavior, and unclear APIs. You want simpler ownership and better separation of concerns, guided by SOLID and DRY rather than dogmatic pattern adoption.
 
 ## Step 1: `/brain-review-architecture` — Discover evidence
+
+**Model (main session):** **Opus** (`brain-review-architecture`).
 
 Standalone architecture reviews save a revision-specific report under `.brain/reviews/architecture/<NN>-<slug>/review.md` when a writable brain exists. Subsequent reviews validate prior findings against current code rather than assuming they remain correct.
 
@@ -472,6 +512,8 @@ You decide to investigate the first two findings.
 
 ## Step 2: Focus the architectural alternatives
 
+**Model (main session):** **Opus** (`brain-review-architecture`).
+
 **Example prompt:**
 
 > `/brain-review-architecture`
@@ -498,6 +540,8 @@ These are **proposals**, not approved changes. Claude may recommend first extrac
 
 ## Step 3: `/brain-brainstorm` — Choose an approved direction
 
+**Model (main session):** **Opus** (`brain-brainstorm`).
+
 **Example prompt:**
 
 > `/brain-brainstorm`
@@ -516,6 +560,8 @@ These are **proposals**, not approved changes. Claude may recommend first extrac
 Claude identifies genuinely consequential questions: Are public connection APIs allowed to change? Must existing behavior and error semantics remain byte-for-byte compatible? Can responsibility move between components? The approved choices become binding design constraints.
 
 ## Step 4: `/brain-write-spec` and `/brain-design-implementation`
+
+**Models (main session):** **Opus** (`brain-write-spec`); **Opus** (`brain-design-implementation`).
 
 For refactoring, the specification should emphasize what **must not change**:
 
@@ -572,6 +618,8 @@ Claude should revise the API and evaluate dependency direction before you approv
 
 ## Step 5: `/brain-implement` — Refactor in verified slices
 
+**Model (main session):** **Sonnet** (`brain-implement`).
+
 A safe order is:
 
 1. Add characterization tests for the existing protocol and session behavior.
@@ -594,6 +642,8 @@ In collaborative mode, each increment has a diff, verification, and your approva
 **Goal:** Evaluate a GitLab merge request from another developer implementing client/server messaging behavior. Understand the real system and protocol before recommending whether to merge. This is a **read-only** review unless you separately authorize changes.
 
 ## Step 1: `/brain-review-merge-request` — Provide MR and requirements
+
+**Model (main session):** **Sonnet** (`brain-review-merge-request`).
 
 **Example prompt:**
 
@@ -618,6 +668,8 @@ In collaborative mode, each increment has a diff, verification, and your approva
 
 ## Step 2: Establish the actual review baseline and context
 
+**Model (main session):** **Sonnet** (`brain-review-merge-request`).
+
 Claude should load `.brain` root knowledge and relevant specifications and ADRs, then identify the **actual target branch and source commit** rather than assuming `main`.
 
 | Context | What to examine |
@@ -633,6 +685,10 @@ Claude should load `.brain` root knowledge and relevant specifications and ADRs,
 
 ## Step 3: Independent code assessments
 
+**Models (main session):** **Sonnet** (`brain-review-merge-request`); **Sonnet** (`brain-review-code`).
+
+Optional specialist reviews use **Opus** (`brain-review-security` or `brain-review-architecture`); delegated reviewer models follow the role policy.
+
 `brain-review-merge-request` uses `brain-review-code` to investigate:
 
 - **Correctness:** Bugs, failure paths, resource lifecycle, concurrency, and network edge cases.
@@ -642,6 +698,8 @@ Claude should load `.brain` root knowledge and relevant specifications and ADRs,
 For broad changes, separate reviewer contexts and specialist reviews may be appropriate. Security or architecture specialist skills are useful when the evidence warrants them; avoid invoking everything by default.
 
 ## Step 4: Report actionable, evidence-backed findings
+
+**Model (main session):** **Sonnet** (`brain-review-merge-request`).
 
 **Illustrative finding R1 — High: Coalesced frames can be lost**
 
@@ -672,6 +730,8 @@ This makes it clear that the existence of required classes and methods does not 
 
 ## Step 5: Give an advisory merge recommendation
 
+**Model (main session):** **Sonnet** (`brain-review-merge-request`).
+
 **Illustrative outcome:**
 
 > **Recommendation: Request changes.** The MR contains two high-severity correctness defects that prevent compliance with the protocol. The remaining architectural changes appear consistent with established connection ownership. R1 and R2 block merge pending corrections and verification.
@@ -679,6 +739,8 @@ This makes it clear that the existence of required classes and methods does not 
 The review should identify what tests and CI checks actually ran, and what could not be verified. It should **not** change the MR's approval state or post comments unless explicitly authorized.
 
 ## Step 6: Re-review the updated MR
+
+**Model (main session):** **Sonnet** (`brain-review-merge-request`).
 
 After the developer pushes fixes:
 
@@ -721,19 +783,21 @@ For a project like this, **default to a project-level brainstorm followed by rep
 The recurring feature workflow is:
 
 ```text
-brain-brainstorm (when needed)
+brain-brainstorm (Opus, when needed)
         ↓
-brain-write-spec
+brain-write-spec (Opus)
         ↓
-brain-write-tickets (for substantial features, when useful)
+brain-decompose-feature (Sonnet, if useful)
         ↓
-brain-design-implementation
+brain-design-implementation (Opus)
         ↓
-brain-implement (collaborative by default)
+brain-write-tasks (Sonnet, if useful)
         ↓
-brain-review-code / brain-review-security (as warranted)
+brain-implement (Sonnet by default; collaborative)
         ↓
-brain-update
+brain-review-code (Sonnet) / brain-review-security (Opus, as warranted)
+        ↓
+brain-update (Sonnet)
 ```
 
 Each skill must respect established specifications, ADRs, and approved decisions. A blueprint does not supersede a specification, and a review finding does not authorize an unapproved redesign.
@@ -743,7 +807,7 @@ Each skill must respect established specifications, ADRs, and approved decisions
 ## Session 1 — Initialize the project
 
 **Skill:** `brain-init`  
-**Suggested model:** Sonnet
+**Model (main session):** **Sonnet** (`brain-init`).
 
 Create the repository and an initial Git commit, then initialize `.brain/`.
 
@@ -770,7 +834,7 @@ At this stage, distinguish **planned capabilities** from **implemented facts**. 
 ## Session 2 — Brainstorm the project-level direction
 
 **Skill:** `brain-brainstorm`  
-**Suggested model:** Opus
+**Model (main session):** **Opus** (`brain-brainstorm`).
 
 Define the broad architecture and first usable release without trying to specify every feature.
 
@@ -819,7 +883,7 @@ YAML CLI ────────> Public library API
 ## Optional Session 3 — Plan investigations with `brain-plan`
 
 **Skill:** `brain-plan`  
-**Suggested model:** Opus
+**Model (main session):** **Opus** (`brain-plan`).
 
 **Use this only when needed.** For example, if USB printing across Windows, Linux, and macOS is in scope but the supported printer interfaces, driver requirements, permissions, and reliability guarantees are unclear, create a multi-session investigation plan.
 
@@ -860,7 +924,8 @@ The planning artifacts organize **research and decisions**. They are not a subst
 
 ### A. Brainstorm the feature
 
-**Skill:** `brain-brainstorm` · **Model:** Opus
+**Skill:** `brain-brainstorm`  
+**Model (main session):** **Opus** (`brain-brainstorm`).
 
 ```text
 /brain-brainstorm
@@ -877,7 +942,8 @@ For example, decide whether label positions are represented in **printer dots**.
 
 ### B. Write the specification
 
-**Skill:** `brain-write-spec` · **Model:** Opus
+**Skill:** `brain-write-spec`  
+**Model (main session):** **Opus** (`brain-write-spec`).
 
 ```text
 /brain-write-spec
@@ -904,7 +970,8 @@ This is an **illustrative test vector** until checked against the approved rende
 
 ### C. Approve a code-level blueprint
 
-**Skill:** `brain-design-implementation` · **Model:** Opus
+**Skill:** `brain-design-implementation`  
+**Model (main session):** **Opus** (`brain-design-implementation`).
 
 ```text
 /brain-design-implementation
@@ -935,7 +1002,8 @@ You might instead request `Label.render()` or a builder API. Claude should evalu
 
 ### D. Implement collaboratively
 
-**Skill:** `brain-implement` · **Model:** Sonnet normally; Opus for unusually difficult design or encoding concerns
+**Skill:** `brain-implement`  
+**Model (main session):** **Sonnet** (`brain-implement`). Opus can be appropriate for unusually difficult design or encoding concerns.
 
 ```text
 /brain-implement
@@ -959,7 +1027,7 @@ Possible increments:
 ## Feature cycle 2 — Read and validate YAML labels
 
 **Skills:** `brain-brainstorm` → `brain-write-spec` → `brain-design-implementation` → `brain-implement`  
-**Suggested models:** Opus for design/spec/blueprint; Sonnet for bounded implementation
+**Models (main session):** **Opus** (`brain-brainstorm`); **Opus** (`brain-write-spec`); **Opus** (`brain-design-implementation`); **Sonnet** (`brain-implement`).
 
 The YAML schema is a **public contract**. Decide its shape deliberately rather than letting the CLI parser invent one while coding.
 
@@ -1036,7 +1104,7 @@ zplcli render label.yaml --output label.zpl
 ## Feature cycle 3 — Add TCP printing
 
 **Skills:** `brain-brainstorm` (if needed) → `brain-write-spec` → `brain-design-implementation` → `brain-implement`  
-**Suggested models:** Opus for architecture/blueprint; Sonnet for implementation unless concurrency or failure semantics are unusually complex
+**Models (main session):** **Opus** (`brain-brainstorm`); **Opus** (`brain-write-spec`); **Opus** (`brain-design-implementation`); **Sonnet** (`brain-implement`). Implementation may warrant Opus for unusually complex concurrency or failure semantics.
 
 **Feature prompt**
 
@@ -1091,7 +1159,8 @@ zplcli print label.yaml --tcp 192.168.1.50:9100
 
 ## Feature cycle 4 — Add barcodes and richer layout
 
-**Skills:** Feature-level brainstorm/spec/blueprint/implement as needed
+**Skills:** `brain-brainstorm` → `brain-write-spec` → `brain-design-implementation` → `brain-implement` (use only needed stages)  
+**Models (main session):** **Opus** (`brain-brainstorm`); **Opus** (`brain-write-spec`); **Opus** (`brain-design-implementation`); **Sonnet** (`brain-implement`).
 
 ```text
 /brain-brainstorm
@@ -1120,8 +1189,8 @@ Produce golden ZPL tests for the supported barcode behavior and regression tests
 
 ## Feature cycle 5 — Add USB printing
 
-**Skills:** `brain-plan` if USB feasibility is unresolved; then `brain-brainstorm` → `brain-write-spec` → `brain-design-implementation` → `brain-implement`  
-**Suggested model:** Opus initially for platform and transport design
+**Skills:** `brain-plan` (if feasibility is unresolved) → `brain-brainstorm` → `brain-write-spec` → `brain-design-implementation` → `brain-implement`  
+**Models (main session):** **Opus** (`brain-plan`); **Opus** (`brain-brainstorm`); **Opus** (`brain-write-spec`); **Opus** (`brain-design-implementation`); **Sonnet** (`brain-implement`).
 
 USB is not simply TCP with a different address. Supported printer interfaces, OS queues, permissions, drivers, and bidirectional status capabilities may differ.
 
@@ -1148,7 +1217,7 @@ Only implement after you approve the design. Where actual supported hardware or 
 ## Session — Independent code and security reviews
 
 **Skills:** `brain-review-code`, optionally `brain-review-security` and `brain-review-architecture`  
-**Suggested model:** Sonnet for standard code-review roles; Opus for difficult cross-module or security reasoning, subject to the project's model-tier policy
+**Models (main session):** **Sonnet** (`brain-review-code`); **Opus** (`brain-review-security`); **Opus** (`brain-review-architecture`). Delegated reviewers follow `CLAUDE.local.md` role assignments.
 
 Run a full review at meaningful release milestones, even if individual increments were already tested and reviewed.
 
@@ -1187,7 +1256,7 @@ Claude should distinguish **blocking bugs**, **unverified risks**, and **optiona
 ## Final session — Package, document, and release
 
 **Skills:** `brain-implement`, `brain-update`  
-**Suggested model:** Sonnet
+**Models (main session):** **Sonnet** (`brain-implement`); **Sonnet** (`brain-update`).
 
 ```text
 /brain-implement
@@ -1219,6 +1288,8 @@ Run `brain-update` to record verified current architecture, API behavior, suppor
 ---
 
 ## Resuming the work in a new Claude session
+
+**Model (main session):** **Sonnet** (`brain-implement`).
 
 Each session should consult the project brain, relevant specifications, the approved blueprint, the current implementation plan, and Git state. Progress notes are continuity aids, not proof that code is current or tested.
 
