@@ -81,7 +81,7 @@ class SimplificationContract(unittest.TestCase):
 
     def test_selected_workflow_skills_allow_automatic_invocation_without_waiving_approval(self):
         automatically_invocable = {
-            "brain-blueprint", "brain-decompose", "brain-explain-changes",
+            "brain-design-implementation", "brain-decompose-feature", "brain-explain-changes",
             "brain-write-spec", "brain-write-tasks", "brain-implement",
         }
         intentionally_manual = {"brain-distill-content", "brain-review-merge-request", "write-human"}
@@ -124,8 +124,8 @@ class SimplificationContract(unittest.TestCase):
             "brain-init": "init-details.md",
             "brain-brainstorm": "brainstorm-details.md",
             "brain-write-spec": "spec-details.md",
-            "brain-decompose": "decompose-details.md",
-            "brain-blueprint": "blueprint-details.md",
+            "brain-decompose-feature": "decompose-details.md",
+            "brain-design-implementation": "blueprint-details.md",
             "brain-write-tasks": "task-details.md",
             "brain-implement": "implement-details.md",
             "brain-update": "update-details.md",

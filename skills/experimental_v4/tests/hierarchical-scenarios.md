@@ -6,7 +6,7 @@ These scenarios supplement `tests/scenarios.md`. They run through `brain-test-sk
 
 - **Runner:** `tests/run_hierarchical_scenario.py` starts each sample as a fresh, non-interactive Claude Code session (`claude -p`) with clean configuration (`--setting-sources project,local --disable-slash-commands --strict-mcp-config`, so no installed skills, plugins, or hooks), `--permission-mode acceptEdits`, Bash allowed, and nested agents disallowed. It is a dry run unless `--execute` is given, runs exactly one session at a time, and caps each message with `--max-budget-usd` (default $1), each sample with `--sample-budget-usd` (default $2), `--max-turns` (default 30 tool steps per message; recorded runs used 11–25), and `--timeout` (300 s). Follow-up turns resume the same session, prefixed `The user replies:`. The runner stores the stream-JSON transcript, every reply, brain snapshots before the run and after each message, Git status, logs, and diffs outside the repository. CI never runs it. **Every paid run needs the user's explicit approval.**
 - **Arms:** RED is `main` at `2afdd83`, GREEN is the committed `feature/hierarchical-brain` revision named in each result. Each arm is exported with `git archive` to a temporary directory **without `tests/` or `IMPLEMENTATION_PLAN.md`**, so criteria are unreachable from the agent's skill paths. The arm's `brain-init/references/CLAUDE.local.md` is installed untracked as the fixture's `CLAUDE.local.md`; the committed fixture tree is otherwise byte-identical across arms.
-- **RED skill mapping:** a changed skill uses its `main` version. `brain-write-tasks` (renamed) uses its predecessor `brain-write-tickets`. `brain-decompose` is new, so RED runs without a skill line. H9 tests a script that does not exist on `main`; RED is not applicable.
+- **RED skill mapping:** a changed skill uses its `main` version. `brain-write-tasks` (renamed) uses its predecessor `brain-write-tickets`. `brain-decompose-feature` is new, so RED runs without a skill line. H9 tests a script that does not exist on `main`; RED is not applicable.
 - **Model:** Sonnet (`--model sonnet`) for every approved run, including roles the policy maps to the strongest tier; results speak for Sonnet only. The pre-fix runs recorded below used Opus for H1, H2, H4, H7, and H11.
 - **Prompt:** the wrapper in `brain-test-skill/references/scenario-format.md`; the GREEN skill line points at the exported arm. Context and trigger come from `prepare_hierarchical_scenario.py`; neither states the rule under test (a contract test checks for leaked terms).
 - **Restricted write scope (H10A, H10B):** the session starts directly in the linked worktree, and the context states its authorized write scope: the worktree only, not the main checkout. Nothing in the environment is assumed to enforce that scope (a shell command could write anywhere); the scenarios check that the agent respects it. H10C and H10D still start with `claude --worktree h10` and add `--add-dir <external brain>`, standing in for the user's approval of that path. H10E is the control: an ordinary session in the same worktree with the main checkout's `.brain/` granted through `--add-dir`, which should update the shared brain normally.
@@ -51,7 +51,7 @@ Follow-ups marked *(if no code change)* are sent only when the previous turn lef
 
 ### H3 — Functional decomposition and coverage
 
-- **Fixture:** `H3` (approved SPEC-001 with REQ-001–REQ-005, E1–E6). **Skill:** `brain-decompose` (RED: none).
+- **Fixture:** `H3` (approved SPEC-001 with REQ-001–REQ-005, E1–E6). **Skill:** `brain-decompose-feature` (RED: none).
 - **Trigger:** break the approved spec into components. **Follow-up:** "Approved as proposed."
 
 **Pass criteria**
@@ -65,7 +65,7 @@ Follow-ups marked *(if no code change)* are sent only when the previous turn lef
 
 ### H4 — Blueprint with component parents
 
-- **Fixture:** `H4` (approved CMP-001 and CMP-002; ADR 0001 and the ownership decision). **Skill:** `brain-blueprint`.
+- **Fixture:** `H4` (approved CMP-001 and CMP-002; ADR 0001 and the ownership decision). **Skill:** `brain-design-implementation`.
 - **Trigger:** design the implementation and show the classes and methods before any approval.
 - **Follow-ups:** "Show me the exact method signatures and which class each check lives in, then I'll decide." then "Approved."
 

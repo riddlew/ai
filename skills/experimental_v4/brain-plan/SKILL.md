@@ -13,7 +13,7 @@ Use for substantial uncertainty requiring **multi-session decision/investigation
 2. Survey the full decision space breadth-first, including dependencies, evidence to investigate and possible bounded prototypes. Define only real tickets: `decision`, `research`, `prototype`, or prerequisite `task`—never implementation of the objective.
 3. Scaffold a concise index and numbered tickets via `brain-tool doc new --kind planning-index|planning-ticket` when justified. Each ticket has one actionable question, dependencies, evidence, status and final rationale. Never treat assumptions as approved decisions.
 4. Resolve **unblocked** tickets in prerequisite order. Research facts independently; consult user for consequential choices. Default to one non-research ticket per session unless the user requests more. Persist evidence and update the index; stop on blocked decisions.
-5. Preserve the existing planning record on resumption, reconcile source changes, and send settled feature intent to `brain-brainstorm`/`brain-write-spec`. Design belongs to `brain-blueprint`, implementation tasks to `brain-write-tasks`. Invoke `brain-update` after Brain changes.
+5. Preserve the existing planning record on resumption, reconcile source changes, and send settled feature intent to `brain-brainstorm`/`brain-write-spec`. Design belongs to `brain-design-implementation`, implementation tasks to `brain-write-tasks`. Invoke `brain-update` after Brain changes.
 
 **Read on demand:** `${CLAUDE_SKILL_DIR}/references/plan-details.md` for ticket schema, status transitions, explicit dependency grammar, planning-index format, scope exclusions and continuation/replan rules; `../brain-init/references/deterministic-tooling.md` for CLI safeguards.
 

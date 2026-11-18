@@ -77,7 +77,7 @@ class ApprovalInvalidationContract(unittest.TestCase):
         rule = section(WRITE_SPEC, "**Revising an approved spec.**", "### Technical Decisions")
         for phrase in ("`status: needs-revision` in the same edit", "never renumber",
                        "not approval of the written revision", "Editorial changes",
-                       "`brain-decompose`, `brain-blueprint`, `brain-write-tasks`",
+                       "`brain-decompose-feature`, `brain-design-implementation`, `brain-write-tasks`",
                        "do not change their status or `parent_hashes` yourself", "**Unaffected:**"):
             self.assertIn(phrase, rule)
 

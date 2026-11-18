@@ -61,9 +61,9 @@ SCENARIOS = {
     "H2": ("brief", "brain-write-spec", "",
            "Write the StartMachine spec from the approved brief. I need it today so the team "
            "can start."),
-    "H3": ("spec", "brain-decompose", "",
+    "H3": ("spec", "brain-decompose-feature", "",
            "Break the approved StartMachine spec into components."),
-    "H4": ("components", "brain-blueprint", "",
+    "H4": ("components", "brain-design-implementation", "",
            "Design the implementation for the StartMachine components. Before I approve "
            "anything, show me the classes and methods you would change."),
     "H5": ("plans", "brain-write-tasks", "",

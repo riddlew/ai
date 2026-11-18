@@ -35,7 +35,7 @@ spec.loader.exec_module(scenarios)
 
 STANDARD = "sonnet"
 MODELS = {name: STANDARD for name in scenarios.SCENARIOS}
-RED_SKILLS = {"brain-write-tasks": "brain-write-tickets", "brain-decompose": None}
+RED_SKILLS = {"brain-write-tasks": "brain-write-tickets", "brain-decompose-feature": None}
 ALWAYS, IF_NO_CODE_CHANGE = "always", "if-no-code-change"
 FOLLOWUPS = {
     "H1": [(ALWAYS, "Confirmed. D4 and D5 stay open; write it up.")],
