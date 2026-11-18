@@ -23,11 +23,11 @@ They're complementary, not necessarily sequential.
 | Understanding dependencies across several modules | `brain-plan` |
 | Organizing a large feature into stages and deliverables | `brain-plan` |
 | Coordinating work over multiple sessions | `brain-plan` |
-| Designing exact classes, APIs, and method signatures | `brain-blueprint` |
+| Designing exact classes, APIs, and method signatures | `brain-design-implementation` |
 
 ## Example: TCP messaging with unsettled architecture
 
-You know the exact wire format but haven't decided where serialization, buffering, and message dispatch should live. Start with **`brain-brainstorm`** to settle those architectural decisions. Use `brain-plan` if implementation then requires coordinating multiple modules, milestones, or investigations. Use `brain-write-spec` and `brain-blueprint` as appropriate to record binding requirements and agree on the code-level design.
+You know the exact wire format but haven't decided where serialization, buffering, and message dispatch should live. Start with **`brain-brainstorm`** to settle those architectural decisions. Use `brain-plan` if implementation then requires coordinating multiple modules, milestones, or investigations. Use `brain-write-spec` and `brain-design-implementation` as appropriate to record binding requirements and agree on the code-level design.
 
 ## Example: Large feature with settled architecture
 
@@ -42,7 +42,7 @@ You want to display the most recent UDP heartbeat timestamp, and the necessary s
 1. **Are there unresolved product or architectural choices?** If yes, use `brain-brainstorm`.
 2. **Is the work large enough to require coordinated stages, dependencies, or multiple sessions?** If yes, use `brain-plan`.
 
-If both are true, use both. **`brain-plan` is not a substitute for `brain-blueprint`:** planning decides work breakdown and sequencing; blueprinting defines the code-level implementation. You do not need every skill for every feature. Use the smallest workflow that resolves the actual uncertainty and complexity.
+If both are true, use both. **`brain-plan` is not a substitute for `brain-design-implementation`:** planning decides work breakdown and sequencing; blueprinting defines the code-level implementation. You do not need every skill for every feature. Use the smallest workflow that resolves the actual uncertainty and complexity.
 
 For a brand-new, multi-session project, see [Scenario 6: ZPL printer library and YAML CLI](#scenario-6--build-a-zpl-printer-library-and-yaml-cli-across-multiple-sessions) for an example of project-level brainstorming followed by repeated feature cycles.
 
@@ -52,7 +52,7 @@ For a complete traceability example including ADR references, negative-path requ
 
 ## Hierarchical feature workflow
 
-For nontrivial features, use `.brain/features/<slug>/01-brief/` → `02-specifications/` → `03-components/` → `04-implementation-plans/` → `05-tasks/`. `brain-brainstorm` establishes intent, `brain-write-spec` records behavior, `brain-decompose` defines coherent functional responsibilities, `brain-blueprint` specifies code-level implementation, and `brain-write-tasks` produces executable tasks. `brain-implement` writes verification and progress separately to `execution.md`. Read the authoritative schema at `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md` in the installed skills. Skip unhelpful intermediate stages for simple work.
+For nontrivial features, use `.brain/features/<slug>/01-brief/` → `02-specifications/` → `03-components/` → `04-implementation-plans/` → `05-tasks/`. `brain-brainstorm` establishes intent, `brain-write-spec` records behavior, `brain-decompose-feature` defines coherent functional responsibilities, `brain-design-implementation` specifies code-level implementation, and `brain-write-tasks` produces executable tasks. `brain-implement` writes verification and progress separately to `execution.md`. Read the authoritative schema at `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md` in the installed skills. Skip unhelpful intermediate stages for simple work.
 
 ## Understand changes after implementation
 
@@ -168,17 +168,17 @@ Also spell out stream behavior: one TCP receive call may return part of a frame,
 
 **Approval checkpoint:** Approve expected behavior, conformance examples, error handling, and binding architectural constraints.
 
-**Optional coordination:** If the feature spans many modules or sessions, use `brain-plan` to organize phases and dependencies. Use `brain-decompose` before code-level design when distinct functional responsibilities need definition; generate tasks with `brain-write-tasks` **after** the technical plans are approved. Neither replaces the specification.
+**Optional coordination:** If the feature spans many modules or sessions, use `brain-plan` to organize phases and dependencies. Use `brain-decompose-feature` before code-level design when distinct functional responsibilities need definition; generate tasks with `brain-write-tasks` **after** the technical plans are approved. Neither replaces the specification.
 
-## Step 3: `/brain-decompose` — Define functional components
+## Step 3: `/brain-decompose-feature` — Define functional components
 
 For a substantial TCP messaging feature, first map the approved requirements to functional components such as message contract, framing/stream handling, dispatch, and lifecycle behavior. Produce `03-components/` documents with `CMP-` identifiers and qualified `SPEC-...#REQ-...` coverage; get approval of functional boundaries. Do not assume each functional component becomes a software class or service.
 
-## Step 4: `/brain-blueprint` — Agree on the actual code design
+## Step 4: `/brain-design-implementation` — Agree on the actual code design
 
 **Example prompt:**
 
-> `/brain-blueprint`
+> `/brain-design-implementation`
 >
 > Create a collaborative implementation blueprint from the approved specification.
 >
@@ -515,7 +515,7 @@ These are **proposals**, not approved changes. Claude may recommend first extrac
 
 Claude identifies genuinely consequential questions: Are public connection APIs allowed to change? Must existing behavior and error semantics remain byte-for-byte compatible? Can responsibility move between components? The approved choices become binding design constraints.
 
-## Step 4: `/brain-write-spec` and `/brain-blueprint`
+## Step 4: `/brain-write-spec` and `/brain-design-implementation`
 
 For refactoring, the specification should emphasize what **must not change**:
 
@@ -524,7 +524,7 @@ For refactoring, the specification should emphasize what **must not change**:
 - Connection lifecycle and error semantics remain unchanged.
 - The new architecture must not introduce duplicate state ownership.
 
-Then use `brain-blueprint` to design actual responsibilities and APIs.
+Then use `brain-design-implementation` to design actual responsibilities and APIs.
 
 **Before (illustrative):**
 
@@ -583,7 +583,7 @@ A safe order is:
 
 In collaborative mode, each increment has a diff, verification, and your approval before further changes.
 
-**Skills:** `brain-review-architecture` → `brain-brainstorm` → `brain-write-spec` → `brain-blueprint` → `brain-implement` → `brain-review-code`.
+**Skills:** `brain-review-architecture` → `brain-brainstorm` → `brain-write-spec` → `brain-design-implementation` → `brain-implement` → `brain-review-code`.
 
 **Boundary:** Architecture reviews provide evidence and recommendations; they do **not** automatically authorize a redesign.
 
@@ -715,7 +715,7 @@ For a project like this, **default to a project-level brainstorm followed by rep
 |---|---|---|
 | The product goals or architecture are undecided | `brain-brainstorm` | Decide *what to build* and key boundaries |
 | Multiple technical investigations must be completed before decisions can be made | `brain-plan` | Track research, dependencies, and unresolved questions |
-| A feature's requirements are established | `brain-write-spec` or `brain-blueprint` | Avoid unnecessary preliminary stages |
+| A feature's requirements are established | `brain-write-spec` or `brain-design-implementation` | Avoid unnecessary preliminary stages |
 | The public behavior and code design are already settled | `brain-implement` | Deliver the smallest verified change |
 
 The recurring feature workflow is:
@@ -727,7 +727,7 @@ brain-write-spec
         ↓
 brain-write-tickets (for substantial features, when useful)
         ↓
-brain-blueprint
+brain-design-implementation
         ↓
 brain-implement (collaborative by default)
         ↓
@@ -904,10 +904,10 @@ This is an **illustrative test vector** until checked against the approved rende
 
 ### C. Approve a code-level blueprint
 
-**Skill:** `brain-blueprint` · **Model:** Opus
+**Skill:** `brain-design-implementation` · **Model:** Opus
 
 ```text
-/brain-blueprint
+/brain-design-implementation
 
 Design the minimal code structure for the approved label-rendering spec.
 Show the package layout, public API, element types, important method
@@ -958,7 +958,7 @@ Possible increments:
 
 ## Feature cycle 2 — Read and validate YAML labels
 
-**Skills:** `brain-brainstorm` → `brain-write-spec` → `brain-blueprint` → `brain-implement`  
+**Skills:** `brain-brainstorm` → `brain-write-spec` → `brain-design-implementation` → `brain-implement`  
 **Suggested models:** Opus for design/spec/blueprint; Sonnet for bounded implementation
 
 The YAML schema is a **public contract**. Decide its shape deliberately rather than letting the CLI parser invent one while coding.
@@ -1005,7 +1005,7 @@ unknown elements, invalid values, and expected error semantics.
 **Blueprint prompt**
 
 ```text
-/brain-blueprint
+/brain-design-implementation
 
 Design the smallest YAML loader that converts validated input into
 existing public library models. The library must not import YAML or
@@ -1035,7 +1035,7 @@ zplcli render label.yaml --output label.zpl
 
 ## Feature cycle 3 — Add TCP printing
 
-**Skills:** `brain-brainstorm` (if needed) → `brain-write-spec` → `brain-blueprint` → `brain-implement`  
+**Skills:** `brain-brainstorm` (if needed) → `brain-write-spec` → `brain-design-implementation` → `brain-implement`  
 **Suggested models:** Opus for architecture/blueprint; Sonnet for implementation unless concurrency or failure semantics are unusually complex
 
 **Feature prompt**
@@ -1120,7 +1120,7 @@ Produce golden ZPL tests for the supported barcode behavior and regression tests
 
 ## Feature cycle 5 — Add USB printing
 
-**Skills:** `brain-plan` if USB feasibility is unresolved; then `brain-brainstorm` → `brain-write-spec` → `brain-blueprint` → `brain-implement`  
+**Skills:** `brain-plan` if USB feasibility is unresolved; then `brain-brainstorm` → `brain-write-spec` → `brain-design-implementation` → `brain-implement`  
 **Suggested model:** Opus initially for platform and transport design
 
 USB is not simply TCP with a different address. Supported printer interfaces, OS queues, permissions, drivers, and bidirectional status capabilities may differ.
@@ -1128,7 +1128,7 @@ USB is not simply TCP with a different address. Supported printer interfaces, OS
 **Design prompt**
 
 ```text
-/brain-blueprint
+/brain-design-implementation
 
 Design USB printing for the approved printer/OS support matrix and
 connection mechanism. Reuse the existing rendering and print-job path.
@@ -1270,12 +1270,12 @@ Defer USB, discovery, detailed printer status, advanced layout, and more transpo
 
 | Situation | Typical skill sequence | Your involvement |
 |---|---|---|
-| Large feature, rigid protocol | `brain-brainstorm` → `brain-write-spec` → optional `brain-plan` / `brain-write-tasks` → `brain-blueprint` → `brain-implement` → `brain-review-code` | Approve architecture, spec, blueprint, and implementation increments. |
+| Large feature, rigid protocol | `brain-brainstorm` → `brain-write-spec` → optional `brain-plan` / `brain-write-tasks` → `brain-design-implementation` → `brain-implement` → `brain-review-code` | Approve architecture, spec, blueprint, and implementation increments. |
 | Small, settled feature | `brain-implement` | Review the focused change and verification. |
 | Isolated protocol bug | `brain-diagnose` → focused fix → optional `brain-review-code` | Review the diagnosis and correction. |
-| Architecture cleanup | `brain-review-architecture` → `brain-brainstorm` → `brain-write-spec` → `brain-blueprint` → `brain-implement` → `brain-review-code` | Choose improvements and shape the exact design. |
+| Architecture cleanup | `brain-review-architecture` → `brain-brainstorm` → `brain-write-spec` → `brain-design-implementation` → `brain-implement` → `brain-review-code` | Choose improvements and shape the exact design. |
 | Third-party merge request | `brain-review-merge-request` (uses `brain-review-code`) | Evaluate findings and advisory merge recommendation. |
-| New multi-session project (ZPL library + YAML CLI) | `brain-init` → project `brain-brainstorm` → feature-level `brain-write-spec` → `brain-blueprint` → `brain-implement` → reviews; use `brain-plan` when research needs coordination | Approve core architecture, then review each feature and its code increments. |
+| New multi-session project (ZPL library + YAML CLI) | `brain-init` → project `brain-brainstorm` → feature-level `brain-write-spec` → `brain-design-implementation` → `brain-implement` → reviews; use `brain-plan` when research needs coordination | Approve core architecture, then review each feature and its code increments. |
 
 ## How to communicate an intended design
 

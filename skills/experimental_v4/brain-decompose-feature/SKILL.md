@@ -1,5 +1,5 @@
 ---
-name: brain-decompose
+name: brain-decompose-feature
 description: Decompose approved specifications into coherent functional components with complete, traceable requirement coverage before code-level design.
 ---
 

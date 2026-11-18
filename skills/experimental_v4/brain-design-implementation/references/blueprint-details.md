@@ -1,4 +1,4 @@
-# Detailed workflow — brain-blueprint
+# Detailed workflow — brain-design-implementation
 
 **Read only for the cases linked from SKILL.md.** This reference preserves the pre-simplification guidance; the current primary skill and central policy control where wording overlaps.
 

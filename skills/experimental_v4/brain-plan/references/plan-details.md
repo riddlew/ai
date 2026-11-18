@@ -15,7 +15,7 @@ Track planning state for substantial or uncertain efforts across sessions. This 
 ## Boundaries
 
 - **Plan, do not implement.** Bounded investigations, prerequisite tasks, and minimal prototypes are permitted planning work. None of them, nor completed planning, authorizes implementing the final objective.
-- **Planning state is not implementation state.** Do not create feature implementation plans, executable tasks, or implementation checklists here. `brain-blueprint` owns feature-level `04-implementation-plans/`, `brain-write-tasks` owns `05-tasks/`, and `brain-implement` separately owns `execution.md`. The planning directory remains the record of planning decisions.
+- **Planning state is not implementation state.** Do not create feature implementation plans, executable tasks, or implementation checklists here. `brain-design-implementation` owns feature-level `04-implementation-plans/`, `brain-write-tasks` owns `05-tasks/`, and `brain-implement` separately owns `execution.md`. The planning directory remains the record of planning decisions.
 
 ## Start
 
@@ -125,4 +125,4 @@ For a ticket outside the objective: mark it `excluded`, record it under **Out of
 
 ## Hand off to the hierarchical feature workflow
 
-Review unresolved tickets and Open Areas before handoff; resolve every consequential decision that blocks an unambiguous requirement. Record a feature brief through `brain-brainstorm` when appropriate, then invoke `brain-write-spec` for approved behavior, `brain-decompose` for meaningful functional boundaries, `brain-blueprint` for code-aware implementation plans, and `brain-write-tasks` for executable tasks when task decomposition adds value. A simple settled change may skip unnecessary levels. Planning tickets in `.brain/planning/` remain investigation/decision records, never executable tasks. Do not authorize implementation merely because planning concluded.
+Review unresolved tickets and Open Areas before handoff; resolve every consequential decision that blocks an unambiguous requirement. Record a feature brief through `brain-brainstorm` when appropriate, then invoke `brain-write-spec` for approved behavior, `brain-decompose-feature` for meaningful functional boundaries, `brain-design-implementation` for code-aware implementation plans, and `brain-write-tasks` for executable tasks when task decomposition adds value. A simple settled change may skip unnecessary levels. Planning tickets in `.brain/planning/` remain investigation/decision records, never executable tasks. Do not authorize implementation merely because planning concluded.

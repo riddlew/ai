@@ -81,7 +81,7 @@ class SimplificationContract(unittest.TestCase):
 
     def test_selected_workflow_skills_allow_automatic_invocation_without_waiving_approval(self):
         automatically_invocable = {
-            "brain-blueprint", "brain-decompose", "brain-explain-changes",
+            "brain-design-implementation", "brain-decompose-feature", "brain-explain-changes",
             "brain-write-spec", "brain-write-tasks", "brain-implement",
         }
         intentionally_manual = {"brain-distill-content", "brain-review-merge-request", "write-human"}
@@ -119,13 +119,42 @@ class SimplificationContract(unittest.TestCase):
         self.assertEqual(len(names), len(set(names)), "Each skill must appear exactly once")
         self.assertEqual({skill.parent.name for skill in SKILLS}, set(names))
 
+    def test_renamed_skills_and_guides_are_consistent(self):
+        renames = {
+            "brain-blueprint": "brain-design-implementation",
+            "brain-decompose": "brain-decompose-feature",
+        }
+        for old, new in renames.items():
+            with self.subTest(skill=new):
+                self.assertFalse((ROOT / old).exists())
+                skill = (ROOT / new / "SKILL.md").read_text(encoding="utf-8")
+                self.assertIn("name: " + new + "\n", skill)
+        for path in (
+            ROOT / "brain-init/references/README.md",
+            ROOT / "brain-init/references/USAGE.md",
+            ROOT / "brain-init/references/CLAUDE.local.md",
+            ROOT / "brain-init/references/feature-document-contract.md",
+        ):
+            content = path.read_text(encoding="utf-8")
+            for old, new in renames.items():
+                if path.name != "README.md":
+                    self.assertIsNone(re.search(r"(?<![A-Za-z0-9_-])" + re.escape(old) + r"(?![A-Za-z0-9_-])", content), str(path))
+                self.assertIn(new, content, str(path))
+        readme = (ROOT / "brain-init/references/README.md").read_text(encoding="utf-8")
+        self.assertIn("remove the former `brain-blueprint/` and `brain-decompose/`", readme)
+        for name in (
+            "brain-design-implementation", "brain-decompose-feature",
+            "brain-explain-changes", "brain-implement", "brain-write-spec",
+        ):
+            self.assertNotIn("`" + name + "` **(manual)**", readme)
+
     def test_detailed_workflows_still_exist(self):
         pairs = {
             "brain-init": "init-details.md",
             "brain-brainstorm": "brainstorm-details.md",
             "brain-write-spec": "spec-details.md",
-            "brain-decompose": "decompose-details.md",
-            "brain-blueprint": "blueprint-details.md",
+            "brain-decompose-feature": "decompose-details.md",
+            "brain-design-implementation": "blueprint-details.md",
             "brain-write-tasks": "task-details.md",
             "brain-implement": "implement-details.md",
             "brain-update": "update-details.md",

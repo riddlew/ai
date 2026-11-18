@@ -1,5 +1,5 @@
 ---
-name: brain-blueprint
+name: brain-design-implementation
 description: Collaboratively design and approve concrete code-level implementation plans for approved feature components before implementation.
 ---
 

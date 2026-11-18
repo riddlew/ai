@@ -50,8 +50,8 @@ class SkillReferenceContract(unittest.TestCase):
         cases = {
             "brain-brainstorm": "01-brief/",
             "brain-write-spec": "02-specifications/",
-            "brain-decompose": "03-components/",
-            "brain-blueprint": "04-implementation-plans/",
+            "brain-decompose-feature": "03-components/",
+            "brain-design-implementation": "04-implementation-plans/",
             "brain-write-tasks": "05-tasks/",
             "brain-implement": "execution.md",
         }

@@ -37,7 +37,7 @@ The Brain gives orientation, not proof of freshness. Check code, Git history and
 
 Use `brain-init/references/feature-document-contract.md` for the exact hierarchy, metadata, approvals, requirements, dependency/coverage rules and parent fingerprints. Available levels: brief → specification → component → implementation plan → task; `execution.md` records mutable evidence **separately**. Skip unnecessary levels; a small, settled change can be implemented directly. Never create placeholders.
 
-`brain-brainstorm` owns briefs; `brain-write-spec` specifications; `brain-decompose` components; `brain-blueprint` binding plans; `brain-write-tasks` tasks; `brain-implement` execution state. `brain-update` alone maintains shared root knowledge, ADRs, source maps, technical knowledge and the index after initialization. `brain-plan` owns separate planning records.
+`brain-brainstorm` owns briefs; `brain-write-spec` specifications; `brain-decompose-feature` components; `brain-design-implementation` binding plans; `brain-write-tasks` tasks; `brain-implement` execution state. `brain-update` alone maintains shared root knowledge, ADRs, source maps, technical knowledge and the index after initialization. `brain-plan` owns separate planning records.
 
 **Approval integrity:** a material revision to a governing approved document invalidates affected descendants until reviewed and renewed by their owning skills; unaffected work can proceed. Never silently refresh parent hashes or mark revised documents approved. Tasks are not permission to contradict specs or approved binding plans. If an authoritative conflict remains, consult.
 

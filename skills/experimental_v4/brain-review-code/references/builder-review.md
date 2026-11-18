@@ -1,6 +1,6 @@
 # Builder review
 
-A fresh reviewer reads a specification, component set, implementation plan, executable task set, or execution work-item set as the builder who must act on it. Used by `brain-write-spec`, `brain-decompose`, `brain-blueprint`, `brain-write-tasks`, and `brain-implement`.
+A fresh reviewer reads a specification, component set, implementation plan, executable task set, or execution work-item set as the builder who must act on it. Used by `brain-write-spec`, `brain-decompose-feature`, `brain-design-implementation`, `brain-write-tasks`, and `brain-implement`.
 
 ## For the author
 
