@@ -119,6 +119,33 @@ class SimplificationContract(unittest.TestCase):
         self.assertEqual(len(names), len(set(names)), "Each skill must appear exactly once")
         self.assertEqual({skill.parent.name for skill in SKILLS}, set(names))
 
+    def test_renamed_skills_and_guides_are_consistent(self):
+        renames = {
+            "brain-blueprint": "brain-design-implementation",
+            "brain-decompose": "brain-decompose-feature",
+        }
+        for old, new in renames.items():
+            with self.subTest(skill=new):
+                self.assertFalse((ROOT / old).exists())
+                skill = (ROOT / new / "SKILL.md").read_text(encoding="utf-8")
+                self.assertIn("name: " + new + "\n", skill)
+        for path in (
+            ROOT / "brain-init/references/README.md",
+            ROOT / "brain-init/references/USAGE.md",
+            ROOT / "brain-init/references/CLAUDE.local.md",
+            ROOT / "brain-init/references/feature-document-contract.md",
+        ):
+            content = path.read_text(encoding="utf-8")
+            for old, new in renames.items():
+                self.assertNotIn(old, content, str(path))
+                self.assertIn(new, content, str(path))
+        readme = (ROOT / "brain-init/references/README.md").read_text(encoding="utf-8")
+        for name in (
+            "brain-design-implementation", "brain-decompose-feature",
+            "brain-explain-changes", "brain-implement", "brain-write-spec",
+        ):
+            self.assertNotIn("`" + name + "` **(manual)**", readme)
+
     def test_detailed_workflows_still_exist(self):
         pairs = {
             "brain-init": "init-details.md",
