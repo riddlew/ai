@@ -1,6 +1,6 @@
 # Implementation plan template
 
-Follow the shared feature-document contract. `brain-blueprint` owns the plan; `brain-implement` keeps execution evidence **outside** it in the feature's `execution.md`. Do not mix design approval and mutable execution status.
+Follow the shared feature-document contract. `brain-design-implementation` owns the plan; `brain-implement` keeps execution evidence **outside** it in the feature's `execution.md`. Do not mix design approval and mutable execution status.
 
 ```markdown
 ---

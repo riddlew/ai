@@ -1,4 +1,4 @@
-# Detailed workflow — brain-decompose
+# Detailed workflow — brain-decompose-feature
 
 **Read only for the cases linked from SKILL.md.** This reference preserves the pre-simplification guidance; the current primary skill and central policy control where wording overlaps.
 
@@ -61,4 +61,4 @@ Present the proposed component set, scope boundaries, coverage table, and conseq
 
 ## 5. Persist and hand off
 
-Write only component documents, then invoke `brain-update` to update indexes without modifying producer-owned files. Report IDs, paths, coverage, approval status and blockers. Recommend `brain-blueprint` for codebase-aware technical design. Do not create implementation tasks or edit production code.
+Write only component documents, then invoke `brain-update` to update indexes without modifying producer-owned files. Report IDs, paths, coverage, approval status and blockers. Recommend `brain-design-implementation` for codebase-aware technical design. Do not create implementation tasks or edit production code.
