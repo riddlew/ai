@@ -14,6 +14,8 @@ For decision tradeoffs and review discipline, consult `brain-init/references/eng
 
 ## Project brain loading
 
+**Private notes boundary:** `.brain/.notes/` is user-owned and outside Brain knowledge, discovery, and maintenance. Never list, search, scan, read, index, summarize, copy, sync, edit, move, or delete anything inside it by default. Read specified notes **only when the user explicitly requests it**; authorization to read never authorizes modification. Exclude this subtree from broad file traversal, context maps, inventories, and subagent context. Do not treat notes as governing requirements or project facts without explicit user direction.
+
 Locate **one** Brain (must contain `00_index.md`) in order: explicitly supplied valid location; saved `Project brain:` path; current worktree's `.brain/`; main checkout's `.brain/` in a linked worktree. If none exists, follow the active skill's no-brain policy and mention `/brain-init` once.
 
 **Read context based on the actual task, not a mandatory context-map maintenance ritual:**

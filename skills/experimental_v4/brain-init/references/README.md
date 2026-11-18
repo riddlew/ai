@@ -104,6 +104,8 @@ The five numbered feature folders represent progressively more concrete document
 
 For example, a request to extend communication in an existing `Session` does not authorize silently moving connection ownership into a new `ConnectionManager`. Claude should explain the concrete reason for such a change, compare it with extending `Session`, and ask you which design to adopt.
 
+**Private notes:** `.brain/.notes/` is user-owned. Brain skills and discovery tools must ignore it; only read specifically requested notes when the user explicitly directs that access. Never modify these notes.
+
 ## Model tiers and recommended models
 
 `CLAUDE.local.md` is the **authority for role-to-model assignments**: standard tier = Sonnet and strongest tier = Opus. The recommendations below are **starting points for the main session**, not hard requirements or overrides of the policy. Use the latest available model in each family; do not pin these recommendations to a version. Existing skill rules govern whether Claude suggests a `/model` switch, and delegated subagents continue to use the explicit assignments in `CLAUDE.local.md` (including Sonnet implementers/reviewers and Opus final review/fix roles).

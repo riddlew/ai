@@ -319,6 +319,30 @@ class DeterministicCliContract(unittest.TestCase):
             self.assertEqual(manifests[0], manifests[2])
 
 
+    def test_private_notes_are_excluded_from_tool_context_and_git(self):
+        for runtime in ("python", "node", "sh"):
+            with self.subTest(runtime=runtime), tempfile.TemporaryDirectory() as temp:
+                repo = Path(temp)
+                subprocess.run(["git", "init", "-q", str(repo)], check=True)
+                subprocess.run(["git", "-C", str(repo), "-c", "user.name=CI",
+                                "-c", "user.email=ci@example.com", "commit",
+                                "--allow-empty", "-qm", "base"], check=True)
+                brain = repo / ".brain"
+                notes = brain / ".notes"
+                notes.mkdir(parents=True)
+                (brain / "00_index.md").write_text("# Brain\\n")
+                secret = notes / "private.md"
+                secret.write_text("# Private\\n")
+                hidden = invoke(runtime, "context", "--brain", brain,
+                                "--select", ".notes/private.md", ok=False)
+                self.assertNotEqual(hidden.returncode, 0)
+                listing = invoke(runtime, "git", "--repo", repo).stdout
+                self.assertNotIn(".notes", listing)
+                subprocess.run(["git", "-C", str(repo), "add", "-f",
+                                ".brain/.notes/private.md"], check=True)
+                staged = invoke(runtime, "git", "--repo", repo).stdout
+                self.assertNotIn(".notes", staged)
+
     def test_symlink_escape_is_rejected_in_every_runtime(self):
         for runtime in ("python", "node", "sh"):
             with self.subTest(runtime=runtime), tempfile.TemporaryDirectory() as temp:

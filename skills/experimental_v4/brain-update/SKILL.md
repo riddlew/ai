@@ -7,7 +7,7 @@ description: Use when another skill changes project knowledge, when the user ask
 
 Keep the **single shared Brain** accurate and attributable to the proper main branch. This skill owns root project knowledge, `adrs/`, `sources/`, `knowledge/`, and indexes—not producer-owned feature, execution, planning, diagnosis or review files.
 
-**Always:** Read facts from current source and Git evidence; requirements from approved authoritative documents. **Never run the project's code/tests/build, dispatch subagents, or stage/commit/push.** Write only inside the authorized Brain. Never turn unapproved recommendations into decisions or silently edit normative producer-owned docs.
+**Always:** Exclude `.brain/.notes/` from all discovery, indexing, imports, and synchronization. Never read it unless the user explicitly requests specific notes, and never modify its contents. Read facts from current source and Git evidence; requirements from approved authoritative documents. **Never run the project's code/tests/build, dispatch subagents, or stage/commit/push.** Write only inside the authorized Brain. Never turn unapproved recommendations into decisions or silently edit normative producer-owned docs.
 
 ## 1. Resolve and protect the Brain
 

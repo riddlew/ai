@@ -184,6 +184,22 @@ class SafeContextContract(unittest.TestCase):
                                          "--branch", "main")
         self.assertEqual((mode, reason), ("full", "unmapped-code-path"))
 
+    def test_private_notes_are_not_discovered_or_read(self):
+        notes = self.brain / ".notes"
+        notes.mkdir()
+        (notes / "secret.md").write_text("# Private note\\nNever include this\\n")
+        # An inaccessible/symlinked note must not cause discovery to enter this directory.
+        (notes / "outside.md").symlink_to(self.brain.parent / "not-for-brain.md")
+        for action in ("map", "plan"):
+            results = self.outputs(action, *(("--branch", "main") if action == "plan" else ()))
+            for result in results:
+                self.assertNotIn(".notes", result.stdout)
+                self.assertNotIn("Private note", result.stdout)
+        for runtime in RUNTIMES:
+            result = run(runtime, "plan", "--brain", self.brain,
+                         "--branch", "main", "--feature", "payments")
+            self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_generated_map_matches_all_runtimes(self):
         self.outputs("map")
 
