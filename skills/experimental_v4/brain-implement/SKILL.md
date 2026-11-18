@@ -11,12 +11,12 @@ Implement approved requirements within the agreed architecture. Small settled ch
 
 **Automatic skill invocation is not authorization to modify code.** Begin implementation only when the user explicitly requests implementation. Approval of a specification, blueprint, or task list does not independently authorize implementation. Preserve all existing design-approval and collaborative review checkpoints.
 
-**Collaborative is the default**, inline execution. For substantial work, obtain explicit approval of the binding `brain-blueprint` before editing; after **each verified, coherent increment**, show the diff and verification and **wait for user approval**. **Guided** reviews larger increments; **autonomous** skips routine checkpoints only when the user opts in. No mode waives approval for an unresolved consequential change. Subagent-driven is a separate opt-in execution mode; use `${CLAUDE_SKILL_DIR}/references/subagent-driven.md` and keep the main coordinator out of production edits.
+**Collaborative is the default**, inline execution. For substantial work, obtain explicit approval of the binding `brain-design-implementation` before editing; after **each verified, coherent increment**, show the diff and verification and **wait for user approval**. **Guided** reviews larger increments; **autonomous** skips routine checkpoints only when the user opts in. No mode waives approval for an unresolved consequential change. Subagent-driven is a separate opt-in execution mode; use `${CLAUDE_SKILL_DIR}/references/subagent-driven.md` and keep the main coordinator out of production edits.
 
 ## 1. Establish the boundary
 
 1. Read the project core, active feature's specifications, approved implementation plans, tasks, ADRs and technical source knowledge; inspect all relevant code owners, callers, tests and current Git changes. `brain-context` is optional, not a substitute for discovery: when uncertain, **read more**. If no Brain exists, proceed from the request and mention `/brain-init` once.
-2. Recheck binding plan assumptions against current source and `Design inspected at:`. If a binding design is stale, stop affected work and return to `brain-blueprint` for revision/approval; independent authorized work may proceed.
+2. Recheck binding plan assumptions against current source and `Design inspected at:`. If a binding design is stale, stop affected work and return to `brain-design-implementation` for revision/approval; independent authorized work may proceed.
 3. Note `git status`; preserve unrelated edits. Record the **true review base before the first code change** and preserve it on resume (do not substitute the design SHA or latest HEAD). Reconcile any recorded base that no longer represents the actual work.
 4. Resolve the previously chosen workspace and collaboration/execution modes without re-asking. Worktrees use a shared Brain: **do not copy brain documents into it**. Verify new worktrees against committed/uncommitted work and user authorization; never silently discard uncommitted or untracked dependencies, auto-merge, or remove worktrees.
 
@@ -32,7 +32,7 @@ If that write is denied or outside the session's authorized boundaries, follow `
 2. When observable testing is feasible: write a spec-derived test, verify a meaningful **red** result, make the smallest change, verify **green**, and rerun affected checks. If it already passes, investigate; don't manufacture failure. When tests are impractical, use proportionate observable evidence and disclose limits.
 3. Review the actual diff, requirements and approved binding design; inspect command results. Technically verified is **not** the same as approved or done. Maintain verification evidence in execution records.
 4. In collaborative/guided mode, present the relevant diff, covered acceptance cases and actual test results, request approval and **wait**; a `continue` response approves only the previously reviewed increment. If the user edited files, preserve/reverify them before proceeding.
-5. For consequential design deviations, stop the affected scope and consult/return to `brain-blueprint`. Minor reversible illustrative adjustments may proceed and be reported.
+5. For consequential design deviations, stop the affected scope and consult/return to `brain-design-implementation`. Minor reversible illustrative adjustments may proceed and be reported.
 
 Commit only upon explicit user instruction; stage only authorized files. For subagent task review and detailed test/review modes, read `${CLAUDE_SKILL_DIR}/references/implement-details.md` **when that mode or situation arises**.
 

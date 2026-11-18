@@ -66,7 +66,7 @@ A document's `id` is stable within a feature, regardless of filename; requiremen
 
 - [x] `brain-brainstorm`: capture an approved `01-brief/brief.md` without changing its decision process.
 - [x] `brain-write-spec`: write behavior-first `02-specifications/` documents with stable requirement/example IDs.
-- [x] **New `brain-decompose` skill:** group specifications into coherent functional components under `03-components/`; demonstrate complete requirement coverage and meaningful boundaries.
+- [x] **New `brain-decompose-feature` skill:** group specifications into coherent functional components under `03-components/`; demonstrate complete requirement coverage and meaningful boundaries.
 - [x] `brain-plan`: retain its role for investigations, unresolved decisions, and multi-session planning, with updated handoffs.
 
 **Gate:** One approved brief yields specifications and traceable components; open decisions remain open.
@@ -74,7 +74,7 @@ A document's `id` is stable within a feature, regardless of filename; requiremen
 ### P4 — Implementation plans and task generation
 **Status: Initial skill changes authored; validation pending**
 
-- [x] `brain-blueprint`: produce codebase-grounded `04-implementation-plans/` documents for components; preserve binding/illustrative design distinctions and explicit approvals.
+- [x] `brain-design-implementation`: produce codebase-grounded `04-implementation-plans/` documents for components; preserve binding/illustrative design distinctions and explicit approvals.
 - [x] **Rename and evolve `brain-write-tickets` → `brain-write-tasks`**. Reuse its dependency/coverage/builder-review discipline, but generate executable `05-tasks/` documents from approved plans.
 - [x] Remove old `brain-write-tickets/SKILL.md` and update guides, supporting skills, and tests. No parallel ticket/task generator.
 - [x] Preserve `brain-plan` planning tickets as investigation/decision records, not implementation tasks.
@@ -131,7 +131,7 @@ Work in order P1 → P2 → P3 → P4 → P5 → P6 → P7, but write focused te
 
 ## Definition of done
 
-Five document types have explicit contracts, the new `brain-decompose` exists, `brain-write-tickets` is replaced by `brain-write-tasks`, technical plans and mutable execution records have separate owners, structural and behavioral validation pass, the complete `StartMachine` scenario works, and small work can still bypass unnecessary stages. No legacy feature-layout support is required.
+Five document types have explicit contracts, the new `brain-decompose-feature` exists, `brain-write-tickets` is replaced by `brain-write-tasks`, technical plans and mutable execution records have separate owners, structural and behavioral validation pass, the complete `StartMachine` scenario works, and small work can still bypass unnecessary stages. No legacy feature-layout support is required.
 
 ## Current verification and integration limitations
 

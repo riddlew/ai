@@ -76,8 +76,8 @@ A review should be able to trace a verified task back through its plan, componen
 |---|---|
 | `01-brief/` | `brain-brainstorm` (or user-authored material accepted as a brief) |
 | `02-specifications/` | `brain-write-spec` |
-| `03-components/` | `brain-decompose` |
-| `04-implementation-plans/` | `brain-blueprint` |
+| `03-components/` | `brain-decompose-feature` |
+| `04-implementation-plans/` | `brain-design-implementation` |
 | `05-tasks/` | `brain-write-tasks` |
 | `execution.md` | `brain-implement` |
 | Root brain knowledge, `adrs/`, `sources/`, `knowledge/` | `brain-update` (initialized by `brain-init`) |

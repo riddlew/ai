@@ -75,7 +75,7 @@ Each approved component has `parents: [SPEC-001]` and `parent_hashes: [SPEC-001@
 
 An implementation plan contains its own `Design inspected at:` SHA, approved binding design constraints, known owners, intended changes and verification strategy. A SHA or file path is **not invented** when no codebase has been inspected. The sample fixture uses an explicitly illustrative inspection value and must not be adopted unchanged.
 
-`brain-blueprint` records explicit user approval of binding design; it never writes the mutable execution checklist into the plan.
+`brain-design-implementation` records explicit user approval of binding design; it never writes the mutable execution checklist into the plan.
 
 ## 5. Tasks — `05-tasks/`
 

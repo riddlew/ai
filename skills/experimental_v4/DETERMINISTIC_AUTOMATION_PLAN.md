@@ -56,7 +56,7 @@ Implement brain-tool init:
 
 ## Phase 2 — Feature document, planning, and report scaffolding
 
-**Skills:** brain-brainstorm, brain-write-spec, brain-decompose, brain-blueprint, brain-write-tasks; also brain-plan, brain-diagnose, review skills where numbering is mechanical.
+**Skills:** brain-brainstorm, brain-write-spec, brain-decompose-feature, brain-design-implementation, brain-write-tasks; also brain-plan, brain-diagnose, review skills where numbering is mechanical.
 
 Implement brain-tool doc:
 - create one requested draft at a time: brief, specification, component, implementation plan, or task; use existing feature-document-templates.md and the canonical feature folders; never generate five empty levels as a ritual;
