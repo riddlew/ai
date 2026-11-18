@@ -10,7 +10,7 @@ For new feature work the canonical document structure is `.brain/features/<featu
 
 ## Install
 
-Copy each skill directory into the project's `.claude/skills/` directory, then run `/brain-init`. It installs or merges `CLAUDE.local.md`, and copies its bundled `USAGE.md` and `README.md` into the selected project brain (normally `.brain/`). These guides are installed from `brain-init/references/`, so installation works even when the skill is installed independently:
+Copy each skill directory into the project's `.claude/skills/` directory, then run `/brain-init`. **When upgrading from an older installation, remove the former `brain-blueprint/` and `brain-decompose/` skill directories** after installing `brain-design-implementation/` and `brain-decompose-feature/`; otherwise the old slash commands may remain available. Existing feature documents in `.brain/features/` keep their paths and IDs. It installs or merges `CLAUDE.local.md`, and copies its bundled `USAGE.md` and `README.md` into the selected project brain (normally `.brain/`). These guides are installed from `brain-init/references/`, so installation works even when the skill is installed independently:
 
 ```text
 project/
@@ -20,12 +20,12 @@ project/
 │   └── README.md                 # skill catalog (reference only)
 └── .claude/
     └── skills/
-        ├── brain-decompose-feature/            # SKILL.md — functional component decomposition
+        ├── brain-decompose-feature/     # SKILL.md — functional component decomposition
         ├── brain-brainstorm/            # SKILL.md + lenses/ + references/ + scripts/
-        ├── brain-design-implementation/             # SKILL.md + references/blueprint-template.md
+        ├── brain-design-implementation/ # SKILL.md + references/blueprint-template.md
         ├── brain-diagnose/
         ├── brain-distill-content/
-        ├── brain-explain-changes/         # SKILL.md (manual, read-only)
+        ├── brain-explain-changes/         # SKILL.md (read-only)
         ├── brain-implement/             # SKILL.md + references/
         ├── brain-init/                 # SKILL.md + references/{CLAUDE.local.md,USAGE.md,README.md}
         ├── brain-plan/
@@ -46,7 +46,7 @@ project/
 
 `brain-review-architecture`, `brain-review-security`, and `brain-review-merge-request` read the shared finding format and review-storage rules from `${CLAUDE_SKILL_DIR}/../brain-review-code/references/findings.md` and `${CLAUDE_SKILL_DIR}/../brain-review-code/references/report-storage.md`, so install them together with `brain-review-code`. Likewise, `brain-init` uses `brain-update`'s root-file rules and templates, so install the two together.
 
-Skills labeled **manual** use `disable-model-invocation: true` and must be explicitly invoked (for example, `/brain-implement`). Other skills may be selected when relevant, and can also be invoked explicitly.
+Skills labeled **manual** use `disable-model-invocation: true` and must be explicitly invoked (for example, `/brain-review-merge-request`). Other skills may be selected when relevant, and can also be invoked explicitly.
 
 `tests/` contains development fixtures and scenarios; it is not an installed Claude Code skill. Copy only the `brain-*` directories into `.claude/skills/`. Use `brain-test-skill` for behavioral verification (see [Verification](#verification)).
 
