@@ -137,9 +137,11 @@ class SimplificationContract(unittest.TestCase):
         ):
             content = path.read_text(encoding="utf-8")
             for old, new in renames.items():
-                self.assertIsNone(re.search(r"(?<![A-Za-z0-9_-])" + re.escape(old) + r"(?![A-Za-z0-9_-])", content), str(path))
+                if path.name != "README.md":
+                    self.assertIsNone(re.search(r"(?<![A-Za-z0-9_-])" + re.escape(old) + r"(?![A-Za-z0-9_-])", content), str(path))
                 self.assertIn(new, content, str(path))
         readme = (ROOT / "brain-init/references/README.md").read_text(encoding="utf-8")
+        self.assertIn("remove the former `brain-blueprint/` and `brain-decompose/`", readme)
         for name in (
             "brain-design-implementation", "brain-decompose-feature",
             "brain-explain-changes", "brain-implement", "brain-write-spec",
