@@ -7,7 +7,8 @@ The user owns consequential product and architecture decisions. This policy appl
 - **Verify facts** from current source, tests, configuration, documentation and experiments. Distinguish implemented behavior from required behavior and disclose uncertainty.
 - **Honor established choices:** approved specifications, ADRs and `09_user_decisions.md` govern intent; don't reopen them silently. Source documents explicitly designated authoritative govern their contracts over derived summaries.
 - **Decide routine details:** low-risk, local, reversible implementation choices consistent with approved design need no user question.
-- **Consult for consequences:** changes to user-visible behavior, ownership/lifecycle, API/protocol/persistence/security, concurrency guarantees, important architecture or irreversible cost require explicit approval **before acting**. A recommendation, draft, test result or feature request is not approval.
+- **Consult for consequences:** changes to user-visible behavior, ownership/lifecycle, API/protocol/persistence/security, concurrency guarantees, important architecture or irreversible cost require explicit approval **before acting**. A recommendation, draft or test result is not approval of a consequential choice.
+- **Implementation authorization:** An explicit request to implement authorizes routine code changes within the agreed scope, not unapproved redesign or unresolved consequential decisions. Automatic skill invocation, a request to investigate or draft a plan, or approval of a specification, implementation plan or task list does **not** independently authorize implementation.
 - First investigate discoverable facts and approved decisions. Ask only unresolved, material choices with a concise recommendation; wait for the answer. If approved records conflict without an explicit later supersession, stop the affected scope and consult.
 
 For decision tradeoffs and review discipline, consult `brain-init/references/engineering-details.md` only when relevant. Preserve project-specific instructions alongside this policy.
@@ -20,10 +21,10 @@ Locate **one** Brain (must contain `00_index.md`) in order: explicitly supplied 
 
 **Read context based on the actual task, not a mandatory context-map maintenance ritual:**
 
-1. Read available core project orientation (`00_index.md`, `01_about.md`, `02_features.md`, `03_architecture.md`, `09_user_decisions.md`, `state.md`, `open_questions.md`, `glossary.md`) and the active branch's `pending/<branch>.md` when present (`/` becomes `--`).
+1. Inventory the names of root-level project-knowledge `.md` files without reading every file (exclude workflow guides `README.md` and `USAGE.md`; never enter `.notes/`). Read available core project orientation (`00_index.md`, `01_about.md`, `02_features.md`, `03_architecture.md`, `09_user_decisions.md`, `state.md`, `open_questions.md`, `glossary.md`), other root documents relevant to the task (such as `04_data_model.md`, `05_settings.md`, `07_integrations.md` or `spikes.md`), and the active branch's `pending/<branch>.md` when present (`/` becomes `--`).
 2. Read the active feature's governing **approved** brief, specifications, components, implementation plans, tasks and execution state where applicable. Consult root topic knowledge and ADRs that govern the scope.
 3. Inspect actual code, owners, callers, tests and configuration. Search the Brain index, `adrs/`, `sources/`, `knowledge/` and linked files by feature, behavior, identifiers and **source paths**. Read matching documents and their references; verify exact contracts against original authoritative sources.
-4. Expand as new dependencies emerge. If naming or scope is ambiguous, or an important source map is stale or incomplete, **read more**, not less. After compaction, reload applicable context.
+4. Expand as new dependencies emerge. If naming or scope is ambiguous, the task crosses multiple areas, or an important source map is stale or incomplete, **read more**, not less; a broad read of root project knowledge is preferable to missing governing facts. After compaction, reload applicable context.
 
 The installed `brain-context plan` (Python / Node / POSIX shell) and reviewed `context-map.tsv` remain available as **optional discovery accelerators**, not a gate or an exclusion list. No matching row or successful fingerprint is proof that all relevant documentation has been found. See `brain-init/references/safe-context-loading.md` for the short discovery procedure. Never load an unrelated branch's pending facts as current. `brain-update` still reads **every** root project-knowledge file during main-branch synchronization.
 
@@ -38,6 +39,8 @@ The Brain gives orientation, not proof of freshness. Check code, Git history and
 Use `brain-init/references/feature-document-contract.md` for the exact hierarchy, metadata, approvals, requirements, dependency/coverage rules and parent fingerprints. Available levels: brief → specification → component → implementation plan → task; `execution.md` records mutable evidence **separately**. Skip unnecessary levels; a small, settled change can be implemented directly. Never create placeholders.
 
 `brain-brainstorm` owns briefs; `brain-write-spec` specifications; `brain-decompose-feature` components; `brain-design-implementation` binding plans; `brain-write-tasks` tasks; `brain-implement` execution state. `brain-update` alone maintains shared root knowledge, ADRs, source maps, technical knowledge and the index after initialization. `brain-plan` owns separate planning records.
+
+**Authority boundaries:** Approved specifications, ADRs and `09_user_decisions.md` define required behavior and durable decisions; approved implementation plans bind agreed code structure but cannot override those authorities. Current code and descriptive root knowledge report what exists, not what is required; `execution.md` records work and verification, not new requirements. `glossary.md` governs terminology.
 
 **Approval integrity:** a material revision to a governing approved document invalidates affected descendants until reviewed and renewed by their owning skills; unaffected work can proceed. Never silently refresh parent hashes or mark revised documents approved. Tasks are not permission to contradict specs or approved binding plans. If an authoritative conflict remains, consult.
 

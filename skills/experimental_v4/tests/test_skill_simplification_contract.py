@@ -176,6 +176,29 @@ class SimplificationContract(unittest.TestCase):
         ):
             self.assertNotIn("`" + name + "` **(manual)**", readme)
 
+    def test_policy_authorization_discovery_and_authority_boundaries(self):
+        policy = POLICY.read_text(encoding="utf-8")
+        details = (ROOT / "brain-init/references/engineering-details.md").read_text(
+            encoding="utf-8"
+        )
+        for required in (
+            "An explicit request to implement authorizes routine code changes",
+            "Automatic skill invocation",
+            "does **not** independently authorize implementation",
+            "Inventory the names of root-level project-knowledge",
+            "other root documents relevant to the task",
+            "a broad read of root project knowledge",
+            "**Authority boundaries:**",
+            "approved implementation plans bind agreed code structure",
+            "`execution.md` records work and verification, not new requirements",
+            "never enter `.notes/`",
+        ):
+            with self.subTest(requirement=required):
+                self.assertIn(required, policy)
+        self.assertNotIn("feature request is not approval", policy)
+        self.assertIn("brain-design-implementation", details)
+        self.assertNotIn("brain-blueprint", details)
+
     def test_detailed_workflows_still_exist(self):
         pairs = {
             "brain-init": "init-details.md",
