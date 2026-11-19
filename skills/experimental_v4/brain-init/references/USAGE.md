@@ -1,6 +1,6 @@
 # Brain Skills — Usage Guide
 
-This guide explains when to use `brain-brainstorm` versus `brain-plan`, then demonstrates six example workflows: five involving existing TCP/UDP client and server applications, and one multi-session project building a ZPL printer library and YAML-driven CLI.
+This guide explains when to use `brain-brainstorm` versus `brain-plan`, then demonstrates seven example workflows: five involving existing TCP/UDP client and server applications, one multi-session ZPL printer library and YAML-driven CLI project, and one example of revising approved work after implementation has started.
 
 The prompts, file names, code examples, review findings, and test results are **illustrative**, not results from a real repository. Adapt them to your codebase and the capabilities of your installed skills.
 
@@ -1337,16 +1337,175 @@ Defer USB, discovery, detailed printer status, advanced layout, and more transpo
 
 ---
 
+# Scenario 7 — Change an approved feature during implementation
+
+Suppose the ZPL YAML CLI from Scenario 6 has an **approved specification and implementation plan**. `brain-implement` has already added parsing and tests, but you decide that unknown YAML fields should produce **warnings** instead of errors. That changes observable behavior, so simply editing `.brain/09_user_decisions.md`, discussing it in chat, or modifying implementation code is **not enough**: the owning feature documents and affected approvals must be reconciled.
+
+**Choose the smallest revision path:**
+
+| Kind of change | Workflow before resuming implementation |
+|---|---|
+| Undecided behavior or consequential architecture | `brain-brainstorm` first; then the applicable owning skills below |
+| New or changed requirement, invariant, public error, or acceptance example | `brain-write-spec` → review affected components/plans/tasks through their owners |
+| Only the binding code design changes; required behavior stays the same | `brain-design-implementation` → `brain-write-tasks` if affected tasks exist; **skip `brain-write-spec`** |
+| Only task sequencing or acceptance evidence changes, within an approved design | `brain-write-tasks` when existing tasks need revision; otherwise `brain-implement` |
+| A small reversible implementation detail consistent with approved plans | Continue in `brain-implement`; no document rewrite needed |
+
+## Step 1: Pause affected implementation and preserve evidence
+
+**Model (main session):** **Sonnet** (`brain-implement`).
+
+Before changing an approved requirement, stop only the affected work. Preserve already-reviewed increments, uncommitted changes and the real test results. Independent, authorized work whose governing documents are unchanged may continue.
+
+**Example prompt in the active implementation session:**
+
+```text
+/brain-implement
+
+Pause implementation of the YAML unknown-field behavior. I may change
+its acceptance rule. Record the current verified status, remaining
+work, and the affected scope in execution.md. Preserve existing code
+and tests; do not implement the proposed behavior yet.
+```
+
+## Step 2: Resolve the new decision, if necessary
+
+**Model (main session):** **Opus** (`brain-brainstorm`).
+
+If you already made an unambiguous decision, **skip this step**. You can discuss the change with Claude directly; `brain-brainstorm` is useful when semantics, compatibility or consequences still need a decision.
+
+**Optional prompt:**
+
+```text
+/brain-brainstorm
+
+For the YAML CLI, I am considering warnings instead of errors for
+unknown fields. Compare rejecting, ignoring, and warning; cover nested
+fields, forward compatibility, and CLI exit status. Preserve other
+approved validation rules. Do not edit implementation code.
+```
+
+A conversation or updated brief records the agreed direction, **not** automatic approval of an as-yet-unwritten revised specification or plan.
+
+## Step 3: Revise the specification if behavior changed
+
+**Model (main session):** **Opus** (`brain-write-spec`).
+
+For the example, this step is necessary because the accepted input and failure behavior change.
+
+```text
+/brain-write-spec
+
+Revise the existing YAML-validation specification to reflect the
+approved unknown-field warning behavior. Preserve existing document,
+requirement, and example IDs; assign new IDs only where needed.
+
+Show the changed requirements, examples, compatibility constraints,
+and expected CLI results. Mark a materially revised approved spec
+needs-revision until I explicitly approve the written revision.
+
+Identify which components, implementation plans, and tasks depend on
+this specification. Do not edit their documents or approval states.
+Do not implement code.
+```
+
+`brain-write-spec` owns `02-specifications/`. It should report affected descendants, **not** silently rewrite `03-components/`, `04-implementation-plans/` or `05-tasks/`. The spec revision must be explicitly approved before affected downstream work resumes.
+
+## Step 4: Revalidate functional decomposition, if used and affected
+
+**Model (main session):** **Sonnet** (`brain-decompose-feature`).
+
+Skip this step when no component documents exist or none is affected. Otherwise review requirement coverage and existing boundaries; preserve stable IDs and unaffected approvals.
+
+```text
+/brain-decompose-feature
+
+Reconcile the YAML feature's component documents with the newly
+approved specification. Check which components cover the changed
+requirement, review dependency and coverage links, and renew affected
+approvals and parent fingerprints only after validation.
+
+Do not invent new owners or change binding code design.
+```
+
+## Step 5: Revalidate or revise affected implementation plans
+
+**Model (main session):** **Opus** (`brain-design-implementation`).
+
+**You do not always need a new design.** If the revised behavior fits the existing binding design, review and renew affected plan approvals and parent fingerprints as required. If it changes interfaces, error propagation, ownership, lifecycle or another binding choice, revise the design collaboratively and get explicit approval. If a plan's governing documents and binding decisions are unaffected, leave it alone.
+
+```text
+/brain-design-implementation
+
+Compare the revised approved YAML specification and any component
+documents against the existing implementation plans and current code.
+
+Determine whether the unknown-field warning behavior changes any
+binding API, error flow, or ownership decision. Reuse existing plan
+IDs and preserve unaffected decisions. Revise affected plans, validate
+their governing parent references/fingerprints, and present any
+binding changes for my explicit approval.
+
+Do not edit production code or execution.md.
+```
+
+A stale parent fingerprint is a **review requirement**, not permission to update a hash without checking the changed parent.
+
+## Step 6: Reconcile affected tasks, if any
+
+**Model (main session):** **Sonnet** (`brain-write-tasks`).
+
+If `05-tasks/` was used and its work items are affected, update their acceptance criteria, examples, dependencies or coverage **after** their governing plans are approved. Reuse existing task IDs; do not reset verified implementation progress. Skip this step when there are no tasks or their approved scope is unaffected.
+
+```text
+/brain-write-tasks
+
+Review existing YAML feature tasks against the approved revised
+requirements and implementation plans. Revise only affected tasks,
+preserve IDs and genuine dependencies, validate coverage and parent
+fingerprints, and request any required task approval.
+
+Do not rewrite execution.md or implement code.
+```
+
+## Step 7: Explicitly resume implementation
+
+**Model (main session):** **Sonnet** (`brain-implement`).
+
+A revised spec, plan or task approval is **not** implementation authorization. Start a fresh implementation session with an explicit request, inspect actual Git/code/test state and `execution.md`, and verify that all **affected** governing documents are approved and current.
+
+```text
+/brain-implement
+
+Resume implementation of the YAML CLI's approved unknown-field
+warning behavior. I explicitly authorize the revised implementation.
+
+Read the revised approved spec, applicable component/design/task
+documents, and execution.md. Reconcile existing code and tests with
+the last reviewed increment and current Git state. Stop if affected
+approvals or parent fingerprints are still stale.
+
+Continue in collaborative mode, show each small verified diff and
+test result, and wait for approval before proceeding.
+```
+
+**If only architecture changed:** skip Steps 2–4 when requirements and functional ownership remain valid; begin at Step 5, then Step 6 only if tasks are affected, followed by Step 7. **If only an illustrative helper or other local implementation detail changed:** stay in `brain-implement` without revisiting the spec or blueprint. A consequential change already approved in conversation still needs to be recorded and validated in its owning document.
+
+`brain-update` may synchronize shared root knowledge, ADRs and indexes after a producing skill records the revision. It does **not** own or reapprove feature specs, components, plans or tasks. A material change to an approved parent requires review of its **affected** descendants; do not automatically invalidate independent work or silently refresh approval hashes.
+
+---
+
 # Quick workflow reference
 
 | Situation | Typical skill sequence | Your involvement |
 |---|---|---|
-| Large feature, rigid protocol | `brain-brainstorm` → `brain-write-spec` → optional `brain-plan` / `brain-write-tasks` → `brain-design-implementation` → `brain-implement` → `brain-review-code` | Approve architecture, spec, blueprint, and implementation increments. |
+| Large feature, rigid protocol | `brain-brainstorm` → `brain-write-spec` → optional `brain-decompose-feature` → `brain-design-implementation` → optional `brain-write-tasks` → `brain-implement` → `brain-review-code`; use `brain-plan` separately for unresolved research | Approve architecture, spec, blueprint, and implementation increments. |
 | Small, settled feature | `brain-implement` | Review the focused change and verification. |
 | Isolated protocol bug | `brain-diagnose` → focused fix → optional `brain-review-code` | Review the diagnosis and correction. |
 | Architecture cleanup | `brain-review-architecture` → `brain-brainstorm` → `brain-write-spec` → `brain-design-implementation` → `brain-implement` → `brain-review-code` | Choose improvements and shape the exact design. |
 | Third-party merge request | `brain-review-merge-request` (uses `brain-review-code`) | Evaluate findings and advisory merge recommendation. |
 | New multi-session project (ZPL library + YAML CLI) | `brain-init` → project `brain-brainstorm` → feature-level `brain-write-spec` → `brain-design-implementation` → `brain-implement` → reviews; use `brain-plan` when research needs coordination | Approve core architecture, then review each feature and its code increments. |
+| Approved feature changes during implementation | If behavior changed: `brain-write-spec` → affected `brain-decompose-feature` / `brain-design-implementation` / `brain-write-tasks` → `brain-implement`; if only binding design changed, start at `brain-design-implementation` | Approve revised governing documents; explicitly request resumed implementation. |
 
 ## How to communicate an intended design
 
