@@ -13,7 +13,7 @@ POLICY = ROOT / "brain-init/references/CLAUDE.local.md"
 
 class SimplificationContract(unittest.TestCase):
     def test_every_entrypoint_has_a_valid_purpose_and_on_demand_details(self):
-        self.assertEqual(19, len(SKILLS))
+        self.assertEqual(20, len(SKILLS))
         for skill in SKILLS:
             with self.subTest(skill=skill.parent.name):
                 content = skill.read_text(encoding="utf-8")
@@ -84,7 +84,7 @@ class SimplificationContract(unittest.TestCase):
             "brain-design-implementation", "brain-decompose-feature", "brain-explain-changes",
             "brain-write-spec", "brain-write-tasks", "brain-implement",
         }
-        intentionally_manual = {"brain-distill-content", "brain-review-merge-request", "write-human"}
+        intentionally_manual = {"brain-next", "brain-distill-content", "brain-review-merge-request", "write-human"}
         for name in sorted(automatically_invocable | intentionally_manual):
             with self.subTest(skill=name):
                 header = (ROOT / name / "SKILL.md").read_text(encoding="utf-8").split("\n---\n", 1)[0]
@@ -125,7 +125,7 @@ class SimplificationContract(unittest.TestCase):
         tiers = dict(re.findall(r"^\| `([^`]+)` \| \*\*(Sonnet|Opus)\*\* \|", section, re.M))
         usage = (ROOT / "brain-init/references/USAGE.md").read_text(encoding="utf-8")
         steps = re.findall(r"(?m)^## Step \d+:.*$", usage)
-        self.assertEqual(25, len(steps), "Documented steps must remain model-annotated")
+        self.assertEqual(32, len(steps), "Documented steps must remain model-annotated")
         lines = usage.splitlines()
         for i, line in enumerate(lines):
             if not re.match(r"^## Step \d+:", line):
@@ -146,6 +146,27 @@ class SimplificationContract(unittest.TestCase):
                     self.assertEqual(tiers[skill], tier)
                 checked += 1
         self.assertGreaterEqual(checked, 40, "Verify examples and session model labels")
+
+    def test_usage_covers_mid_implementation_revisions(self):
+        usage = (ROOT / "brain-init/references/USAGE.md").read_text(encoding="utf-8")
+        scenario = usage.split("# Scenario 7 — Change an approved feature during implementation", 1)[1]
+        scenario = scenario.split("# Quick workflow reference", 1)[0]
+        self.assertIn("brain-write-spec", scenario)
+        self.assertIn("brain-decompose-feature", scenario)
+        self.assertIn("brain-design-implementation", scenario)
+        self.assertIn("brain-write-tasks", scenario)
+        self.assertIn("brain-implement", scenario)
+        for requirement in (
+            "If you already made an unambiguous decision",
+            "skip this step when no component documents exist",
+            "preserve unaffected",
+            "parent fingerprints",
+            "explicitly authorize",
+            "not** implementation authorization",
+            "Do not edit production code",
+        ):
+            with self.subTest(requirement=requirement):
+                self.assertIn(requirement.lower(), scenario.lower())
 
     def test_renamed_skills_and_guides_are_consistent(self):
         renames = {
@@ -199,9 +220,38 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("brain-design-implementation", details)
         self.assertNotIn("brain-blueprint", details)
 
+    def test_next_skill_is_read_only_by_default_and_routes_optional_revisions(self):
+        skill = (ROOT / "brain-next/SKILL.md").read_text(encoding="utf-8")
+        details = (ROOT / "brain-next/references/next-routing.md").read_text(encoding="utf-8")
+        readme = (ROOT / "brain-init/references/README.md").read_text(encoding="utf-8")
+        usage = (ROOT / "brain-init/references/USAGE.md").read_text(encoding="utf-8")
+        policy = POLICY.read_text(encoding="utf-8")
+        self.assertFalse((ROOT / "brain-change").exists())
+        for required in (
+            "name: brain-next", "disable-model-invocation: true", "argument-hint:",
+            "$ARGUMENTS", "Default mode is read-only", "state.md", "execution.md",
+            "parents", "parent_hashes", "depends_on", "Git", "brain-write-spec",
+            "brain-decompose-feature", "brain-design-implementation",
+            "brain-write-tasks", "brain-diagnose", "brain-review-code",
+            "brain-update", "brain-implement", "INC-", "explicit user request",
+            "Skill tool", "does not write or approve", "Recommended next step:",
+        ):
+            with self.subTest(required=required):
+                self.assertIn(required.lower(), skill.lower())
+        for required in ("INC-4", "INC-4.5", "INC-5", "needs-revision",
+                         "no additional global progress file", "review",
+                         "dependencies", "verification", "approval", "read-only"):
+            with self.subTest(required=required):
+                self.assertIn(required.lower(), details.lower())
+        self.assertIn("`brain-next`", readme)
+        self.assertIn("/brain-next <feature>", usage)
+        self.assertIn("--reconcile", usage)
+        self.assertIn("brain-next", policy)
+
     def test_detailed_workflows_still_exist(self):
         pairs = {
             "brain-init": "init-details.md",
+            "brain-next": "next-routing.md",
             "brain-brainstorm": "brainstorm-details.md",
             "brain-write-spec": "spec-details.md",
             "brain-decompose-feature": "decompose-details.md",
