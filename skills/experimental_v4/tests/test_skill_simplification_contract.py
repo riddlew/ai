@@ -84,7 +84,7 @@ class SimplificationContract(unittest.TestCase):
             "brain-design-implementation", "brain-decompose-feature", "brain-explain-changes",
             "brain-write-spec", "brain-write-tasks", "brain-implement",
         }
-        intentionally_manual = {"brain-change", "brain-distill-content", "brain-review-merge-request", "write-human"}
+        intentionally_manual = {"brain-next", "brain-distill-content", "brain-review-merge-request", "write-human"}
         for name in sorted(automatically_invocable | intentionally_manual):
             with self.subTest(skill=name):
                 header = (ROOT / name / "SKILL.md").read_text(encoding="utf-8").split("\n---\n", 1)[0]
@@ -220,28 +220,38 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("brain-design-implementation", details)
         self.assertNotIn("brain-blueprint", details)
 
-    def test_change_skill_routes_affected_document_owners_without_implementation(self):
-        skill = (ROOT / "brain-change/SKILL.md").read_text(encoding="utf-8")
-        details = (ROOT / "brain-change/references/change-routing.md").read_text(encoding="utf-8")
+    def test_next_skill_is_read_only_by_default_and_routes_optional_revisions(self):
+        skill = (ROOT / "brain-next/SKILL.md").read_text(encoding="utf-8")
+        details = (ROOT / "brain-next/references/next-routing.md").read_text(encoding="utf-8")
         readme = (ROOT / "brain-init/references/README.md").read_text(encoding="utf-8")
         usage = (ROOT / "brain-init/references/USAGE.md").read_text(encoding="utf-8")
-        for requirement in ("disable-model-invocation: true", "Skill tool", "brain-write-spec",
-                            "brain-decompose-feature", "brain-design-implementation",
-                            "brain-write-tasks", "brain-update", "parent_hashes",
-                            "brain-implement", "does not write or approve",
-                            "explicit user request", "exact", "wait"):
-            with self.subTest(requirement=requirement):
-                self.assertIn(requirement.lower(), skill.lower())
-        for requirement in ("needs-revision", "preserve", "approval", "parents"):
-            self.assertIn(requirement, details.lower())
-        self.assertIn("**Opus**", readme)
-        self.assertIn("/brain-change yaml-cli", usage)
-        self.assertIn("manual fallback", usage)
+        policy = POLICY.read_text(encoding="utf-8")
+        self.assertFalse((ROOT / "brain-change").exists())
+        for required in (
+            "name: brain-next", "disable-model-invocation: true", "argument-hint:",
+            "$ARGUMENTS", "Default mode is read-only", "state.md", "execution.md",
+            "parents", "parent_hashes", "depends_on", "Git", "brain-write-spec",
+            "brain-decompose-feature", "brain-design-implementation",
+            "brain-write-tasks", "brain-diagnose", "brain-review-code",
+            "brain-update", "brain-implement", "INC-", "explicit user request",
+            "Skill tool", "does not write or approve", "Recommended next step:",
+        ):
+            with self.subTest(required=required):
+                self.assertIn(required.lower(), skill.lower())
+        for required in ("INC-4", "INC-4.5", "INC-5", "needs-revision",
+                         "no additional global progress file", "review",
+                         "dependencies", "verification", "approval", "read-only"):
+            with self.subTest(required=required):
+                self.assertIn(required.lower(), details.lower())
+        self.assertIn("`brain-next`", readme)
+        self.assertIn("/brain-next <feature>", usage)
+        self.assertIn("--reconcile", usage)
+        self.assertIn("brain-next", policy)
 
     def test_detailed_workflows_still_exist(self):
         pairs = {
             "brain-init": "init-details.md",
-            "brain-change": "change-routing.md",
+            "brain-next": "next-routing.md",
             "brain-brainstorm": "brainstorm-details.md",
             "brain-write-spec": "spec-details.md",
             "brain-decompose-feature": "decompose-details.md",

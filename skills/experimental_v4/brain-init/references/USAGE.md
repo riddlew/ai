@@ -1339,30 +1339,28 @@ Defer USB, discovery, detailed printer status, advanced layout, and more transpo
 
 # Scenario 7 — Change an approved feature during implementation
 
-**Default: call `/brain-change` once the change is proposed or decided.** It identifies and invokes only the required documentation skills in order, pausing for your approvals. You do **not** need to select `brain-write-spec` or `brain-design-implementation` yourself. It never runs `brain-implement` or treats a plan approval as permission to write code. When skill invocation is unavailable, it supplies the exact next command instead of silently editing another skill's files.
+**First run `/brain-next yaml-cli` to identify the next step.** By default it is **read-only**: it inspects approvals, dependencies, current code and `execution.md`, then recommends one action without running another skill or writing anything.
 
-**After `brain-brainstorm` (with the agreed decision recorded):**
-
-```text
-/brain-change yaml-cli
-
-Reconcile our confirmed decision to warn instead of error on unknown
-YAML fields. Invoke only the affected document-owning skills and obtain
-required approvals. Do not implement code.
-```
-
-**After an ordinary conversation (no brainstorming required):**
+**After `brain-brainstorm` has recorded a confirmed decision, explicitly request reconciliation:**
 
 ```text
-/brain-change yaml-cli
+/brain-next yaml-cli --reconcile unknown fields should warn instead of error
 
-I want unknown YAML fields to generate warnings instead of errors.
-Identify unresolved consequential details and reconcile affected specs,
-components, plans and tasks through their owning skills.
-Do not implement code.
+Use the confirmed decision. Reconcile only affected specs, components,
+plans and tasks through their respective owning skills, pausing for my
+approval when needed. Do not implement code.
 ```
 
-**Model (main session):** **Opus** (`brain-change`; Sonnet is appropriate for a narrow, settled change). The longer steps below describe the manual fallback and approval gates, not a mandatory list of commands to type after `/brain-change`.
+**After a normal discussion, without brainstorming:**
+
+```text
+/brain-next yaml-cli --reconcile unknown fields should warn instead of error
+
+Identify unresolved consequential details, then coordinate only the
+affected document-owning skills. Do not implement code.
+```
+
+**Model (main session):** **Sonnet** (`brain-next`); Opus for consequential or ambiguous decisions. If nested skill invocation is unavailable, it gives the exact next command rather than editing documents directly. The steps below explain the equivalent **manual fallback**, not commands you must run after `/brain-next --reconcile`.
 
 Suppose the ZPL YAML CLI from Scenario 6 has an **approved specification and implementation plan**. `brain-implement` has already added parsing and tests, but you decide that unknown YAML fields should produce **warnings** instead of errors. That changes observable behavior, so simply editing `.brain/09_user_decisions.md`, discussing it in chat, or modifying implementation code is **not enough**: the owning feature documents and affected approvals must be reconciled.
 
@@ -1520,17 +1518,32 @@ test result, and wait for approval before proceeding.
 
 ---
 
+## Determine the next action without creating another progress file
+
+**Model (main session):** **Sonnet** (`brain-next`).
+
+Call `/brain-next <feature>` after any stage, including in a new session. Its default mode is **read-only**: it checks approved specifications, optional components, binding plans and tasks, per-feature `execution.md`, dependencies, actual code/tests and Git changes. It uses `.brain/state.md` **only to find the feature**, not as a global current-increment tracker. If more than one feature matches, it asks which to use.
+
+For instance, after working on `INC-4`, a changed requirement might require `/brain-write-spec <feature>`, a stale approved plan might require `/brain-design-implementation <feature>`, and updated task dependencies might require `/brain-write-tasks <feature>`. Once all applicable approvals are current, a **real, recorded and unblocked** `INC-4.5` could produce the recommendation `/brain-implement INC-4.5`.
+
+After `INC-4.5` is verified and approved, repeating `/brain-next <feature>` may recommend `/brain-implement INC-5` if `INC-5` exists and is the next ready work. **Never invent increment IDs or order solely by numbering, or skip pending increment approvals.** If no step is needed, it should say so. A recommendation never starts implementation: the user must explicitly invoke the recommended command.
+
+Use `/brain-next <feature> --reconcile <change>` only when you explicitly want feature documentation revised through the relevant owning skills. No global progress file or duplicated approval ledger is created.
+
+---
+
 # Quick workflow reference
 
 | Situation | Typical skill sequence | Your involvement |
 |---|---|---|
 | Large feature, rigid protocol | `brain-brainstorm` → `brain-write-spec` → optional `brain-decompose-feature` → `brain-design-implementation` → optional `brain-write-tasks` → `brain-implement` → `brain-review-code`; use `brain-plan` separately for unresolved research | Approve architecture, spec, blueprint, and implementation increments. |
+| Identify the next workflow stage or increment | `/brain-next <feature>` (read-only default) | Decide whether to invoke its one evidence-backed recommendation. |
 | Small, settled feature | `brain-implement` | Review the focused change and verification. |
 | Isolated protocol bug | `brain-diagnose` → focused fix → optional `brain-review-code` | Review the diagnosis and correction. |
 | Architecture cleanup | `brain-review-architecture` → `brain-brainstorm` → `brain-write-spec` → `brain-design-implementation` → `brain-implement` → `brain-review-code` | Choose improvements and shape the exact design. |
 | Third-party merge request | `brain-review-merge-request` (uses `brain-review-code`) | Evaluate findings and advisory merge recommendation. |
 | New multi-session project (ZPL library + YAML CLI) | `brain-init` → project `brain-brainstorm` → feature-level `brain-write-spec` → `brain-design-implementation` → `brain-implement` → reviews; use `brain-plan` when research needs coordination | Approve core architecture, then review each feature and its code increments. |
-| Approved feature changes during implementation | **`brain-change`** invokes only affected owning skills (spec → components → plan → tasks); request `brain-implement` separately after approvals. | Confirm unresolved decisions and approve revised documents; explicitly request implementation. |
+| Approved feature changes during implementation | `/brain-next <feature> --reconcile <decision>` coordinates affected document owners; `/brain-next <feature>` then recommends the next action. | Approve revised governing docs; explicitly request implementation separately. |
 
 ## How to communicate an intended design
 
