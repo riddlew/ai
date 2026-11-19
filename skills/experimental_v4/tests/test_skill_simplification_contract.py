@@ -125,7 +125,7 @@ class SimplificationContract(unittest.TestCase):
         tiers = dict(re.findall(r"^\| `([^`]+)` \| \*\*(Sonnet|Opus)\*\* \|", section, re.M))
         usage = (ROOT / "brain-init/references/USAGE.md").read_text(encoding="utf-8")
         steps = re.findall(r"(?m)^## Step \d+:.*$", usage)
-        self.assertEqual(25, len(steps), "Documented steps must remain model-annotated")
+        self.assertEqual(32, len(steps), "Documented steps must remain model-annotated")
         lines = usage.splitlines()
         for i, line in enumerate(lines):
             if not re.match(r"^## Step \d+:", line):
@@ -146,6 +146,27 @@ class SimplificationContract(unittest.TestCase):
                     self.assertEqual(tiers[skill], tier)
                 checked += 1
         self.assertGreaterEqual(checked, 40, "Verify examples and session model labels")
+
+    def test_usage_covers_mid_implementation_revisions(self):
+        usage = (ROOT / "brain-init/references/USAGE.md").read_text(encoding="utf-8")
+        scenario = usage.split("# Scenario 7 — Change an approved feature during implementation", 1)[1]
+        scenario = scenario.split("# Quick workflow reference", 1)[0]
+        self.assertIn("brain-write-spec", scenario)
+        self.assertIn("brain-decompose-feature", scenario)
+        self.assertIn("brain-design-implementation", scenario)
+        self.assertIn("brain-write-tasks", scenario)
+        self.assertIn("brain-implement", scenario)
+        for requirement in (
+            "If you already made an unambiguous decision",
+            "skip this step when no component documents exist",
+            "preserve unaffected",
+            "parent fingerprints",
+            "explicitly authorize",
+            "not** implementation authorization",
+            "Do not edit production code",
+        ):
+            with self.subTest(requirement=requirement):
+                self.assertIn(requirement.lower(), scenario.lower())
 
     def test_renamed_skills_and_guides_are_consistent(self):
         renames = {
