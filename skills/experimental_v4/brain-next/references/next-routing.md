@@ -15,13 +15,23 @@
 
 **Feature selection:** explicit feature or existing task/increment wins. Resolve an increment identifier (e.g. `INC-4`) to actual work and its parent feature; do not create or infer missing IDs. Otherwise consult current conversation/branch/`state.md`. If two features are plausible, ask which rather than assume a global working state. Never traverse `.brain/.notes/` without explicit request.
 
+## Default workflow and optional depth
+
+Prefer `brain-brainstorm` (only for unresolved decisions) → `brain-write-spec` → `brain-design-implementation` → `brain-implement`. Tiny settled fixes can be implemented directly. Specifications can record simple responsibility boundaries; implementation plans can contain an ordered, verifiable increment checklist without separate components or task files.
+
+Optional examples:
+- `Next: /brain-design-implementation messaging`; `Optional: /brain-decompose-feature messaging — separate client/server owners need explicit independent requirement coverage and approval`. If chosen, decompose **before** design.
+- `Next: /brain-implement messaging`; `Optional: /brain-write-tasks messaging — dependent increments will be delegated to multiple agents across sessions`. If chosen, write tasks **before** implementation.
+
+Neither optional skill is a routine gate. But an **existing** component or task with a stale approved parent or changed responsibility is a **required** owning-skill reconciliation, not optional. Distinguish existing affected artifacts from unneeded new documents.
+
 ## Recommend one next step
 
 1. **Unresolved consequential behavior/design decision:** `brain-brainstorm` or a focused user question. A prior-session decision must be recorded or provided, not reconstructed.
 2. **Changed/missing requirements or stale spec:** `brain-write-spec`. When a changed spec affects an existing component, the owning `brain-decompose-feature` skill revalidates it before dependent plans.
-3. **Changed/missing component coverage:** `brain-decompose-feature`, only if functional decomposition is used and affected.
+3. **Changed/missing component coverage:** require `brain-decompose-feature` for **existing affected components**; otherwise suggest it only as optional when separate ownership/traceability has real value.
 4. **Binding design not approved/current:** `brain-design-implementation`. Even if design text stays the same, direct-parent hash changes need documented review and renewed approval where required.
-5. **Tasks used and affected/unapproved, or complex work needs executable decomposition:** `brain-write-tasks`. Small settled work can skip task files.
+5. **Tasks used and affected/unapproved:** require `brain-write-tasks` when existing governing tasks need reconciliation; for new complex dependencies or delegation recommend it only as optional. Small settled work can use plan-level increments.
 6. **Current increment in progress, tests failing or review pending:** recommend resuming/reviewing **that increment**, or `brain-diagnose` for an unresolved failure. Do not advance past a pending collaborative approval.
 7. **Ready work:** after verifying approved and current governing documents, actual Git/test state and `depends_on`, recommend `/brain-implement <real-unblocked-id>`. If `INC-4.5` is recorded, unblocked and prioritized, it can come before `INC-5`. Never invent either ID or order solely by numbers. If several independent increments are ready and no priority is established, disclose the tie and ask.
 8. **After verified completion:** recommend risk-proportionate `brain-review-code`, `brain-update` when shared knowledge is out of date, or no further action.

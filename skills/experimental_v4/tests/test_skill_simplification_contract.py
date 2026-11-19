@@ -248,6 +248,25 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("--reconcile", usage)
         self.assertIn("brain-next", policy)
 
+    def test_next_prefers_core_workflow_with_optional_complexity_reasons(self):
+        skill = (ROOT / "brain-next/SKILL.md").read_text(encoding="utf-8")
+        detail = (ROOT / "brain-next/references/next-routing.md").read_text(encoding="utf-8")
+        readme = (ROOT / "brain-init/references/README.md").read_text(encoding="utf-8")
+        usage = (ROOT / "brain-init/references/USAGE.md").read_text(encoding="utf-8")
+        for expected in ("## Default path", "brain-brainstorm", "brain-write-spec",
+                         "brain-design-implementation", "brain-implement",
+                         "brain-decompose-feature", "brain-write-tasks",
+                         "Optional:", "not optional", "reason"):
+            with self.subTest(expected=expected):
+                self.assertIn(expected.lower(), skill.lower())
+        for expected in ("Optional:", "client/server", "delegated",
+                         "existing", "approval"):
+            self.assertIn(expected.lower(), detail.lower())
+        self.assertIn("**Default path:**", readme)
+        self.assertIn("**Default workflow:**", usage)
+        self.assertIn("**Optional:**", usage)
+        self.assertIn("An *existing* affected component or task", usage)
+
     def test_detailed_workflows_still_exist(self):
         pairs = {
             "brain-init": "init-details.md",
