@@ -13,7 +13,7 @@ POLICY = ROOT / "brain-init/references/CLAUDE.local.md"
 
 class SimplificationContract(unittest.TestCase):
     def test_every_entrypoint_has_a_valid_purpose_and_on_demand_details(self):
-        self.assertEqual(19, len(SKILLS))
+        self.assertEqual(20, len(SKILLS))
         for skill in SKILLS:
             with self.subTest(skill=skill.parent.name):
                 content = skill.read_text(encoding="utf-8")
@@ -84,7 +84,7 @@ class SimplificationContract(unittest.TestCase):
             "brain-design-implementation", "brain-decompose-feature", "brain-explain-changes",
             "brain-write-spec", "brain-write-tasks", "brain-implement",
         }
-        intentionally_manual = {"brain-distill-content", "brain-review-merge-request", "write-human"}
+        intentionally_manual = {"brain-change", "brain-distill-content", "brain-review-merge-request", "write-human"}
         for name in sorted(automatically_invocable | intentionally_manual):
             with self.subTest(skill=name):
                 header = (ROOT / name / "SKILL.md").read_text(encoding="utf-8").split("\n---\n", 1)[0]
@@ -220,9 +220,28 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("brain-design-implementation", details)
         self.assertNotIn("brain-blueprint", details)
 
+    def test_change_skill_routes_affected_document_owners_without_implementation(self):
+        skill = (ROOT / "brain-change/SKILL.md").read_text(encoding="utf-8")
+        details = (ROOT / "brain-change/references/change-routing.md").read_text(encoding="utf-8")
+        readme = (ROOT / "brain-init/references/README.md").read_text(encoding="utf-8")
+        usage = (ROOT / "brain-init/references/USAGE.md").read_text(encoding="utf-8")
+        for requirement in ("disable-model-invocation: true", "Skill tool", "brain-write-spec",
+                            "brain-decompose-feature", "brain-design-implementation",
+                            "brain-write-tasks", "brain-update", "parent_hashes",
+                            "brain-implement", "does not write or approve",
+                            "explicit user request", "exact", "wait"):
+            with self.subTest(requirement=requirement):
+                self.assertIn(requirement.lower(), skill.lower())
+        for requirement in ("needs-revision", "preserve", "approval", "parents"):
+            self.assertIn(requirement, details.lower())
+        self.assertIn("**Opus**", readme)
+        self.assertIn("/brain-change yaml-cli", usage)
+        self.assertIn("manual fallback", usage)
+
     def test_detailed_workflows_still_exist(self):
         pairs = {
             "brain-init": "init-details.md",
+            "brain-change": "change-routing.md",
             "brain-brainstorm": "brainstorm-details.md",
             "brain-write-spec": "spec-details.md",
             "brain-decompose-feature": "decompose-details.md",

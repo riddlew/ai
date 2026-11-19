@@ -1,6 +1,6 @@
 # Claude Code Skills
 
-An opinionated set of **18 Claude Code skills** for collaborative software development, built around a **project brain**: a `.brain/` folder that holds what the project is, how it is built, what you decided, what is open, and what is done. A new session reads the brain instead of re-reading the codebase. The goal is to produce straightforward, maintainable changes while keeping consequential product and architectural decisions under your control.
+An opinionated set of **20 Claude Code skills** for collaborative software development, built around a **project brain**: a `.brain/` folder that holds what the project is, how it is built, what you decided, what is open, and what is done. A new session reads the brain instead of re-reading the codebase. The goal is to produce straightforward, maintainable changes while keeping consequential product and architectural decisions under your control.
 
 The skills are **tools to use when needed**, not a mandatory pipeline. Small changes should stay small; complex or multi-session work can use more structure.
 
@@ -22,6 +22,7 @@ project/
     └── skills/
         ├── brain-decompose-feature/     # SKILL.md — functional component decomposition
         ├── brain-brainstorm/            # SKILL.md + lenses/ + references/ + scripts/
+        ├── brain-change/                # SKILL.md + references/change-routing.md
         ├── brain-design-implementation/ # SKILL.md + references/blueprint-template.md
         ├── brain-diagnose/
         ├── brain-distill-content/
@@ -115,6 +116,7 @@ For example, a request to extend communication in an existing `Session` does not
 | `brain-init` | **Sonnet** | **Opus** for a large or unfamiliar repository, contradictory legacy documentation, or tricky project/brain migration decisions. |
 | `brain-update` | **Sonnet** | **Opus** for importing a large, dense multi-system specification, reconciling conflicting authoritative records, complex rebases, or broad re-verification after history changes. |
 | `brain-brainstorm` | **Opus** | **Sonnet** if requirements and ownership are already settled and only a narrow, low-risk choice remains. |
+| `brain-change` | **Opus** | **Sonnet** for a narrow, settled documentation change requiring no difficult specification or architecture reasoning; follow the selected producer skills' model guidance. |
 | `brain-decompose-feature` | **Sonnet** | **Opus** when component boundaries, requirement ownership, or cross-system dependencies are unusually ambiguous or consequential; preserve existing ownership unless a change is approved. |
 | `brain-diagnose` | **Sonnet** | **Opus** for intermittent concurrency bugs, distributed client/server failures, intricate lifecycle issues, or evidence supporting several competing root causes. |
 | `brain-distill-content` | **Sonnet** | **Opus** for lengthy, deeply interdependent technical or protocol material where losing a qualification could change the meaning. Check exact contractual wording regardless of model. |
@@ -141,6 +143,7 @@ For example, a request to extend communication in an existing `Session` does not
 | `brain-init` | Installs or merges `CLAUDE.local.md`, copies the bundled `USAGE.md` and `README.md` guides, then creates the project brain when needed. For an existing brain, installs any missing guides and saves a supplied brain path without rebuilding project knowledge. | A project has no brain yet, its brain lives elsewhere, or its workflow guides need installing. | `CLAUDE.local.md`, `.brain/` root knowledge and reference guides, or a `Project brain:` line. |
 | `brain-update` | Keeps the brain in sync with code, decisions, and authoritative technical documents; builds section maps and topic-based knowledge with exact source references. | Another skill finished work, you want a sync, or you need to ingest or refresh a governing specification. | Updated root knowledge, ADRs, `.brain/sources/`, and `.brain/knowledge/`. |
 | `brain-brainstorm` | Resolves open requirements and design decisions through a visible decision table, lens-guided options, and dependency-ordered questions. Every behavior you could observe is your decision. It keeps asking until you say to write up, and lists each change as current → new with the reason, plus what stays unchanged and any assumptions for you to confirm. For a decision you would look at, such as a page layout or a diagram, it offers a browser tab with mockups. | Behavior, constraints, or architectural direction is unclear. | A confirmed direction summary; decisions recorded through `brain-update`. |
+| `brain-change` **(manual)** | Coordinates changes to approved features by invoking only affected document-owning skills in dependency order, preserving approvals and leaving implementation untouched. | After brainstorming or a confirmed conversation revises requirements, design, components or tasks. | Revised owner-authored docs, or an exact next command when invocation is unavailable. |
 | `brain-diagnose` | Investigates failures using reproduction and discriminating hypotheses; applies a bounded fix only when authorized. Reproduces the failure before fixing, traces root causes to their source, stops and consults after three failed fixes, and uses a red-flags list. | A failure, regression, or intermittent issue needs explanation. | Diagnosis in conversation; `.brain/diagnoses/` only on request. |
 | `brain-distill-content` **(manual)** | Removes verbosity from technical documents while preserving all material information and accuracy, reorganizing where that reads more clearly. | AI-generated docs, MR descriptions, or RFCs are padded. | The distilled document. |
 | `brain-decompose-feature` | Maps approved requirements to coherent functional component documents, with complete traceability and explicit approval. | A feature has meaningful functional pieces that benefit from separate design. | `.brain/features/<slug>/03-components/` documents. |

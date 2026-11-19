@@ -1339,6 +1339,31 @@ Defer USB, discovery, detailed printer status, advanced layout, and more transpo
 
 # Scenario 7 — Change an approved feature during implementation
 
+**Default: call `/brain-change` once the change is proposed or decided.** It identifies and invokes only the required documentation skills in order, pausing for your approvals. You do **not** need to select `brain-write-spec` or `brain-design-implementation` yourself. It never runs `brain-implement` or treats a plan approval as permission to write code. When skill invocation is unavailable, it supplies the exact next command instead of silently editing another skill's files.
+
+**After `brain-brainstorm` (with the agreed decision recorded):**
+
+```text
+/brain-change yaml-cli
+
+Reconcile our confirmed decision to warn instead of error on unknown
+YAML fields. Invoke only the affected document-owning skills and obtain
+required approvals. Do not implement code.
+```
+
+**After an ordinary conversation (no brainstorming required):**
+
+```text
+/brain-change yaml-cli
+
+I want unknown YAML fields to generate warnings instead of errors.
+Identify unresolved consequential details and reconcile affected specs,
+components, plans and tasks through their owning skills.
+Do not implement code.
+```
+
+**Model (main session):** **Opus** (`brain-change`; Sonnet is appropriate for a narrow, settled change). The longer steps below describe the manual fallback and approval gates, not a mandatory list of commands to type after `/brain-change`.
+
 Suppose the ZPL YAML CLI from Scenario 6 has an **approved specification and implementation plan**. `brain-implement` has already added parsing and tests, but you decide that unknown YAML fields should produce **warnings** instead of errors. That changes observable behavior, so simply editing `.brain/09_user_decisions.md`, discussing it in chat, or modifying implementation code is **not enough**: the owning feature documents and affected approvals must be reconciled.
 
 **Choose the smallest revision path:**
@@ -1505,7 +1530,7 @@ test result, and wait for approval before proceeding.
 | Architecture cleanup | `brain-review-architecture` → `brain-brainstorm` → `brain-write-spec` → `brain-design-implementation` → `brain-implement` → `brain-review-code` | Choose improvements and shape the exact design. |
 | Third-party merge request | `brain-review-merge-request` (uses `brain-review-code`) | Evaluate findings and advisory merge recommendation. |
 | New multi-session project (ZPL library + YAML CLI) | `brain-init` → project `brain-brainstorm` → feature-level `brain-write-spec` → `brain-design-implementation` → `brain-implement` → reviews; use `brain-plan` when research needs coordination | Approve core architecture, then review each feature and its code increments. |
-| Approved feature changes during implementation | If behavior changed: `brain-write-spec` → affected `brain-decompose-feature` / `brain-design-implementation` / `brain-write-tasks` → `brain-implement`; if only binding design changed, start at `brain-design-implementation` | Approve revised governing documents; explicitly request resumed implementation. |
+| Approved feature changes during implementation | **`brain-change`** invokes only affected owning skills (spec → components → plan → tasks); request `brain-implement` separately after approvals. | Confirm unresolved decisions and approve revised documents; explicitly request implementation. |
 
 ## How to communicate an intended design
 
