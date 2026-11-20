@@ -4,9 +4,9 @@ A fresh reviewer reads a specification, component set, implementation plan, exec
 
 ## For the author
 
-**Dispatch.** Send one fresh subagent on the standard tier, read-only. Fill every slot. Every path in any slot is absolute. `{artifact}` is the artifact's absolute file path when the file exists; for a draft not yet written, the full draft text. `{glossary_path}` is `glossary.md` in the `.brain/` you are using. `{sources}` holds paths to source files, or text when there is no file. Never pass the conversation or the rest of `.brain`.
+**Confirm execution mode:** Inherit the user's confirmed inline/subagent choice from the invoking workflow, per `CLAUDE.local.md` §Execution mode selection. If none exists, the invoking skill must ask and wait. **Inline is recommended: read the artifact in the current session; never dispatch a subagent unless the user explicitly chose subagents.** In subagent mode, send one fresh standard-tier read-only reviewer. Fill every slot. Every path in any slot is absolute. `{artifact}` is the artifact's absolute file path when the file exists; for a draft not yet written, the full draft text. `{glossary_path}` is `glossary.md` in the `.brain/` you are using. `{sources}` holds paths to source files, or text when there is no file. Never pass the conversation or the rest of `.brain`.
 
-**No subagent tool.** Read the artifact yourself as the builder would, then report the `self-read` line below.
+**Inline mode:** Read the artifact yourself as the builder would, then report the `self-read` line below. **Subagents unavailable:** ask before switching modes; never claim a fresh independent reviewer when none ran.
 
 **Sort each returned question into one of three piles:**
 

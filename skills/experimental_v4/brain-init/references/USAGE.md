@@ -4,6 +4,8 @@ This guide explains when to use `brain-brainstorm` versus `brain-plan`, then dem
 
 The prompts, file names, code examples, review findings, and test results are **illustrative**, not results from a real repository. Adapt them to your codebase and the capabilities of your installed skills.
 
+**Execution mode:** If you have not chosen inline or subagents for this work, Claude asks before starting and waits. Inline is recommended but not automatically selected. Nested builder, code and final reviews inherit this mode; subagents require explicit opt-in.
+
 **Model labels** below are the README's **default main-session recommendations**, not automatic model switches or mandatory requirements. Deviate for task difficulty as the README describes; delegated subagents follow `CLAUDE.local.md` role assignments.
 
 ---

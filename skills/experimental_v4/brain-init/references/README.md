@@ -153,7 +153,7 @@ For example, a request to extend communication in an existing `Session` does not
 | `brain-plan` | Tracks multi-session planning with dependency-aware research, consult, prototype, and task tickets. | An initiative has many interdependent decisions and spans days or sessions. | `.brain/planning/<feature>/INDEX.md` and planning tickets. |
 | `brain-refine-backlog` | Reviews Jira stories for refinement readiness without changing them. | Preparing for backlog refinement. | Suggested gaps, draft acceptance criteria, and questions. |
 | `brain-review-architecture` | Discovers architectural friction **or** assesses a selected boundary, checks relevant previous reviews, and records coverage and finding dispositions. | You want improvement candidates or a focused design evaluation. | Findings in conversation; standalone reviews save `.brain/reviews/architecture/<NN>-<slug>/review.md` by default when a brain is writable. |
-| `brain-review-code` | Assesses a bounded change set for correctness, requirement fit, and repository fit, delegating to subagents for larger changes. | A substantive change needs review, or you request one. | Three-section findings report and requirements coverage table; optional `.brain/reviews/code/<NN>-<slug>/review.md`. |
+| `brain-review-code` | Assesses a bounded change set for correctness, requirement fit, and repository fit, inline or with explicitly authorized subagents (no automatic delegation based on size). | A substantive change needs review, or you request one. | Three-section findings report and requirements coverage table; optional `.brain/reviews/code/<NN>-<slug>/review.md`. |
 | `brain-review-merge-request` **(manual)** | Reviews an MR/PR against Jira acceptance criteria using `brain-review-code`, adding coverage, tests, performance, and a merge recommendation. Read-only except requested report export. | You want an advisory merge assessment. | Consolidated findings and Approve / Request changes; optional `.brain/reviews/merge-request/<NN>-<slug>/review.md`. |
 | `brain-review-security` | Examines realistic threats, trust boundaries, access control, credentials, and sensitive-data flows. | Work changes a security boundary or you request an audit. | Findings in conversation; optional `.brain/reviews/security/<NN>-<slug>/review.md`. |
 | `brain-test-skill` | Tests whether a skill changes what an agent does by running it in fresh agents on throwaway fixtures, before and after a change, with pressure scenarios for rules an agent may skip. It reports pass or fail per criterion with verbatim quotes, and never reports a reading of the skill as a test result. | You want to know whether a skill's rule holds, or you are creating a skill or changing what one does. | Per-criterion results in conversation, also recorded in the project's scenarios file when a skill changed. |
@@ -228,11 +228,11 @@ Example: Changes to note permissions regularly require updates across several mo
 
 | Collaboration mode | Review checkpoint | Typical use |
 |---|---|---|
-| **Collaborative (default)** | Agree on important code structure in `/brain-design-implementation`, then review each small verified increment; inline execution by default. | You want to shape actual classes, interfaces, and source changes. |
+| **Collaborative (default)** | Agree on important code structure in `/brain-design-implementation`, then review each small verified increment; inline execution when selected. | You want to shape actual classes, interfaces, and source changes. |
 | **Guided** | Approve a blueprint and review larger coherent increments. | You care about architecture but not every method detail. |
 | **Autonomous** | No routine increment pauses; final review and consequential-decision consultation still apply. | Stable, approved design and a well-scoped implementation. |
 
-**Execution mode** is separate: `inline` uses the main Claude session to code, while `subagent-driven` delegates implementation and per-task reviews. The latter is usually better only after the design is settled. Switching collaboration modes requires your direction, not an inferred preference. A full blueprint is optional for a trivial direct fix, but an **existing unapproved blueprint must not be treated as approved**.
+**Execution mode selection:** If inline or subagents has not explicitly been selected for this work, each skill asks and waits before starting; **inline is recommended, not silently selected**. Inline reviews occur in the main session, including builder/final/code reviews. Subagents require explicit opt-in, even for large diffs; nested reviews inherit the selected mode. This is separate from collaborative/guided/autonomous approval cadence. Switching collaboration modes requires your direction, not an inferred preference. A full blueprint is optional for a trivial direct fix, but an **existing unapproved blueprint must not be treated as approved**.
 
 **Collaborative checkpoint:** Claude shows the changed files/diff, coverage, actual test results, and any design deviation. You can request revisions, edit the code yourself, or approve. A response to proceed approves **only the increment shown**, not future increments. Commits are suggested, not required; Claude commits only at your explicit request.
 
@@ -261,7 +261,7 @@ All four `brain-review-*` skills share the severity, confidence, and finding for
 
 ## Reviews
 
-Every specification, task set, technical blueprint, and newly constructed execution work-item set gets an author self-check and then a fresh standard-tier builder review (or, without a subagent tool, a self-read the skill reports as weaker) that reads it as someone who must build from it without asking.
+Every specification, task set, technical blueprint, and newly constructed execution work-item set gets an author self-check and a builder review in the **confirmed execution mode**: inline self-read, or a fresh standard-tier reviewer **only if subagents were explicitly chosen**. Label inline self-read as weaker than an independent review.
 
 | Skill | Review |
 |---|---|

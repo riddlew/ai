@@ -8,7 +8,7 @@ This review applies when `brain-implement` first creates or structurally changes
 2. Draft work items by task ID or coherent behavior, preserving genuine task dependencies.
 3. Verify coverage and `Review Focus` below.
 4. Run builder review with the task set and plans as sources; when unavailable, identify weaker self-review.
-5. Choose default `Workspace: main checkout`, `Execution mode: inline`, and collaborative review checkpoints unless user preferences or the project environment require otherwise.
+5. Use `Workspace: main checkout` and collaborative checkpoints unless otherwise directed. For execution mode, inherit a confirmed inline/subagent selection or **ask and wait** before the builder review; recommend inline but do not silently choose it.
 6. If working in a separate worktree, carry forward the complete `execution.md` and all referenced approved feature documents without overwriting project-specific changes; preserve `Review base`.
 
 ## Coverage check

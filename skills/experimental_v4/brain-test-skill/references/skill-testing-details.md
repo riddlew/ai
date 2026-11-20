@@ -30,7 +30,7 @@ Use `${CLAUDE_SKILL_DIR}/references/scenario-format.md` for the scenario fields,
 
 ## 3. Run
 
-- Dispatch one fresh subagent per run, and name its model explicitly. Use the tier of the role being tested in `CLAUDE.local.md`; standard unless the table maps that role to strongest.
+- Only if the user explicitly selected subagents, dispatch one fresh subagent per run, and name its model explicitly. Use the tier of the role being tested in `CLAUDE.local.md`; standard unless the table maps that role to strongest.
 - Tell the test agent to use only the skills named in its prompt and the skills they mention, so another installed skill can't stand in for the one under test.
 - Send follow-up turns to the same agent, prefixed `The user replies:`.
 - Run RED before GREEN, and before any edit to the skill under test.

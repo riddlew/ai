@@ -9,6 +9,8 @@ Review a **bounded change set** for **Correctness**, **Requirement fit**, and **
 
 ## Workflow
 
+**Execution mode:** Follow `CLAUDE.local.md` §Execution mode selection before review work. If no explicit or confirmed mode applies, ask inline (recommended) or subagents and wait. Large change sets never authorize delegation automatically. Inline runs all three assessments in the main session.
+
 1. Resolve **the actual comparison** (target base, source HEAD, merge base and working-tree scope). Never substitute the branch's own `@{upstream}` for the intended target. Include staged, unstaged and relevant untracked **contents** whenever in scope; preserve user edits.
 2. Read applicable approved specifications/Examples, task acceptance criteria, architecture/ADRs and repository guidance. If no authoritative requirement basis is available, explain why Requirement fit is limited; never invent it.
 3. Independently check correctness, spec coverage, and repository conventions. Trace plausible defects through code/tests; try to disprove each. Evaluate observable behavior and current costs, not aesthetic preferences. Preserve one status row for each in-scope Example, acceptance criterion and Review Focus (`RF<n>`): met, unmet or unverifiable.
