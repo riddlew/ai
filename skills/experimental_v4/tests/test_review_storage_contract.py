@@ -34,7 +34,7 @@ class ReviewStorageContract(unittest.TestCase):
         self.assertIn("deeper structural analysis only when", details)
         self.assertIn("complete Requirement fit coverage unchanged", details)
         self.assertIn("one status row for each in-scope Example", skill)
-        self.assertIn("only if the user selected subagents", details)
+        self.assertIn("Only if the user selected subagents", details)
 
     def test_code_review_uses_current_brain_document_paths(self):
         skill = (ROOT / "brain-review-code/SKILL.md").read_text(encoding="utf-8")
