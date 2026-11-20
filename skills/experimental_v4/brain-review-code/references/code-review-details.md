@@ -19,7 +19,7 @@ Format every finding as defined in `${CLAUDE_SKILL_DIR}/references/findings.md`.
 Choose the base in this order:
 
 1. base explicitly given by the user;
-2. base recorded by the invoking workflow before changes began (for example, `Review base` in the impl plan in `.brain/impl_plans/`), if it resolves and is an ancestor of `HEAD`;
+2. base recorded by the invoking workflow before changes began (for example, `Review base` in `.brain/features/<feature-slug>/execution.md`), if it resolves and is an ancestor of `HEAD`;
 3. target branch of a verified PR/MR for the current branch (for example, from `gh pr view` or `glab mr view`);
 4. unambiguous repository evidence, such as documented branch conventions naming a single integration branch, or a repository with only one long-lived branch;
 5. otherwise ask the user for the base and stop.
@@ -41,7 +41,7 @@ Use the first that applies:
 
 1. specification or approved ticket supplied by the user;
 2. governing specification or ticket recorded by the invoking workflow;
-3. an unambiguous relevant specification under `.brain/specs/`;
+3. an unambiguous relevant approved specification under `.brain/features/<feature-slug>/02-specifications/` (plus applicable approved task acceptance criteria under `05-tasks/`);
 4. requirements explicitly established in the current task or approved discussion.
 
 Do not invent a specification or choose among conflicting ones. Ask only when ambiguity prevents a faithful review. If no reliable basis exists, skip Requirement fit and say why.
@@ -96,6 +96,8 @@ Also build a coverage table: one row for each specification Example, and one for
 ### Repository fit
 
 **Packet:** the change set, applicable repository rules with their locations, and what tooling guarantees.
+
+**Proportionality:** Always perform this third assessment, but do not turn a small localized change into a whole-repository architecture audit. For a narrow diff, inspect changed code, directly affected owners/callers and applicable repository rules; stop when there is no evidence of a material maintenance concern. Expand into other components or deeper structural analysis only when changed boundaries, actual dependencies or demonstrated maintenance costs justify it. Keep the Correctness assessment and complete Requirement fit coverage unchanged regardless of review size.
 
 Evaluate as heuristics, subordinate to documented rules:
 
