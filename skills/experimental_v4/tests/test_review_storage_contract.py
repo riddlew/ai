@@ -22,6 +22,30 @@ class ReviewStorageContract(unittest.TestCase):
                 self.assertIn(f".brain/reviews/{kind}/<NN>-<short-slug>/review.md", content)
                 self.assertNotRegex(content, rf"\.brain/reviews/{re.escape(kind)}/<NN>-<short-slug>\.md")
 
+    def test_code_review_preserves_three_assessments_with_proportional_repo_fit(self):
+        skill = (ROOT / "brain-review-code/SKILL.md").read_text(encoding="utf-8")
+        details = (ROOT / "brain-review-code/references/code-review-details.md").read_text(encoding="utf-8")
+        for assessment in ("Correctness", "Requirement fit", "Repository fit"):
+            with self.subTest(assessment=assessment):
+                self.assertIn(f"### {assessment}", details)
+        self.assertIn("scope Repository fit proportionally", skill)
+        self.assertIn("Always perform this third assessment", details)
+        self.assertIn("small localized change", details)
+        self.assertIn("deeper structural analysis only when", details)
+        self.assertIn("complete Requirement fit coverage unchanged", details)
+        self.assertIn("one status row for each in-scope Example", skill)
+        self.assertIn("Only if the user selected subagents", details)
+
+    def test_code_review_uses_current_brain_document_paths(self):
+        skill = (ROOT / "brain-review-code/SKILL.md").read_text(encoding="utf-8")
+        details = (ROOT / "brain-review-code/references/code-review-details.md").read_text(encoding="utf-8")
+        self.assertIn(".brain/features/<feature-slug>/02-specifications/", skill)
+        self.assertIn(".brain/features/<feature-slug>/02-specifications/", details)
+        self.assertIn(".brain/features/<feature-slug>/execution.md", details)
+        self.assertIn("05-tasks/", details)
+        self.assertNotIn(".brain/specs/", details)
+        self.assertNotIn(".brain/impl_plans/", details)
+
     def test_shared_rules_cover_legacy_and_baseline(self):
         storage = (ROOT / "brain-review-code/references/report-storage.md").read_text()
         for phrase in ("legacy flat", "Never overwrite", "relevant previous", "brain-update"):
