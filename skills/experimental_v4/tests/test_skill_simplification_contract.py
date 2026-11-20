@@ -28,6 +28,21 @@ class SimplificationContract(unittest.TestCase):
                 self.assertNotIn("brain-context plan", content,
                                  "The context map must not become a mandatory skill gate")
 
+    def test_execution_mode_requires_explicit_choice_including_reviews(self):
+        policy = POLICY.read_text(encoding="utf-8")
+        code = (ROOT / "brain-review-code/references/code-review-details.md").read_text(encoding="utf-8")
+        builder = (ROOT / "brain-review-code/references/builder-review.md").read_text(encoding="utf-8")
+        implementation = (ROOT / "brain-implement/references/implement-details.md").read_text(encoding="utf-8")
+        tester = (ROOT / "brain-test-skill/SKILL.md").read_text(encoding="utf-8")
+        for phrase in ("Execution mode selection", "ask before starting substantive skill work",
+                       "No skill may dispatch subagents by default", "Propagate the selected mode"):
+            self.assertIn(phrase, policy)
+        self.assertIn("Scope, component count and changed-line count do not authorize subagents", code)
+        self.assertIn("never dispatch a subagent unless", builder)
+        self.assertIn("ask which one and wait", implementation)
+        self.assertIn("only when the user opts into subagents", tester)
+        self.assertNotIn("Dispatch one standard-tier subagent per assessment in parallel", code)
+
     def test_cross_cutting_safety_is_visible_in_primary_instructions(self):
         policy = POLICY.read_text(encoding="utf-8")
         implement = (ROOT / "brain-implement/SKILL.md").read_text()
