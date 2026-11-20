@@ -54,7 +54,7 @@ For a complete traceability example including ADR references, negative-path requ
 
 ## Hierarchical feature workflow
 
-For nontrivial features, use `.brain/features/<slug>/01-brief/` → `02-specifications/` → `03-components/` → `04-implementation-plans/` → `05-tasks/`. `brain-brainstorm` establishes intent, `brain-write-spec` records behavior, `brain-decompose-feature` defines coherent functional responsibilities, `brain-design-implementation` specifies code-level implementation, and `brain-write-tasks` produces executable tasks. `brain-implement` writes verification and progress separately to `execution.md`. Read the authoritative schema at `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md` in the installed skills. Skip unhelpful intermediate stages for simple work.
+**Default workflow:** `brain-brainstorm` (when needed) → `brain-write-spec` → `brain-design-implementation` → `brain-implement`. Use `brain-decompose-feature` **optionally** for separate responsibility/coverage approvals; use `brain-write-tasks` **optionally** for complex dependencies, delegation or handoffs. Simple functional boundaries can live in specifications and coherent ordered increments in implementation plans. An *existing* affected component or task must still be reconciled by its owner; optional only means new stages are not mandatory. `brain-implement` records progress in `execution.md`. See `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md`.
 
 ## Understand changes after implementation
 
@@ -1522,9 +1522,17 @@ test result, and wait for approval before proceeding.
 
 **Model (main session):** **Sonnet** (`brain-next`).
 
-Call `/brain-next <feature>` after any stage, including in a new session. Its default mode is **read-only**: it checks approved specifications, optional components, binding plans and tasks, per-feature `execution.md`, dependencies, actual code/tests and Git changes. It uses `.brain/state.md` **only to find the feature**, not as a global current-increment tracker. If more than one feature matches, it asks which to use.
+Call `/brain-next <feature>` after any stage, including in a new session. Its default mode is **read-only**: it checks approved specifications, optional components, binding plans and tasks, per-feature `execution.md`, dependencies, actual code/tests and Git changes. Its **primary** recommendation normally uses `brain-brainstorm`, `brain-write-spec`, `brain-design-implementation` or `brain-implement`. It can add `brain-decompose-feature (optional) if <reason>` or `brain-write-tasks (optional) if <reason>` based on evidence. Existing affected documents are **required** revalidation, not optional new steps. `.brain/state.md` only helps find the feature, not track a global current increment. If multiple features match, it asks.
 
-For instance, after working on `INC-4`, a changed requirement might require `/brain-write-spec <feature>`, a stale approved plan might require `/brain-design-implementation <feature>`, and updated task dependencies might require `/brain-write-tasks <feature>`. Once all applicable approvals are current, a **real, recorded and unblocked** `INC-4.5` could produce the recommendation `/brain-implement INC-4.5`.
+For instance, after `INC-4`, a changed requirement may require `/brain-write-spec <feature>` and a stale binding plan may require `/brain-design-implementation <feature>`. New work normally skips separate decomposition/tasks, but existing affected component/task documents must be reconciled. A possible recommendation is:
+
+> **Next:** `/brain-design-implementation messaging` — the behavior is approved and needs a code-level design. **Optional:** `/brain-decompose-feature messaging` — distinct client/server owners benefit from independent requirement coverage and approval.
+
+Or, after approving the design:
+
+> **Next:** `/brain-implement messaging` — the plan already contains verifiable increments. **Optional:** `/brain-write-tasks messaging` — complex dependent increments will be handed to multiple agents.
+
+Once applicable approvals are current, a **real, recorded and unblocked** `INC-4.5` could produce `/brain-implement INC-4.5`.
 
 After `INC-4.5` is verified and approved, repeating `/brain-next <feature>` may recommend `/brain-implement INC-5` if `INC-5` exists and is the next ready work. **Never invent increment IDs or order solely by numbering, or skip pending increment approvals.** If no step is needed, it should say so. A recommendation never starts implementation: the user must explicitly invoke the recommended command.
 
