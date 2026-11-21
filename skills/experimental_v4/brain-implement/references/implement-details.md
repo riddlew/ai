@@ -101,6 +101,8 @@ When the increment is approved and verified, mark its work item done. Suggest a 
 
 ## 6. Keep state accurate
 
+**Concise execution records:** Follow `${CLAUDE_SKILL_DIR}/../brain-init/references/compact-writing.md` for new and revised `execution.md` entries. Record one evidence-complete entry per ruling, verification run or approval; include date, work ID, source/basis, command, observed result, revision and user checkpoint as applicable. Avoid repeating prior session summaries, but **never merge distinct historical runs or erase actual evidence**. Keep the original review base and approved-plan boundaries.
+
 Update `execution.md` after verified progress, when blockers change, and before ending a session, not after every edit. Keep unresolved user choices visible and do not proceed through blocked work.
 
 Before ending a session, record its state in `execution.md`. Then invoke `brain-update` with a one-line summary of what changed.
