@@ -153,6 +153,10 @@ Keep documents topic-specific. Include only applicable sections; use precise ref
 
 The original source remains authoritative. Do not copy entire documents, invent details for uninspected sections, or record source requirements as user-approved decisions.
 
+## Compact entry rule
+
+Use `brain-init/references/compact-writing.md` for project root facts, decisions, source summaries, indexes and ADRs. Prefer concise clauses, stable paths and a table for repeated fields; retain user rationale and source/verification scope, do not silently replace normative requirements with summaries.
+
 ## `09_user_decisions.md` entry
 
 ```markdown

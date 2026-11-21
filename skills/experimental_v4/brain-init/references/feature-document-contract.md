@@ -84,6 +84,10 @@ A review should be able to trace a verified task back through its plan, componen
 
 `brain-update` may index and report problems with producer-owned files, not silently edit them. `brain-plan` owns its separate `planning/` records and calls the appropriate producer when the objective is ready.
 
+## Concise, information-preserving writing
+
+Brain authors follow `brain-init/references/compact-writing.md` for new and materially revised passages. Prefer compact, readable statements and stable references rather than repeated narrative. Preserve normative content, unique requirements/examples, decision authority, metadata, approvals, exact evidence and distinct history. **No arbitrary length target.** Routine producing skills do not rewrite unrelated historical records solely for style. Existing-file reformatting goes through opt-in `brain-compact` preview and the relevant owner. Even editorial-only parent edits change Git-blob fingerprints and require affected child-owner review; no silent hash refresh or reapproval.
+
 ## Proportionality
 
 Do not generate filler documents or insist on passing through all five folders. For a small, settled change, direct implementation is valid. For a modest feature, spec → implementation plan → task can be valid. If a level is omitted, links point to the actual governing documents rather than fabricated placeholders. Avoid decomposition into individual lines of code; tasks should be coherent, independently verifiable actions.

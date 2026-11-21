@@ -1,6 +1,6 @@
 # Feature document templates
 
-Use the smallest relevant template. Before approving a child, populate `parent_hashes` with the current Git-blob content fingerprints of every direct parent. `parent_hashes: []` is only final for a root brief (or a document with no parents); see the contract. Use the helper described there. Do not add inline YAML comments to list values. Keep YAML metadata consistent with `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md`; IDs in this file are **illustrative**, not reservations.
+Use the smallest relevant template. Follow `${CLAUDE_SKILL_DIR}/../brain-init/references/compact-writing.md`: use concise, self-contained statements, stable cross-references, exact evidence and non-redundant headings. A one-line fact is preferable to a paragraph when meaning is unchanged. Before approving a child, populate `parent_hashes` with the current Git-blob content fingerprints of every direct parent. `parent_hashes: []` is only final for a root brief (or a document with no parents); see the contract. Use the helper described there. Do not add inline YAML comments to list values. Keep YAML metadata consistent with `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md`; IDs in this file are **illustrative**, not reservations.
 
 ## 01 — Brief (`01-brief/brief.md`)
 
@@ -148,7 +148,9 @@ Execution mode: inline
 ## Design deviations
 ## Verification evidence (command, outcome, revision)
 ## Rulings and deferred issues
+- **<date> · <actor> · <increment>:** Decision: <exact ruling>; effect: <scope or exception>; basis: <approved source/evidence>.
 ## Review focus and checkpoint history
+- <increment> · <date> · <status>: <verified command/outcome/revision; approval if observed>.
 ```
 
 Execution status does not alter a task's approved definition. Revalidate the repository on every resumed session.

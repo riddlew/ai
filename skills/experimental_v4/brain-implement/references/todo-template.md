@@ -27,7 +27,7 @@ Execution mode: inline
 - None. (Do not edit an approved technical plan to reflect implementation.)
 
 ## Rulings
-- Ruling: <decision> — <reason> — <cost if wrong>
+- **<YYYY-MM-DD> · <actor> · <work-ID>:** Decision: <exact ruling>; scope: <constraint/exception>; basis: <source or rationale>; risk: <if known>.
 
 ## Deferred
 - <item deliberately outside current scope>
@@ -36,7 +36,7 @@ Execution mode: inline
 - RF1: <applicable failure not already covered> — tested in TASK-001
 
 ## Verification
-- Passed: <command, date/revision and observed output>
+- Passed: <command, date/revision, observed output> (one entry per actual run; do not merge distinct evidence)
 - Not run: <checks and why>
 - Known failures: <scope and observed evidence>
 - Final review: <actual review method and outcome>
@@ -47,6 +47,7 @@ Execution mode: inline
 
 ## Rules
 
+- Follow `${CLAUDE_SKILL_DIR}/../brain-init/references/compact-writing.md` for concise facts, stable references and complete execution evidence; never collapse distinct rulings, test runs, approvals or checkpoints.
 - Retain the original review base, branch, collaboration mode, workspace, and execution mode across sessions; reconcile stale facts from Git and actual code, not historical text alone.
 - Do not mark a task `[x]` until relevant evidence is observed and, in collaborative/guided mode, the user approved the increment. Verification without approval remains pending review.
 - Record command outcomes only when actually executed. Preserve existing user changes, worktree history, blockers, deviations and checkpoints.
