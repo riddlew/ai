@@ -1,6 +1,6 @@
 # Preview-first compaction procedure
 
-The shared policy, `compact-writing.md` and feature-document contract govern. Minimize words **only if information and authority remain equivalent**.
+The shared policy, `compact-writing.md` and feature-document contract govern. Minimize words **only if information and authority remain equivalent**. Preserve distinct approval and verification **history** as well as current state.
 
 ## Procedure
 
