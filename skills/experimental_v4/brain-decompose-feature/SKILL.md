@@ -17,4 +17,7 @@ Create **functional components** only when a feature benefits from explicit resp
 
 Use `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md`. **Read on demand:** `${CLAUDE_SKILL_DIR}/references/decompose-details.md` for multi-parent/split features, overlap analysis and detailed review procedure; `../brain-init/references/deterministic-tooling.md` for CLI.
 
+
+**Writing:** Follow `${CLAUDE_SKILL_DIR}/../brain-init/references/compact-writing.md` when recording Brain facts: concise, evidence-complete entries without duplicated narrative. Do not reformat unrelated existing files solely for style.
+
 **Recommended next step:** End the final user-facing reply with one concise, evidence-based next action, naming the appropriate skill or command when useful. If blocked, identify the missing information, prerequisite, or approval instead of advancing; if complete, say no further action is needed. A recommendation is not authorization to execute another step. Keep it outside copy-ready deliverables.

@@ -1,5 +1,8 @@
 # Brain Skills — Usage Guide
 
+**Compact writing:** New/revised `.brain` documents use concise factual entries without dropping required evidence. To shorten **existing** documents safely, call `/brain-compact <file-or-feature> --preview-only`; the skill shows proposed diffs and owner/approval impacts before any application. It never silently rewrites approved feature documents.
+
+
 This guide explains when to use `brain-brainstorm` versus `brain-plan`, then demonstrates seven example workflows: five involving existing TCP/UDP client and server applications, one multi-session ZPL printer library and YAML-driven CLI project, and one example of revising approved work after implementation has started.
 
 The prompts, file names, code examples, review findings, and test results are **illustrative**, not results from a real repository. Adapt them to your codebase and the capabilities of your installed skills.

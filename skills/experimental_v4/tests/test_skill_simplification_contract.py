@@ -13,7 +13,7 @@ POLICY = ROOT / "brain-init/references/CLAUDE.local.md"
 
 class SimplificationContract(unittest.TestCase):
     def test_every_entrypoint_has_a_valid_purpose_and_on_demand_details(self):
-        self.assertEqual(20, len(SKILLS))
+        self.assertEqual(21, len(SKILLS))
         for skill in SKILLS:
             with self.subTest(skill=skill.parent.name):
                 content = skill.read_text(encoding="utf-8")
@@ -99,7 +99,7 @@ class SimplificationContract(unittest.TestCase):
             "brain-design-implementation", "brain-decompose-feature", "brain-explain-changes",
             "brain-write-spec", "brain-write-tasks", "brain-implement",
         }
-        intentionally_manual = {"brain-next", "brain-distill-content", "brain-review-merge-request", "write-human"}
+        intentionally_manual = {"brain-next", "brain-compact", "brain-distill-content", "brain-review-merge-request", "write-human"}
         for name in sorted(automatically_invocable | intentionally_manual):
             with self.subTest(skill=name):
                 header = (ROOT / name / "SKILL.md").read_text(encoding="utf-8").split("\n---\n", 1)[0]
@@ -282,10 +282,32 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("**Optional:**", usage)
         self.assertIn("An *existing* affected component or task", usage)
 
+    def test_compact_skill_preview_ownership_and_information_preservation(self):
+        skill = (ROOT / "brain-compact/SKILL.md").read_text(encoding="utf-8")
+        details = (ROOT / "brain-compact/references/compact-details.md").read_text(encoding="utf-8")
+        writing = (ROOT / "brain-init/references/compact-writing.md").read_text(encoding="utf-8")
+        policy = POLICY.read_text(encoding="utf-8")
+        usage = (ROOT / "brain-init/references/USAGE.md").read_text(encoding="utf-8")
+        for required in ("disable-model-invocation: true", "--preview-only",
+                         "does not write producer-owned files", "explicit user approval",
+                         "parent_hashes", ".brain/.notes/", "brain-write-spec",
+                         "brain-implement", "brain-update", "No safe reduction",
+                         "Recommended next step:"):
+            self.assertIn(required.lower(), skill.lower())
+        for required in ("Diff", "fingerprint", "approval", "history", "authoritative"):
+            self.assertIn(required.lower(), details.lower())
+        for required in ("atomic", "information-dense", "self-contained",
+                         "actual results", "distinct", "No arbitrary"):
+            self.assertIn(required.lower(), writing.lower())
+        self.assertIn("## Compact Brain writing", policy)
+        self.assertIn("/brain-compact", usage)
+        self.assertIn("brain-compact", (ROOT / "brain-init/references/README.md").read_text(encoding="utf-8"))
+
     def test_detailed_workflows_still_exist(self):
         pairs = {
             "brain-init": "init-details.md",
             "brain-next": "next-routing.md",
+            "brain-compact": "compact-details.md",
             "brain-brainstorm": "brainstorm-details.md",
             "brain-write-spec": "spec-details.md",
             "brain-decompose-feature": "decompose-details.md",
