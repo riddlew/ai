@@ -19,6 +19,6 @@ Review a **bounded change set** for **Correctness**, **Requirement fit**, and **
 
 **Read when needed:** `${CLAUDE_SKILL_DIR}/references/code-review-details.md` for delegated/inline assessment separation, full evidence packets, coverage report format or complex review. `${CLAUDE_SKILL_DIR}/references/findings.md` for severity and validation; `${CLAUDE_SKILL_DIR}/references/builder-review.md` for source-specific fit.
 
-Do not change reviewed code or introduce a consequential redesign as a review finding without consulting the user.
+Do not change reviewed code or introduce a consequential redesign as a review finding without consulting the user. For **evidenced repeated workflow friction**, rather than ordinary defects, optionally suggest `/brain-retro <feature>` with the reason; **never invoke it** or make it a review gate.
 
 **Recommended next step:** End the final user-facing reply with one concise, evidence-based next action, naming the appropriate skill or command when useful. If blocked, identify the missing information, prerequisite, or approval instead of advancing; if complete, say no further action is needed. A recommendation is not authorization to execute another step. Keep it outside copy-ready deliverables.

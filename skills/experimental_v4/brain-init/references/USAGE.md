@@ -1545,12 +1545,23 @@ Use `/brain-next <feature> --reconcile <change>` only when you explicitly want f
 
 ---
 
+## Review workflow friction with brain-retro
+
+**Model (main session):** **Sonnet** (`brain-retro`); **Opus** for ambiguous or consequential root causes spanning multiple skills or systems.
+
+After repeated failed fixes, confusing workflow directions or redundant context recovery, optionally call `/brain-retro <feature>`. It examines available conversation, `execution.md`, tests, Git and review evidence, distinguishes reports from verified facts, and suggests at most three targeted improvements. Routine review findings are not evidence of a workflow failure.
+
+`brain-retro` is **manual and read-only**: no automatic post-review execution, no file edits, no new progress ledger. `brain-update` remains responsible for knowledge synchronization. Other skills only recommend a retro when they have a concrete repeated-friction reason.
+
+---
+
 # Quick workflow reference
 
 | Situation | Typical skill sequence | Your involvement |
 |---|---|---|
 | Large feature, rigid protocol | `brain-brainstorm` → `brain-write-spec` → optional `brain-decompose-feature` → `brain-design-implementation` → optional `brain-write-tasks` → `brain-implement` → `brain-review-code`; use `brain-plan` separately for unresolved research | Approve architecture, spec, blueprint, and implementation increments. |
 | Identify the next workflow stage or increment | `/brain-next <feature>` (read-only default) | Decide whether to invoke its one evidence-backed recommendation. |
+| Improve recurring workflow problems | Optional `/brain-retro <feature>` (manual, read-only) | Review evidence and explicitly approve any later changes. |
 | Small, settled feature | `brain-implement` | Review the focused change and verification. |
 | Isolated protocol bug | `brain-diagnose` → focused fix → optional `brain-review-code` | Review the diagnosis and correction. |
 | Architecture cleanup | `brain-review-architecture` → `brain-brainstorm` → `brain-write-spec` → `brain-design-implementation` → `brain-implement` → `brain-review-code` | Choose improvements and shape the exact design. |

@@ -13,7 +13,7 @@ POLICY = ROOT / "brain-init/references/CLAUDE.local.md"
 
 class SimplificationContract(unittest.TestCase):
     def test_every_entrypoint_has_a_valid_purpose_and_on_demand_details(self):
-        self.assertEqual(21, len(SKILLS))
+        self.assertEqual(22, len(SKILLS))
         for skill in SKILLS:
             with self.subTest(skill=skill.parent.name):
                 content = skill.read_text(encoding="utf-8")
@@ -99,7 +99,7 @@ class SimplificationContract(unittest.TestCase):
             "brain-design-implementation", "brain-decompose-feature", "brain-explain-changes",
             "brain-write-spec", "brain-write-tasks", "brain-implement",
         }
-        intentionally_manual = {"brain-next", "brain-compact", "brain-distill-content", "brain-review-merge-request", "write-human"}
+        intentionally_manual = {"brain-next", "brain-compact", "brain-retro", "brain-distill-content", "brain-review-merge-request", "write-human"}
         for name in sorted(automatically_invocable | intentionally_manual):
             with self.subTest(skill=name):
                 header = (ROOT / name / "SKILL.md").read_text(encoding="utf-8").split("\n---\n", 1)[0]
@@ -303,11 +303,40 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("/brain-compact", usage)
         self.assertIn("brain-compact", (ROOT / "brain-init/references/README.md").read_text(encoding="utf-8"))
 
+    def test_retro_is_manual_read_only_and_conditionally_suggested(self):
+        retro = (ROOT / "brain-retro/SKILL.md").read_text(encoding="utf-8")
+        details = (ROOT / "brain-retro/references/retro-details.md").read_text(encoding="utf-8")
+        next_skill = (ROOT / "brain-next/SKILL.md").read_text(encoding="utf-8")
+        routing = (ROOT / "brain-next/references/next-routing.md").read_text(encoding="utf-8")
+        implement = (ROOT / "brain-implement/SKILL.md").read_text(encoding="utf-8")
+        review = (ROOT / "brain-review-code/SKILL.md").read_text(encoding="utf-8")
+        update = (ROOT / "brain-update/SKILL.md").read_text(encoding="utf-8")
+        readme = (ROOT / "brain-init/references/README.md").read_text(encoding="utf-8")
+        usage = (ROOT / "brain-init/references/USAGE.md").read_text(encoding="utf-8")
+        for required in ("name: brain-retro", "disable-model-invocation: true",
+                         "explicitly invoked", "read-only", "never", "at most 1–3",
+                         "No justified workflow change", ".brain/.notes/",
+                         "brain-update", "brain-review-code", "Recommended next step:"):
+            self.assertIn(required.lower(), retro.lower())
+        for required in ("evidence", "confidence", "No process change needed",
+                         "past chat transcripts", "user"):
+            self.assertIn(required.lower(), details.lower())
+        for caller in (next_skill, routing, implement, review):
+            self.assertIn("/brain-retro", caller)
+            self.assertIn("optional", caller.lower())
+            self.assertIn("never", caller.lower())
+        self.assertNotIn("brain-retro", update)
+        self.assertIn("| `brain-retro` | **Sonnet**", readme)
+        self.assertIn("`brain-retro` **(manual)**", readme)
+        self.assertIn("## Review workflow friction with brain-retro", usage)
+        self.assertIn("**Opus**", usage)
+
     def test_detailed_workflows_still_exist(self):
         pairs = {
             "brain-init": "init-details.md",
             "brain-next": "next-routing.md",
             "brain-compact": "compact-details.md",
+            "brain-retro": "retro-details.md",
             "brain-brainstorm": "brainstorm-details.md",
             "brain-write-spec": "spec-details.md",
             "brain-decompose-feature": "decompose-details.md",

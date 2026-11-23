@@ -1,6 +1,6 @@
 # Claude Code Skills
 
-An opinionated set of **21 Claude Code skills** for collaborative software development, built around a **project brain**: a `.brain/` folder that holds what the project is, how it is built, what you decided, what is open, and what is done. A new session reads the brain instead of re-reading the codebase. The goal is to produce straightforward, maintainable changes while keeping consequential product and architectural decisions under your control.
+An opinionated set of **22 Claude Code skills** for collaborative software development, built around a **project brain**: a `.brain/` folder that holds what the project is, how it is built, what you decided, what is open, and what is done. A new session reads the brain instead of re-reading the codebase. The goal is to produce straightforward, maintainable changes while keeping consequential product and architectural decisions under your control.
 
 The skills are **tools to use when needed**, not a mandatory pipeline. Small changes should stay small; complex or multi-session work can use more structure.
 
@@ -34,6 +34,7 @@ project/
         ├── brain-refine-backlog/        # SKILL.md + references/
         ├── brain-review-architecture/
         ├── brain-review-code/           # SKILL.md + references/{findings.md,report-storage.md}
+        ├── brain-retro/                 # SKILL.md + references/retro-details.md
         ├── brain-review-merge-request/
         ├── brain-review-security/
         ├── brain-test-skill/            # SKILL.md + references/scenario-format.md
@@ -129,6 +130,7 @@ For example, a request to extend communication in an existing `Session` does not
 | `brain-refine-backlog` | **Sonnet** | **Opus** for ambiguous cross-service requirements, major compatibility constraints, or complex dependency and acceptance-criteria conflicts. |
 | `brain-review-architecture` | **Opus** | **Sonnet** for a narrow, well-understood module or interface assessment with few architectural tradeoffs. |
 | `brain-review-code` | **Sonnet** | **Opus** for broad, high-risk changes involving multiple interacting services, concurrency, security boundaries, exact wire contracts, or hard-to-trace regressions. Delegated assessment subagents remain Sonnet unless the central policy is changed. |
+| `brain-retro` | **Sonnet** | **Opus** for ambiguous, consequential process causes across multiple skills or subsystems; always read-only and manual. |
 | `brain-review-merge-request` | **Sonnet** | **Opus** for large, consequential MRs/PRs with substantial cross-module behavior, protocol/security impact, migration risk, or difficult requirement reconciliation. |
 | `brain-review-security` | **Opus** | **Sonnet** only for a narrowly scoped, well-understood check with explicit threat assumptions; retain Opus for consequential trust-boundary, authentication, authorization, or cryptographic decisions. |
 | `brain-test-skill` | **Sonnet** | **Opus** when designing subtle adversarial scenarios or interpreting ambiguous, high-impact behavior failures. Test agents should still run at the tier of the role being tested, as defined in the policy. |
@@ -157,6 +159,7 @@ For example, a request to extend communication in an existing `Session` does not
 | `brain-refine-backlog` | Reviews Jira stories for refinement readiness without changing them. | Preparing for backlog refinement. | Suggested gaps, draft acceptance criteria, and questions. |
 | `brain-review-architecture` | Discovers architectural friction **or** assesses a selected boundary, checks relevant previous reviews, and records coverage and finding dispositions. | You want improvement candidates or a focused design evaluation. | Findings in conversation; standalone reviews save `.brain/reviews/architecture/<NN>-<slug>/review.md` by default when a brain is writable. |
 | `brain-review-code` | Assesses a bounded change set for correctness, requirement fit, and repository fit, inline or with explicitly authorized subagents (no automatic delegation based on size). | A substantive change needs review, or you request one. | Three-section findings report and requirements coverage table; optional `.brain/reviews/code/<NN>-<slug>/review.md`. |
+| `brain-retro` **(manual)** | Analyzes evidenced workflow friction and suggests up to three durable improvements; never edits files or runs automatically. | After repeated avoidable rework, context loss, confusing instructions or an explicit request. | Read-only proposals with evidence, confidence and verification ideas. |
 | `brain-review-merge-request` **(manual)** | Reviews an MR/PR against Jira acceptance criteria using `brain-review-code`, adding coverage, tests, performance, and a merge recommendation. Read-only except requested report export. | You want an advisory merge assessment. | Consolidated findings and Approve / Request changes; optional `.brain/reviews/merge-request/<NN>-<slug>/review.md`. |
 | `brain-review-security` | Examines realistic threats, trust boundaries, access control, credentials, and sensitive-data flows. | Work changes a security boundary or you request an audit. | Findings in conversation; optional `.brain/reviews/security/<NN>-<slug>/review.md`. |
 | `brain-test-skill` | Tests whether a skill changes what an agent does by running it in fresh agents on throwaway fixtures, before and after a change, with pressure scenarios for rules an agent may skip. It reports pass or fail per criterion with verbatim quotes, and never reports a reading of the skill as a test result. | You want to know whether a skill's rule holds, or you are creating a skill or changing what one does. | Per-criterion results in conversation, also recorded in the project's scenarios file when a skill changed. |
@@ -166,6 +169,10 @@ For example, a request to extend communication in an existing `Session` does not
 ## Compacting existing Brain documentation
 
 Use `/brain-compact .brain/features/<feature-slug> --preview-only` to **preview**, without modifying files, a reduced-prose version of one feature's documents. Review the diff and any parent-fingerprint consequences; request an owner-applied change only when meaning and approval history are preserved. A broad `/brain-compact .brain` request works in reviewed batches, never a bulk silent rewrite. All new documents use the same concise-writing rules automatically.
+
+## Improve the workflow after friction
+
+Invoke `/brain-retro <feature>` only when needed: it examines repeated preventable rework, unclear skill instructions or duplicated context retrieval and recommends up to three targeted fixes. It is **manual and read-only**; `brain-implement`, `brain-review-code` and `brain-next` may suggest it **optionally**, never call it automatically. `brain-update` still synchronizes knowledge. A normal review does not need a retro.
 
 ## Example workflows
 
