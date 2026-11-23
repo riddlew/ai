@@ -38,7 +38,7 @@ Commit only upon explicit user instruction; stage only authorized files. For sub
 
 ## 4. Finish
 
-Run proportionate final checks and inspect the **full diff**. Substantial or consequential work, or requested review, gets `brain-review-code` including in-scope uncommitted files and recorded Review Focus; small changes get a disclosed self-review. Address significant findings and honor any outstanding user checkpoint. Record evidence and limitations, invoke `brain-update` once when project knowledge changed, and report changed files, verification, approvals, rulings/deferred items and blockers. Never claim completion with unresolved critical failures.
+Run proportionate checks and inspect the full diff. Substantial or consequential work, or requested review, gets `brain-review-code` including in-scope uncommitted files and recorded Review Focus; small changes get a disclosed self-review. Address findings and user checkpoints. Record evidence; use `brain-update` if knowledge changed. Report changes, verification, approvals and blockers; never claim completion with critical failures. **Only for evidenced repeated process friction**, optionally suggest `/brain-retro <feature>` with a reason. **Never invoke it** or suggest it for routine work.
 
 **Detailed exceptions:** `${CLAUDE_SKILL_DIR}/references/implement-details.md` covers worktree creation, paused/resumed runs, subagent review packets, failed-test diagnosis, final independent review and fix-pass mechanics. The CLI contract is `${CLAUDE_SKILL_DIR}/../brain-init/references/deterministic-tooling.md`.
 
