@@ -12,6 +12,8 @@ Branch: <verified branch>
 Collaboration mode: collaborative
 Workspace: main checkout
 Execution mode: inline
+Implementation workflow: brain-implement | brain-pair-program (when used)
+Pair mode: AI-led | developer-led (only with brain-pair-program)
 
 ## Work Items
 - [ ] TASK-001 — pending
@@ -48,6 +50,7 @@ Execution mode: inline
 ## Rules
 
 - Follow `${CLAUDE_SKILL_DIR}/../brain-init/references/compact-writing.md` for concise facts, stable references and complete execution evidence; never collapse distinct rulings, test runs, approvals or checkpoints.
+- With `brain-pair-program`, record the explicitly selected pair mode and any dated, user-approved switch; only the user edits application source/tests in developer-led mode. Both implementation skills append to the same history and preserve pending reviews.
 - Retain the original review base, branch, collaboration mode, workspace, and execution mode across sessions; reconcile stale facts from Git and actual code, not historical text alone.
 - Do not mark a task `[x]` until relevant evidence is observed and, in collaborative/guided mode, the user approved the increment. Verification without approval remains pending review.
 - Record command outcomes only when actually executed. Preserve existing user changes, worktree history, blockers, deviations and checkpoints.
