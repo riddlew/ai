@@ -346,10 +346,8 @@ class SimplificationContract(unittest.TestCase):
                        "execution mode", "subagents", "actual diff", "real files",
                        "missing classes", "adaptive", "review", "approved requirements",
                        "brain-design-implementation", "execution.md", "review base",
-                       "brain-update", "Never commit", "Recommended next step:"):
+                       "brain-update", "Stage/commit only", "Recommended next step:"):
             with self.subTest(phrase=phrase):
-                if phrase == "Never commit":
-                    continue
                 self.assertIn(phrase.lower(), skill.lower())
         self.assertIn("brain-pair-program", policy)
         self.assertIn("brain-pair-program", contract)
@@ -360,7 +358,9 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("`brain-pair-program`", readme)
         self.assertIn("## Pair programming with AI-led or developer-led increments", usage)
         self.assertIn("Spring Boot", usage)
-        self.assertIn("different", details.lower() if "different" in details.lower() else "different")
+        self.assertIn("Developer-led", details)
+        self.assertIn("AI-led", details)
+        self.assertIn("never reset review base", details.lower())
 
     def test_detailed_workflows_still_exist(self):
         pairs = {
