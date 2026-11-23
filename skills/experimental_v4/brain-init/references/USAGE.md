@@ -59,7 +59,23 @@ For a complete traceability example including ADR references, negative-path requ
 
 ## Hierarchical feature workflow
 
-**Default workflow:** `brain-brainstorm` (when needed) → `brain-write-spec` → `brain-design-implementation` → `brain-implement`. Use `brain-decompose-feature` **optionally** for separate responsibility/coverage approvals; use `brain-write-tasks` **optionally** for complex dependencies, delegation or handoffs. Simple functional boundaries can live in specifications and coherent ordered increments in implementation plans. An *existing* affected component or task must still be reconciled by its owner; optional only means new stages are not mandatory. `brain-implement` records progress in `execution.md`. See `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md`.
+**Default workflow:** `brain-brainstorm` (when needed) → `brain-write-spec` → `brain-design-implementation` → **`brain-implement` or `brain-pair-program`**. Use `brain-decompose-feature` **optionally** for separate responsibility/coverage approvals; use `brain-write-tasks` **optionally** for complex dependencies, delegation or handoffs. Simple functional boundaries can live in specifications and coherent ordered increments in implementation plans. An *existing* affected component or task must still be reconciled by its owner; optional only means new stages are not mandatory. Both implementation skills share `execution.md` and preserve its review base, history and pending approvals. See `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md`.
+
+## Pair programming with AI-led or developer-led increments
+
+**Model (main session):** **Sonnet** (`brain-pair-program`); **Opus** when significant concurrency, cross-system contracts or design revisions require deeper reasoning.
+
+Use `/brain-pair-program order-cancellation` in place of `/brain-implement` after approved specifications and binding design. Claude asks for **pair mode** (**AI-led recommended** or **developer-led** if unspecified), and separately for **execution mode** (inline recommended or subagents), without assuming either. In both pair modes, implementation proceeds through **adaptive, logically coherent, dependency-safe increments** with explanations focused on important decisions rather than every line. Mandatory review and approval follows **each** increment.
+
+**Illustrative Spring Boot dialogue:**
+
+- **Claude:** "The existing entity and repository are present. The cancellation service will require two domain exceptions that don't exist yet. First increment: create those exceptions and verify compilation. This avoids using missing classes. Approve this structure?"
+- **Developer-led user:** "Yes, I'll implement the exceptions." Claude provides focused source snippets, explains the purpose, and **does not edit application code or tests**. When the user says "done," Claude inspects the actual files and diff, checks evidence, and waits for approval.
+- **AI-led user:** "Go ahead." Claude writes **only** the authorized exception increment, shows the actual diff and test results, then waits for review.
+- **User:** "Should cancellation handle processing orders?" Claude checks the approved behavior and whether the change affects a binding decision; if so, it routes to the owning spec/design skill rather than silently altering the implementation.
+- **After approval:** Move to the service and its tests, then its HTTP consumer and integration coverage. The exact order follows actual repository dependencies, not a universal layer recipe.
+
+Either mode writes verification, rulings and checkpoints to the **same** `.brain/features/<feature>/execution.md` that `brain-implement` uses. Developer-led edits remain user-owned; switching modes requires an explicit choice. Do not present an unfinished, unbuildable piece as approved, or skip the next checkpoint.
 
 ## Understand changes after implementation
 
@@ -1563,6 +1579,7 @@ After repeated failed fixes, confusing workflow directions or redundant context 
 | Identify the next workflow stage or increment | `/brain-next <feature>` (read-only default) | Decide whether to invoke its one evidence-backed recommendation. |
 | Improve recurring workflow problems | Optional `/brain-retro <feature>` (manual, read-only) | Review evidence and explicitly approve any later changes. |
 | Small, settled feature | `brain-implement` | Review the focused change and verification. |
+| Design-sensitive hands-on implementation | `/brain-pair-program <feature>` after the agreed design | Choose AI-led or developer-led, examine explanations and approve each dependency-safe increment. |
 | Isolated protocol bug | `brain-diagnose` → focused fix → optional `brain-review-code` | Review the diagnosis and correction. |
 | Architecture cleanup | `brain-review-architecture` → `brain-brainstorm` → `brain-write-spec` → `brain-design-implementation` → `brain-implement` → `brain-review-code` | Choose improvements and shape the exact design. |
 | Third-party merge request | `brain-review-merge-request` (uses `brain-review-code`) | Evaluate findings and advisory merge recommendation. |

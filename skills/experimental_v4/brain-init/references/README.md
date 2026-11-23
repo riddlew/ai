@@ -1,6 +1,6 @@
 # Claude Code Skills
 
-An opinionated set of **22 Claude Code skills** for collaborative software development, built around a **project brain**: a `.brain/` folder that holds what the project is, how it is built, what you decided, what is open, and what is done. A new session reads the brain instead of re-reading the codebase. The goal is to produce straightforward, maintainable changes while keeping consequential product and architectural decisions under your control.
+An opinionated set of **23 Claude Code skills** for collaborative software development, built around a **project brain**: a `.brain/` folder that holds what the project is, how it is built, what you decided, what is open, and what is done. A new session reads the brain instead of re-reading the codebase. The goal is to produce straightforward, maintainable changes while keeping consequential product and architectural decisions under your control.
 
 The skills are **tools to use when needed**, not a mandatory pipeline. Small changes should stay small; complex or multi-session work can use more structure.
 
@@ -24,6 +24,7 @@ project/
         ├── brain-brainstorm/            # SKILL.md + lenses/ + references/ + scripts/
         ├── brain-compact/               # SKILL.md + references/compact-details.md
         ├── brain-next/                  # SKILL.md + references/next-routing.md
+        ├── brain-pair-program/          # SKILL.md + references/pair-program-details.md
         ├── brain-design-implementation/ # SKILL.md + references/blueprint-template.md
         ├── brain-diagnose/
         ├── brain-distill-content/
@@ -126,6 +127,7 @@ For example, a request to extend communication in an existing `Session` does not
 | `brain-design-implementation` | **Opus** | **Sonnet** for a small, familiar change with established architecture and straightforward interfaces; use Opus for consequential ownership, API, or cross-service design. |
 | `brain-explain-changes` | **Sonnet** | **Opus** only for unusually intricate execution paths or complex concurrency; the explanation should remain simple regardless of model. |
 | `brain-implement` | **Sonnet** | **Opus** for tightly coupled multi-system changes, byte-exact protocol work, concurrency/state-machine correctness, risky migrations, or repeated design/test failures. Merely changing many files does not itself require Opus. In **subagent-driven** execution, keep the main coordinator on Sonnet as the policy specifies; explicit subagent/final-review roles follow the policy table. |
+| `brain-pair-program` | **Sonnet** | **Opus** when explaining or revising complex concurrency, protocols or architectural choices with the developer; use the explicitly selected pair and execution modes regardless of model. |
 | `brain-plan` | **Opus** | **Sonnet** when the architecture and requirements are settled and the work is primarily sequencing known tasks and maintaining planning state. |
 | `brain-refine-backlog` | **Sonnet** | **Opus** for ambiguous cross-service requirements, major compatibility constraints, or complex dependency and acceptance-criteria conflicts. |
 | `brain-review-architecture` | **Opus** | **Sonnet** for a narrow, well-understood module or interface assessment with few architectural tradeoffs. |
@@ -155,6 +157,7 @@ For example, a request to extend communication in an existing `Session` does not
 | `brain-design-implementation` | Investigates the real code, then collaborates with you on files, ownership, call flow, important signatures, method outlines, unchanged boundaries, testable increments, and design approval. Writes no production code; distinguishes binding constraints from illustrative sketches. | A substantial feature or code structure you want to influence before implementation. | Approved technical plan document(s) in `.brain/features/<feature-slug>/04-implementation-plans/`. |
 | `brain-explain-changes` | Walks through recent changes or a selected component in plain language, tracing actual application behavior one step at a time. Not a code review; pauses for questions and never modifies files. | You want to understand code Claude wrote or how a change fits into the running app. | Read-only walkthrough in conversation. |
 | `brain-implement` | Implements approved work in small verified behavioral increments. **Collaborative is default**: review the actual diff and tests, then approve each increment before the next. Guided uses larger increments; autonomous skips routine approval pauses. Inline/subagent execution is independent (collaborative defaults inline). Proposes commits but commits only if explicitly asked. Performs proportionate final review. | You are ready to change code, with or without a formal spec; substantial/design-sensitive work normally starts with an approved blueprint. | Code changes and verified progress in `.brain/features/<feature-slug>/execution.md`, separate from approved plans and tasks. |
+| `brain-pair-program` | Alternative implementation path with adaptive, dependency-safe increments, design explanations, verification and mandatory user approval after each chunk. **AI-led (recommended)**: Claude edits; **developer-led**: user edits and Claude reviews actual changes. Explicitly asks which mode if unspecified. | You want to shape implementation piece by piece and discuss design choices while the code is being written. | One approved increment at a time; same feature `execution.md` as `brain-implement`, not a new ledger. |
 | `brain-plan` | Tracks multi-session planning with dependency-aware research, consult, prototype, and task tickets. | An initiative has many interdependent decisions and spans days or sessions. | `.brain/planning/<feature>/INDEX.md` and planning tickets. |
 | `brain-refine-backlog` | Reviews Jira stories for refinement readiness without changing them. | Preparing for backlog refinement. | Suggested gaps, draft acceptance criteria, and questions. |
 | `brain-review-architecture` | Discovers architectural friction **or** assesses a selected boundary, checks relevant previous reviews, and records coverage and finding dispositions. | You want improvement candidates or a focused design evaluation. | Findings in conversation; standalone reviews save `.brain/reviews/architecture/<NN>-<slug>/review.md` by default when a brain is writable. |
@@ -173,6 +176,10 @@ Use `/brain-compact .brain/features/<feature-slug> --preview-only` to **preview*
 ## Improve the workflow after friction
 
 Invoke `/brain-retro <feature>` only when needed: it examines repeated preventable rework, unclear skill instructions or duplicated context retrieval and recommends up to three targeted fixes. It is **manual and read-only**; `brain-implement`, `brain-review-code` and `brain-next` may suggest it **optionally**, never call it automatically. `brain-update` still synchronizes knowledge. A normal review does not need a retro.
+
+## Pair programming rather than delegating the entire implementation
+
+After the approved spec and binding plan, use `/brain-pair-program <feature>` **instead of** `/brain-implement <feature>` when you want to shape code in real time. Claude asks **AI-led (recommended)** or **developer-led** if not specified, and separately confirms inline/subagent execution. In AI-led Claude writes one logical piece and presents its diff; in developer-led you write that piece and Claude inspects **your real code**. Both explain key tradeoffs, verify available behavior, and **wait for approval** after every increment. Build prerequisites before consumers, preserve existing binding decisions, and use the shared `execution.md` across sessions or workflow switches. See USAGE for a Spring Boot example.
 
 ## Example workflows
 
@@ -204,7 +211,7 @@ Example: Add a share-link capability for notes.
 5. Use `/brain-write-tasks` when executable increments improve reliability or multi-session coordination. The approved `05-tasks/` definitions reference their plans, requirements, and dependencies.
 6. Use `/brain-implement` to execute authorized tasks, verify behavior, and review coherent increments. Track actual progress and approvals in `execution.md`, never by rewriting the approved implementation plans.
 
-**Default path:** optional `brain-brainstorm` → `brain-write-spec` → `brain-design-implementation` → `brain-implement`. Simple functional boundaries can live in the specification, and ordered verifiable increments in the design. Use `brain-decompose-feature` only for meaningful separate requirement ownership/coverage, and `brain-write-tasks` for complex dependencies, delegation or multi-session handoff. Existing affected component/task documents still need their owners' review and approval. For complex unresolved decisions, `brain-plan` may coordinate investigations under `.brain/planning/`.
+**Default path:** optional `brain-brainstorm` → `brain-write-spec` → `brain-design-implementation` → `brain-implement` **or `brain-pair-program`**. Simple functional boundaries can live in the specification, and ordered verifiable increments in the design. Use `brain-decompose-feature` only for meaningful separate requirement ownership/coverage, and `brain-write-tasks` for complex dependencies, delegation or multi-session handoff. Existing affected component/task documents still need their owners' review and approval. For complex unresolved decisions, `brain-plan` may coordinate investigations under `.brain/planning/`.
 
 ### Large, multi-session planning effort
 

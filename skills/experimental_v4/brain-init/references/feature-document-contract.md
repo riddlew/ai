@@ -79,7 +79,7 @@ A review should be able to trace a verified task back through its plan, componen
 | `03-components/` | `brain-decompose-feature` |
 | `04-implementation-plans/` | `brain-design-implementation` |
 | `05-tasks/` | `brain-write-tasks` |
-| `execution.md` | `brain-implement` |
+| `execution.md` | `brain-implement` or `brain-pair-program` (shared history, never competing copies) |
 | Root brain knowledge, `adrs/`, `sources/`, `knowledge/` | `brain-update` (initialized by `brain-init`) |
 
 `brain-update` may index and report problems with producer-owned files, not silently edit them. `brain-plan` owns its separate `planning/` records and calls the appropriate producer when the objective is ready.

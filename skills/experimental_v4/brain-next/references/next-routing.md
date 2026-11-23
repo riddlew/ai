@@ -17,7 +17,7 @@
 
 ## Default workflow and optional depth
 
-Prefer `brain-brainstorm` (only for unresolved decisions) → `brain-write-spec` → `brain-design-implementation` → `brain-implement`. Tiny settled fixes can be implemented directly. Specifications can record simple responsibility boundaries; implementation plans can contain an ordered, verifiable increment checklist without separate components or task files.
+Prefer `brain-brainstorm` (only for unresolved decisions) → `brain-write-spec` → `brain-design-implementation` → `brain-implement` **or `brain-pair-program` when explicitly preferred**. Tiny settled fixes can be implemented directly. Specifications can record simple responsibility boundaries; implementation plans can contain an ordered, verifiable increment checklist without separate components or task files.
 
 Optional examples:
 - `Next: /brain-design-implementation messaging`; `Optional: /brain-decompose-feature messaging — separate client/server owners need explicit independent requirement coverage and approval`. If chosen, decompose **before** design.
@@ -33,7 +33,7 @@ Neither optional skill is a routine gate. But an **existing** component or task 
 4. **Binding design not approved/current:** `brain-design-implementation`. Even if design text stays the same, direct-parent hash changes need documented review and renewed approval where required.
 5. **Tasks used and affected/unapproved:** require `brain-write-tasks` when existing governing tasks need reconciliation; for new complex dependencies or delegation recommend it only as optional. Small settled work can use plan-level increments.
 6. **Current increment in progress, tests failing or review pending:** recommend resuming/reviewing **that increment**, or `brain-diagnose` for an unresolved failure. Do not advance past a pending collaborative approval.
-7. **Ready work:** after verifying approved and current governing documents, actual Git/test state and `depends_on`, recommend `/brain-implement <real-unblocked-id>`. If `INC-4.5` is recorded, unblocked and prioritized, it can come before `INC-5`. Never invent either ID or order solely by numbers. If several independent increments are ready and no priority is established, disclose the tie and ask.
+7. **Ready work:** after verifying approved and current governing documents, actual Git/test state and `depends_on`, recommend `/brain-implement <real-unblocked-id>` (or `/brain-pair-program <real-unblocked-id>` when that implementation workflow was explicitly chosen). If `INC-4.5` is recorded, unblocked and prioritized, it can come before `INC-5`. Never invent either ID or order solely by numbers. If several independent increments are ready and no priority is established, disclose the tie and ask.
 8. **After verified completion:** recommend risk-proportionate `brain-review-code`, `brain-update` for stale shared knowledge, or no further action. If repeated failed fixes, redundant investigation or confusing instructions are evidenced, optionally suggest `/brain-retro <feature>` with a concrete reason, **never invoke it**. Ordinary review findings alone are insufficient.
 
 **Conflict handling:** an outdated `execution.md`, stale `state.md`, mismatched direct parent hash, unrecorded approval or surprising uncommitted code is a verification blocker, not a reason to guess completion. Check source and authoritative documents and choose the earliest genuinely actionable stage.

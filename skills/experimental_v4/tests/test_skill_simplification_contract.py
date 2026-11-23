@@ -13,7 +13,7 @@ POLICY = ROOT / "brain-init/references/CLAUDE.local.md"
 
 class SimplificationContract(unittest.TestCase):
     def test_every_entrypoint_has_a_valid_purpose_and_on_demand_details(self):
-        self.assertEqual(22, len(SKILLS))
+        self.assertEqual(23, len(SKILLS))
         for skill in SKILLS:
             with self.subTest(skill=skill.parent.name):
                 content = skill.read_text(encoding="utf-8")
@@ -97,6 +97,7 @@ class SimplificationContract(unittest.TestCase):
     def test_selected_workflow_skills_allow_automatic_invocation_without_waiving_approval(self):
         automatically_invocable = {
             "brain-design-implementation", "brain-decompose-feature", "brain-explain-changes",
+            "brain-pair-program",
             "brain-write-spec", "brain-write-tasks", "brain-implement",
         }
         intentionally_manual = {"brain-next", "brain-compact", "brain-retro", "brain-distill-content", "brain-review-merge-request", "write-human"}
@@ -331,12 +332,43 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("## Review workflow friction with brain-retro", usage)
         self.assertIn("**Opus**", usage)
 
+    def test_pair_program_is_explicit_two_mode_and_checkpointed(self):
+        skill = (ROOT / "brain-pair-program/SKILL.md").read_text(encoding="utf-8")
+        details = (ROOT / "brain-pair-program/references/pair-program-details.md").read_text(encoding="utf-8")
+        policy = POLICY.read_text(encoding="utf-8")
+        contract = (ROOT / "brain-init/references/feature-document-contract.md").read_text(encoding="utf-8")
+        template = (ROOT / "brain-implement/references/todo-template.md").read_text(encoding="utf-8")
+        readme = (ROOT / "brain-init/references/README.md").read_text(encoding="utf-8")
+        usage = (ROOT / "brain-init/references/USAGE.md").read_text(encoding="utf-8")
+        next_skill = (ROOT / "brain-next/SKILL.md").read_text(encoding="utf-8")
+        routing = (ROOT / "brain-next/references/next-routing.md").read_text(encoding="utf-8")
+        for phrase in ("AI-led (recommended)", "developer-led", "ask", "wait",
+                       "execution mode", "subagents", "actual diff", "real files",
+                       "missing classes", "adaptive", "review", "approved requirements",
+                       "brain-design-implementation", "execution.md", "review base",
+                       "brain-update", "Never commit", "Recommended next step:"):
+            with self.subTest(phrase=phrase):
+                if phrase == "Never commit":
+                    continue
+                self.assertIn(phrase.lower(), skill.lower())
+        self.assertIn("brain-pair-program", policy)
+        self.assertIn("brain-pair-program", contract)
+        self.assertIn("Pair mode: AI-led | developer-led", template)
+        self.assertIn("brain-pair-program", next_skill)
+        self.assertIn("brain-pair-program", routing)
+        self.assertIn("| `brain-pair-program` | **Sonnet**", readme)
+        self.assertIn("`brain-pair-program`", readme)
+        self.assertIn("## Pair programming with AI-led or developer-led increments", usage)
+        self.assertIn("Spring Boot", usage)
+        self.assertIn("different", details.lower() if "different" in details.lower() else "different")
+
     def test_detailed_workflows_still_exist(self):
         pairs = {
             "brain-init": "init-details.md",
             "brain-next": "next-routing.md",
             "brain-compact": "compact-details.md",
             "brain-retro": "retro-details.md",
+            "brain-pair-program": "pair-program-details.md",
             "brain-brainstorm": "brainstorm-details.md",
             "brain-write-spec": "spec-details.md",
             "brain-decompose-feature": "decompose-details.md",
