@@ -1,35 +1,42 @@
 # Detailed workflow — brain-explain-changes
 
-Read for the specialized cases linked from SKILL.md. This preserves the previous complete procedure; the current primary skill and policy govern revised default behavior.
+These are **situational safeguards**, not separate modes or a required sequence. The primary skill follows the user's intent and preferred depth. Always follow `CLAUDE.local.md` for context loading, the explicit inline/subagent choice, and the private `.brain/.notes/` boundary.
 
+## Explain code without assuming a predefined target
 
-# Explain Changes
+- The user may ask about a function, class, file's purpose, several files interacting, an unfamiliar subsystem, current changes, a commit or a branch. Resolve from their words, `$ARGUMENTS`, recent context and Git state; ask only when material ambiguity remains. Don't redirect a clear question into a full tour.
+- No target given: inspect staged, unstaged and relevant untracked changes; if none, inspect the latest commit as a useful default. If several unrelated changes exist, offer a short map and let the user choose. Don't silently claim the latest commit represents an entire feature branch.
+- Read relevant actual code **beyond** the diff as needed to establish callers, instantiation/wiring, interfaces, configuration, data flow and tests. Brain-approved specifications and plans clarify requirements and recorded choices; current code determines current behavior. The fact a plan intended a design does not prove the code implements it.
+- Start with the purpose and a short mental model. For a focused question, give the answer directly. For broader material, identify natural components, connections and a useful starting point. Follow a concrete execution path where meaningful; not every utility, declaration, migration or test has an application entry point. State when a component is not wired into production.
 
-Help the user understand code they may not have written. **Teach how it works, not whether it should be changed.** Be conversational, accurate, and deliberately easy to follow.
+## Full-branch and other cumulative change sets
 
-**Project context (current rule):** Follow `CLAUDE.local.md` §Project brain loading; read governing core decisions, feature evidence and related technical/source material. Search by behavior and source paths; when coverage is uncertain, broaden. Existing mandatory root/context-map instructions are superseded.
+For requests such as "walk me through all changes on this branch":
 
-**Scope:** Use `$ARGUMENTS` as the requested commit, range, file, function, or topic. If absent, inspect staged, unstaged, and untracked changes; if the working tree is clean, inspect the latest commit. Identify the exact revision or paths being explained. If multiple unrelated changes are present, give a brief overview and let the user choose where to start. If there are no changes or a usable target, ask what to explain. Do not silently substitute a full repository tour.
+1. Establish the **intended target branch** from an explicit target, PR metadata, repository conventions or verified Git configuration. Do not assume the current branch's upstream is the target. When materially ambiguous, ask which target to compare.
+2. Determine the **merge base** of the target and source branch, then inspect the **final cumulative diff** from that base to the requested branch tip. **Do not narrate each commit** or use commit-message summaries as implementation evidence. Show the chosen target, merge-base reference and diff scope in plain language; if unavailable, explain the limitation.
+3. Cover **added, modified, renamed and deleted files**, including relevant tests, migrations, configuration and wiring. Group by responsibility or end-to-end behavior; start with the goal and component relationships rather than an alphabetical file dump. Account for changed paths in a compact **change map** so important groups aren't lost. Explain details progressively, not all at once.
+4. Identify **uncommitted staged, unstaged and untracked** work separately. Clarify whether the user wants it included if it might change the walkthrough; never silently mix working-tree changes into the committed branch diff. If a PR/base diff has moved or the merge-base comparison is misleading, state the reference and caveat rather than asserting an exact final PR outcome.
+5. Keep a **conversation-level** sense of which groups were explained and what remains. Resume questions and jumps without repeating the tour or creating a checklist/progress file. In a long session, recover scope from verified Git state and available conversation context; don't invent remembered coverage.
 
-## Workflow
+The comparison rule also applies to broad requests about a change set, but **don't require a Git diff** to explain an unchanged component or concept. Use actual files, relationships and tests for any scope.
 
-1. **Find the actual changes.** Read the relevant diff (when available), changed code, nearby callers, entry points, configuration, and tests. Use `.brain` context or approved design documents when helpful, but check current behavior in source. Distinguish what changed from what already existed.
-2. **Build a short mental model.** Explain in plain English what the change adds or fixes, where it fits, and the 2–4 most important parts. Start with the purpose, not class names or implementation detail.
-3. **Trace a real execution path.** Follow one concrete input, request, or event from where the application starts using the change through its main calls, state changes, result, and relevant failure/cleanup behavior. Show how the new component is actually wired into production code; do not stop at isolated tests or the new file. If it is not wired in, say so without turning the walkthrough into a review.
-4. **Unpack only the tricky parts.** Explain unfamiliar syntax, important decisions, and non-obvious conditions as they arise. Explain why a design choice exists only when supported by code, tests, comments, or decisions; label inference as inference. Use one short code snippet or concrete example only when it improves comprehension.
-5. **Connect tests to behavior.** Point out the most useful tests and what real behavior they demonstrate, when relevant. Don't recite the entire test suite.
-6. **Proceed interactively.** Explain one coherent part per response, then pause. Offer to continue to the next part or dig into the current one, and follow the user's questions and preferred depth. On the first response, provide the overview and *one* starting point, not a complete lecture. Do not quiz the user unless requested.
+## Explain what, how and why
 
-## Plain-language standard
+- **Purpose:** What job does this class, method or change perform, and why does the wider feature need it? Explain ownership and how it connects to existing code, especially for an unfamiliar new file.
+- **Behavior:** Trace representative inputs, calls, relevant state transitions and outputs; discuss failures, edge cases, threading, transactions or lifecycle **when they actually matter**. If the path cannot be verified, identify the uncertainty.
+- **Reasoning:** Explain important choices such as dependency injection, abstraction boundaries, SQL/JPA behavior, concurrency or error mapping. Check approved design, ADRs, comments and tests for the **recorded rationale**. When rationale is not documented, say "A likely reason is..." and distinguish it from what can be proved. Do not attribute speculative intentions to the author.
+- **Understanding:** Define unfamiliar syntax/framework concepts succinctly and expand with a small code excerpt or realistic example if useful. Explain tradeoffs when they illuminate the approach; don't quietly turn the teaching session into a refactoring review.
+- **Adaptation:** Prefer logically coherent chunks over a line-by-line lecture. Respond to specific questions immediately, allow digressions, then continue from the place the user chooses. Never quiz or require the user to demonstrate comprehension unless they request it.
 
-- Use short, direct sentences and familiar words. Write like a patient, experienced developer explaining the code to a teammate, **not** like a textbook, tutorial generator, or architecture report.
-- Explain unfamiliar terms in one simple sentence on first use; don't avoid precise names when they help the user locate code.
-- Explain **what happens, why it matters, and where to see it**. Use concrete examples ("when the app receives a message...") rather than abstract summaries ("the system orchestrates message lifecycle management").
-- Prefer small chunks and ordinary paragraphs to long bullet lists, walls of text, line-by-line narration, or unnecessary analogies. Match the user's requested depth; start simple and add detail when asked.
-- Link explanations to real `path:line` locations where available, otherwise cite file and symbol. Do not invent call flows, claims, or reasons.
+Give concrete source references (`path:line` when known). Distinguish the existing behavior from new behavior and explain the test's observable coverage without claiming tests were executed. If serious concerns become apparent, mention them neutrally when relevant; a requested assessment belongs to `brain-review-code`.
+
+## During implementation review
+
+A user may invoke `/brain-explain-changes` while paused at a `brain-implement` or `brain-pair-program` increment. Explain the **actual current diff** and related code, with relevant approved design and `execution.md` as read-only context. Answer as many questions as necessary; **do not mark the increment approved**, edit `execution.md`, initiate the next increment, modify code or trigger a review. Direct approval/revision decisions back to the paused implementing skill. A request to understand code is **not** authorization to approve or change it.
 
 ## Boundaries
 
-- **Read-only:** Do not edit code, tests, project-brain files, or documentation; don't create reports, update the brain, or commit. Avoid commands that modify the working tree. Reading tests is enough; don't run them unless the user asks.
-- **Not a review:** Don't hunt for defects, grade code quality, suggest refactors, or invoke other review skills. If you notice a serious issue relevant to the explanation, mention it briefly and neutrally, then return to teaching. If the user asks for a review, direct them to the relevant review skill.
-- Do not claim an execution path, behavior, or test result is verified by running the program unless it actually was. Be explicit about what you read and what remains uncertain.
+- Strictly **read-only**: no code, test, doc, Brain, report or execution-record writes. Don't invoke `brain-update`; don't run tests unless the user explicitly asks and the command is safe within the authorized scope.
+- **Not a code review:** don't hunt for defects, grade code, suggest a rewrite unprompted or trigger reviewer skills automatically. If asked for correctness or requirement-fit review, hand off to `brain-review-code` without claiming a review already occurred.
+- **Evidence honesty:** tests read are not tests run; plans are intent, not proof of implementation; source walkthroughs are not runtime executions. Don't invent branch baselines, original motives or unseen sessions.

@@ -81,7 +81,13 @@ Either mode writes verification, rulings and checkpoints to the **same** `.brain
 
 **Model (main session):** **Sonnet** (`brain-explain-changes`).
 
-Run `/brain-explain-changes` to walk through the working-tree changes (or the latest commit if the tree is clean). Pass a file, symbol, or commit range to focus it, for example `/brain-explain-changes connection_manager`. Claude starts with a plain-language overview, traces actual application calls in small steps, and pauses for questions rather than giving a full code review. This skill reads files but does not edit them or create reports.
+Use `/brain-explain-changes` to understand unfamiliar code at **whatever scope you choose**: a method, a new file's purpose, interactions between files, implementation choices, or a complete feature branch. With no target it starts from working-tree changes (or the latest commit if clean). For example:
+
+- `/brain-explain-changes OrderCancellationService` — explain what the service does, why it exists, how its methods work and how its callers use it.
+- `/brain-explain-changes How does the new order exception handler interact with the controller?` — follow the actual cross-file flow.
+- `/brain-explain-changes branch feature/order-cancellation` — identify the intended target and its merge base, map the **final cumulative diff** (not individual commits), group changed files by responsibility and walk through each meaningful area interactively.
+
+Claude starts with a short mental model, then explains what, how and why using the actual code, applicable approved design decisions, concrete inputs and relevant tests. Recorded intent is distinguished from inferred rationale. It pauses for your questions; **no quizzes**, forced line-by-line lesson or fixed set of stages. It is read-only and **not** `brain-review-code`. You can use it while `brain-implement` or `brain-pair-program` waits for your review; the existing checkpoint stays pending until you explicitly approve it in the implementation workflow.
 
 ---
 
@@ -1580,6 +1586,7 @@ After repeated failed fixes, confusing workflow directions or redundant context 
 | Improve recurring workflow problems | Optional `/brain-retro <feature>` (manual, read-only) | Review evidence and explicitly approve any later changes. |
 | Small, settled feature | `brain-implement` | Review the focused change and verification. |
 | Design-sensitive hands-on implementation | `/brain-pair-program <feature>` after the agreed design | Choose AI-led or developer-led, examine explanations and approve each dependency-safe increment. |
+| Understand AI-written code or an entire feature branch | `/brain-explain-changes [file, symbol, topic or branch]` | Ask questions and steer the read-only walkthrough before approving code separately. |
 | Isolated protocol bug | `brain-diagnose` → focused fix → optional `brain-review-code` | Review the diagnosis and correction. |
 | Architecture cleanup | `brain-review-architecture` → `brain-brainstorm` → `brain-write-spec` → `brain-design-implementation` → `brain-implement` → `brain-review-code` | Choose improvements and shape the exact design. |
 | Third-party merge request | `brain-review-merge-request` (uses `brain-review-code`) | Evaluate findings and advisory merge recommendation. |
