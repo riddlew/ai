@@ -85,7 +85,7 @@ class ExplainChangesContract(unittest.TestCase):
                        "do not approve, close or advance that checkpoint"):
             self.assertIn(phrase.lower(), content.lower())
         for phrase in ("execution.md", "do not mark the increment approved",
-                       "not authorization to approve"):
+                       "not** authorization to approve"):
             self.assertIn(phrase.lower(), details.lower())
 
     def test_is_read_only_and_not_a_review(self):
