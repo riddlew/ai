@@ -332,7 +332,7 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("## Review workflow friction with brain-retro", usage)
         self.assertIn("**Opus**", usage)
 
-    def test_pair_program_is_explicit_two_mode_and_checkpointed(self):
+    def test_pair_program_preserves_existing_modes_and_checkpoints(self):
         skill = (ROOT / "brain-pair-program/SKILL.md").read_text(encoding="utf-8")
         details = (ROOT / "brain-pair-program/references/pair-program-details.md").read_text(encoding="utf-8")
         policy = POLICY.read_text(encoding="utf-8")
@@ -351,16 +351,44 @@ class SimplificationContract(unittest.TestCase):
                 self.assertIn(phrase.lower(), skill.lower())
         self.assertIn("brain-pair-program", policy)
         self.assertIn("brain-pair-program", contract)
-        self.assertIn("Pair mode: AI-led | developer-led", template)
+        self.assertIn("Pair mode: AI-led | developer-led | Learning Mode", template)
         self.assertIn("brain-pair-program", next_skill)
         self.assertIn("brain-pair-program", routing)
         self.assertIn("| `brain-pair-program` | **Sonnet**", readme)
         self.assertIn("`brain-pair-program`", readme)
-        self.assertIn("## Pair programming with AI-led or developer-led increments", usage)
+        self.assertIn("## Pair programming with AI-led, developer-led or Learning Mode", usage)
         self.assertIn("Spring Boot", usage)
         self.assertIn("Developer-led", details)
         self.assertIn("AI-led", details)
         self.assertIn("never reset review base", details.lower())
+
+    def test_pair_program_learning_mode_is_user_led_and_opt_in(self):
+        skill = (ROOT / "brain-pair-program/SKILL.md").read_text(encoding="utf-8")
+        learning = (ROOT / "brain-pair-program/references/learning-mode.md").read_text(encoding="utf-8")
+        details = (ROOT / "brain-pair-program/references/pair-program-details.md").read_text(encoding="utf-8")
+        template = (ROOT / "brain-implement/references/todo-template.md").read_text(encoding="utf-8")
+        readme = (ROOT / "brain-init/references/README.md").read_text(encoding="utf-8")
+        usage = (ROOT / "brain-init/references/USAGE.md").read_text(encoding="utf-8")
+        for phrase in ("AI-led (recommended)", "developer-led", "Learning Mode",
+                       "ask", "wait", "execution mode", "subagents", "learning-mode.md",
+                       "without revealing code", "direct answers", "actual diff",
+                       "real files", "user approval", "execution.md"):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase.lower(), skill.lower())
+        for phrase in ("never automatically edits", "user designs", "approved",
+                       "conceptual hint", "full method", "Debug collaboratively",
+                       "potential risks", "Design/maintainability", "Optional improvements",
+                       "do not invent criticism", "occasionally check understanding",
+                       "never auto-advance", "execution.md", "switch to AI-led"):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase.lower(), learning.lower())
+        self.assertIn("AI-led", details)
+        self.assertIn("Developer-led", details)
+        self.assertIn("Learning Mode", details)
+        self.assertIn("Pair mode: AI-led | developer-led | Learning Mode", template)
+        self.assertIn("Learning Mode", readme)
+        self.assertIn("### Learning Mode: independent implementation", usage)
+        self.assertIn("**23 Claude Code skills**", readme)
 
     def test_detailed_workflows_still_exist(self):
         pairs = {
