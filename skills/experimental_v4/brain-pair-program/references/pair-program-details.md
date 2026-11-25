@@ -4,10 +4,10 @@ Use this when implementation modes or checkpoint behavior need more detail. **Do
 
 | Choice | Modes | Controls |
 |---|---|---|
-| Pair programming | **AI-led (recommended)** or **developer-led** | Who edits production code/tests |
+| Pair programming | **AI-led (recommended)**, **developer-led**, or **Learning Mode** | Who edits code and whether Claude proposes implementation first |
 | Execution | **Inline (recommended)** or **subagents** | Who carries out Claude's research/review |
 
-Ask for any missing choice at the beginning (both can be asked in one message), wait, and record the selection. In developer-led Claude may read code, propose snippets, inspect actual diffs, and perform authorized non-editing checks; it must not write application code, tests or database migrations. Updating the authorized `execution.md` record is permitted. Explicitly confirm a switch before Claude takes over edits; subagents do not change authorship or waive review checkpoints.
+Ask for any missing choice at the beginning (both can be asked in one message), wait, and record the selection. In developer-led Claude may read code, propose snippets, inspect actual diffs, and perform authorized non-editing checks; it must not write application code, tests or database migrations. Updating the authorized `execution.md` record is permitted. In Learning Mode the user proposes and implements first; Claude mentors without automatically revealing code. Read `learning-mode.md` when selected. Explicitly confirm a switch before Claude takes over edits; subagents do not change authorship or waive review checkpoints.
 
 ## Dependency-aware Spring Boot example
 
