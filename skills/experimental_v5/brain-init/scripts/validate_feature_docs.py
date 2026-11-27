@@ -1,15 +1,11 @@
 #!/usr/bin/env python3
-"""Check references and metadata in the new .brain/features/ hierarchy.
-
-Uses only Python's standard library and the intentionally small YAML
-frontmatter subset defined in feature-document-contract.md.
-"""
+"""V5 feature document validator: references and amendments, never approval gates."""
 from __future__ import annotations
-
 import argparse
 import hashlib
-import re
 from pathlib import Path
+import re
+import sys
 
 LEVELS = {
     "01-brief": ("brief", "BRF", 1),
@@ -18,294 +14,194 @@ LEVELS = {
     "04-implementation-plans": ("implementation-plan", "PLAN", 4),
     "05-tasks": ("task", "TASK", 5),
 }
-SEQUENCES = {"parents", "requirements", "depends_on", "parent_hashes"}
-REQUIRED = {"id", "kind", "status", *SEQUENCES}
-STATUSES = {"draft", "approved", "needs-revision"}
+SEQUENCES = {"parents", "requirements", "depends_on", "amends", "supersedes", "parent_hashes"}
+REQUIRED = {"id", "kind", "parents", "requirements", "depends_on"}
+DECLARED_REQUIREMENT = re.compile(r"^\s*[-*]\s*(REQ-\d{3}):", re.M)
 REQUIREMENT = re.compile(r"^(SPEC-\d{3})#(REQ-\d{3})$")
-PARENT_HASH = re.compile(r"^((?:BRF|SPEC|CMP|PLAN|TASK)-\d{3})@([0-9a-f]{40})$")
-DECLARED_REQUIREMENT = re.compile(r"^\s*(?:[-*]\s*)?(REQ-\d{3}):", re.MULTILINE)
-
-
-def _items(value: str) -> list[str]:
-    value = value.strip()
-    if value in ("", "[]"):
-        return []
-    if not (value.startswith("[") and value.endswith("]")):
-        raise ValueError("sequence values must use [items] or indented - items")
-    value = value[1:-1]
-    return [item.strip().strip("'\"") for item in value.split(",") if item.strip()]
-
-
-def git_blob_sha(path: Path) -> str:
-    """Content fingerprint; works for ignored/untracked project-brain files."""
-    content = path.read_bytes()
-    header = f"blob {len(content)}\0".encode("ascii")
-    return hashlib.sha1(header + content).hexdigest()
-
+DOCUMENT_ID = re.compile(r"^(?:BRF|SPEC|CMP|PLAN|TASK)-\d{3}$")
+DECISION_REF = re.compile(r"^((?:BRF|SPEC|CMP|PLAN|TASK)-\d{3})#([A-Za-z][A-Za-z0-9_-]*)$")
 
 def parse_document(path: Path) -> tuple[dict, str]:
-    """Parse a limited metadata map, including simple YAML sequences."""
     source = path.read_text(encoding="utf-8")
-    lines = source.splitlines()
-    if not lines or lines[0] != "---":
-        raise ValueError("missing opening YAML frontmatter delimiter")
-    try:
-        end = lines.index("---", 1)
-    except ValueError as exc:
-        raise ValueError("missing closing YAML frontmatter delimiter") from exc
-
-    values: dict = {}
-    active: str | None = None
-    for line in lines[1:end]:
+    if not source.startswith("---\n"):
+        raise ValueError("missing opening frontmatter")
+    boundary = source.find("\n---", 4)
+    if boundary < 0:
+        raise ValueError("unterminated frontmatter")
+    meta: dict = {}
+    current = None
+    for line in source[4:boundary].splitlines():
         if not line.strip() or line.lstrip().startswith("#"):
             continue
-        if line.startswith("  - ") and active in SEQUENCES:
-            values[active].append(line[4:].strip().strip("'\""))
+        if line.startswith("  - ") and current:
+            meta[current].append(line[4:].strip().strip("'\""))
             continue
         match = re.fullmatch(r"([a-z_]+):\s*(.*)", line)
-        if match is None:
-            raise ValueError(f"unsupported YAML frontmatter syntax: {line!r}")
+        if not match:
+            raise ValueError(f"unsupported metadata line: {line}")
         key, value = match.groups()
-        if key in values:
+        if key in meta:
             raise ValueError(f"duplicate metadata key: {key}")
         if key in SEQUENCES:
-            values[key] = _items(value)
-            active = key if not value else None
+            if value == "" or value == "[]":
+                meta[key] = []
+                current = key if value == "" else None
+            elif value.startswith("[") and value.endswith("]"):
+                meta[key] = [x.strip().strip("'\"") for x in value[1:-1].split(",") if x.strip()]
+                current = None
+            else:
+                raise ValueError(f"unsupported list syntax: {key}")
         else:
-            values[key] = value.strip().strip("'\"")
-            active = None
-    return values, "\n".join(lines[end + 1:])
+            meta[key] = value.strip().strip("'\"")
+            current = None
+    return meta, source[boundary+4:]
 
+def git_blob_sha(path: Path) -> str:
+    data = path.read_bytes()
+    return hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
+
+def describe_parent_hashes(path: Path) -> list[str]:
+    """Legacy compatibility diagnostic only; never required for v5 documents."""
+    meta, _ = parse_document(path)
+    feature = path.parent.parent
+    known = {}
+    for folder in LEVELS:
+        for f in (feature / folder).glob("*.md"):
+            m, _ = parse_document(f)
+            known[m["id"]] = f
+    return [f"{pid}@{git_blob_sha(known[pid])}" for pid in meta.get("parents", []) if pid in known]
 
 def validate_feature(feature: Path, check_coverage: bool = False) -> list[str]:
     errors: list[str] = []
-    documents: dict[str, dict] = {}
-    by_level: dict[int, list[dict]] = {i: [] for i in range(1, 6)}
-
+    docs: dict[str, dict] = {}
+    by_level = {n: [] for n in range(1, 6)}
     for folder, (kind, prefix, level) in LEVELS.items():
-        location = feature / folder
-        if not location.exists():
-            continue
-        for file in sorted(location.glob("*.md")):
+        for path in sorted((feature / folder).glob("*.md")):
             try:
-                metadata, body = parse_document(file)
+                meta, body = parse_document(path)
+                missing = REQUIRED - meta.keys()
+                if missing:
+                    raise ValueError("missing metadata: " + ", ".join(sorted(missing)))
+                if meta["kind"] != kind or not re.fullmatch(rf"{prefix}-\d{{3}}", meta["id"]):
+                    errors.append(f"{path}: invalid kind or ID")
+                for key in SEQUENCES:
+                    if key not in meta:
+                        meta[key] = []
+                    if not isinstance(meta[key], list):
+                        errors.append(f"{path}: {key} must be list")
+                    elif len(meta[key]) != len(set(meta[key])):
+                        errors.append(f"{path}: duplicate {key}")
+                if meta["id"] in docs:
+                    errors.append(f"{path}: duplicate ID {meta['id']}")
+                    continue
+                doc = {"path": path, "meta": meta, "body": body, "level": level}
+                docs[meta["id"]] = doc
+                by_level[level].append(doc)
             except (OSError, ValueError) as exc:
-                errors.append(f"{file}: {exc}")
-                continue
-
-            missing = REQUIRED - metadata.keys()
-            if missing:
-                errors.append(f"{file}: missing metadata: {', '.join(sorted(missing))}")
-                continue
-            if metadata["kind"] != kind:
-                errors.append(f"{file}: kind must be {kind}")
-            if not re.fullmatch(rf"{prefix}-\d{{3}}", metadata["id"]):
-                errors.append(f"{file}: invalid {kind} id {metadata['id']!r}")
-            if metadata["status"] not in STATUSES:
-                errors.append(f"{file}: invalid status {metadata['status']!r}")
-            for key in SEQUENCES:
-                if not isinstance(metadata[key], list):
-                    errors.append(f"{file}: {key} must be a sequence")
-                if len(metadata[key]) != len(set(metadata[key])):
-                    errors.append(f"{file}: duplicate entries in {key}")
-
-            doc_id = metadata["id"]
-            if doc_id in documents:
-                errors.append(f"{file}: duplicate id {doc_id} (also {documents[doc_id]['path']})")
-                continue
-            doc = {"path": file, "id": doc_id, "kind": kind,
-                   "level": level, "meta": metadata, "body": body}
-            documents[doc_id] = doc
-            by_level[level].append(doc)
-
-    # Specification requirements must be unique so stable qualified IDs are reliable.
-    for spec in by_level[2]:
-        ids = DECLARED_REQUIREMENT.findall(spec["body"])
+                errors.append(f"{path}: {exc}")
+    specs = {}
+    for d in by_level[2]:
+        ids = DECLARED_REQUIREMENT.findall(d["body"])
         if len(ids) != len(set(ids)):
-            errors.append(f"{spec['path']}: duplicate declared requirement ID")
-
-    for doc in documents.values():
-        meta, path = doc["meta"], doc["path"]
-        if doc["level"] == 1 and meta["parents"]:
-            errors.append(f"{path}: brief must not have parents")
-        # A specification may stand alone even when another scope has a brief.
-        # For later stages, a requirement-bearing document cannot omit its
-        # governing chain simply because the filenames are different.
-        if doc["level"] > 2 and meta["requirements"] and not meta["parents"]:
-            errors.append(f"{path}: requirements need at least one governing parent")
-        parent_hashes: dict[str, str] = {}
-        for recorded in meta["parent_hashes"]:
-            match = PARENT_HASH.fullmatch(recorded)
-            if not match:
-                errors.append(f"{path}: malformed parent hash {recorded!r}")
-                continue
-            parent_id, digest = match.groups()
-            if parent_id in parent_hashes:
-                errors.append(f"{path}: duplicate parent hash for {parent_id}")
-            parent_hashes[parent_id] = digest
-            if parent_id not in meta["parents"]:
-                errors.append(f"{path}: parent hash for non-parent {parent_id}")
-        for parent_id in meta["parents"]:
-            parent = documents.get(parent_id)
+            errors.append(f"{d['path']}: duplicate requirement ID")
+        specs[d["meta"]["id"]] = set(ids)
+    for doc_id, doc in docs.items():
+        m, level, path = doc["meta"], doc["level"], doc["path"]
+        if level == 1 and m["parents"]:
+            errors.append(f"{path}: brief cannot have parents")
+        for pid in m["parents"]:
+            parent = docs.get(pid)
             if parent is None:
-                errors.append(f"{path}: unknown parent {parent_id}")
-            elif parent["level"] >= doc["level"]:
-                errors.append(f"{path}: parent {parent_id} must be from an earlier level")
-            elif meta["status"] == "approved" and parent["meta"]["status"] != "approved":
-                errors.append(f"{path}: approved document has unapproved parent {parent_id}")
-            if parent is not None and meta["status"] == "approved":
-                actual = git_blob_sha(parent["path"])
-                recorded = parent_hashes.get(parent_id)
-                if recorded is None:
-                    errors.append(f"{path}: approved document missing parent hash for {parent_id}")
-                elif recorded != actual:
-                    errors.append(f"{path}: stale parent hash for {parent_id} (parent was revised)")
-        for dep_id in meta["depends_on"]:
-            dep = documents.get(dep_id)
-            if dep is None:
-                errors.append(f"{path}: unknown dependency {dep_id}")
-            elif dep["level"] != doc["level"]:
-                errors.append(f"{path}: dependency {dep_id} must be at the same level")
-            elif dep_id == doc["id"]:
-                errors.append(f"{path}: self-dependency {dep_id}")
-            elif meta["status"] == "approved" and dep["meta"]["status"] != "approved":
-                errors.append(f"{path}: approved document has unapproved dependency {dep_id}")
-        parent_requirements: set[str] = set()
-        for parent_id in meta["parents"]:
-            parent = documents.get(parent_id)
-            if parent is None:
-                continue
-            if parent["kind"] == "specification":
-                parent_requirements.update(
-                    f"{parent_id}#{req}" for req in DECLARED_REQUIREMENT.findall(parent["body"])
-                )
-            else:
-                parent_requirements.update(parent["meta"]["requirements"])
-        for req in meta["requirements"]:
-            if doc["level"] >= 3 and meta["parents"] and req not in parent_requirements:
-                errors.append(f"{path}: requirement {req} is not supported by a parent")
+                errors.append(f"{path}: unknown parent {pid}")
+            elif parent["level"] >= level:
+                errors.append(f"{path}: parent {pid} must be earlier level")
+        for did in m["depends_on"]:
+            dep = docs.get(did)
+            if dep is None or dep["level"] != level or did == doc_id:
+                errors.append(f"{path}: invalid dependency {did}")
+        for req in m["requirements"]:
             match = REQUIREMENT.fullmatch(req)
-            if match is None:
-                errors.append(f"{path}: invalid qualified requirement {req!r}")
-                continue
-            spec_id, requirement_id = match.groups()
-            spec = documents.get(spec_id)
-            if spec is None or spec["kind"] != "specification":
-                errors.append(f"{path}: unknown specification {spec_id} in {req}")
-            elif requirement_id not in set(DECLARED_REQUIREMENT.findall(spec["body"])):
+            if not match or match.group(2) not in specs.get(match.group(1), set()):
                 errors.append(f"{path}: unknown requirement {req}")
-
-    # Cycles on explicit same-level dependencies, even when dependencies are valid IDs.
-    visiting: set[str] = set()
-    visited: set[str] = set()
-
-    def walk(doc_id: str, path: tuple[str, ...]) -> None:
-        if doc_id in visiting:
-            errors.append(f"{documents[doc_id]['path']}: dependency cycle: {' -> '.join((*path, doc_id))}")
-            return
-        if doc_id in visited:
-            return
-        visiting.add(doc_id)
-        for dep in documents[doc_id]["meta"]["depends_on"]:
-            if dep in documents and dep != doc_id:
-                walk(dep, (*path, doc_id))
-        visiting.remove(doc_id)
-        visited.add(doc_id)
-
-    for doc_id in documents:
-        walk(doc_id, ())
-
+        if bool(m["amends"]) != bool(m["supersedes"]):
+            errors.append(f"{path}: amendments require both amends and supersedes")
+        for aid in m["amends"]:
+            target = docs.get(aid)
+            if not target or target["level"] != level or aid == doc_id:
+                errors.append(f"{path}: invalid amendment target {aid}")
+        for ref in m["supersedes"]:
+            match = DECISION_REF.fullmatch(ref)
+            if not match or match.group(1) not in m["amends"]:
+                errors.append(f"{path}: invalid supersession {ref}")
+            elif match.group(1) in docs:
+                original = docs[match.group(1)]["body"]
+                anchor = match.group(2)
+                if (not re.search(r"(?m)^\s*[-*]?\s*" + re.escape(anchor) + r"\b", original)
+                        and not re.search(r"(?m)^#{1,6}\s+.*\b" + re.escape(anchor.replace("-", " ")) + r"\b", original, re.I)):
+                    errors.append(f"{path}: superseded anchor not found {ref}")
+    for field in ("depends_on", "amends"):
+        seen, active = set(), set()
+        def visit(did: str) -> None:
+            if did in active:
+                errors.append(f"{feature}: {field} cycle at {did}")
+                return
+            if did in seen:
+                return
+            active.add(did)
+            for nxt in docs[did]["meta"][field]:
+                if nxt in docs:
+                    visit(nxt)
+            active.remove(did)
+            seen.add(did)
+        for did in docs:
+            visit(did)
+    claims: dict[str, str] = {}
+    for did, doc in docs.items():
+        for ref in doc["meta"]["supersedes"]:
+            if ref in claims:
+                errors.append(f"{doc['path']}: conflicting supersession {ref} claimed by {claims[ref]} and {did}")
+            else:
+                claims[ref] = did
     if check_coverage:
-        required = {
-            f"{doc['id']}#{req}"
-            for doc in by_level[2] if doc["meta"]["status"] == "approved"
-            for req in DECLARED_REQUIREMENT.findall(doc["body"])
-        }
-        # A level may be intentionally skipped for one specification while
-        # another specification in the same feature uses it. Coverage is
-        # complete per participating specification, not feature-wide.
-        for level in range(3, 6):
-            participants: dict[str, list[dict]] = {}
-            for doc in by_level[level]:
-                scope = {
-                    match.group(1)
-                    for value in doc["meta"]["requirements"]
-                    if (match := REQUIREMENT.fullmatch(value))
-                }
-                scope.update(parent for parent in doc["meta"]["parents"]
-                             if parent.startswith("SPEC-"))
-                for spec_id in scope:
-                    participants.setdefault(spec_id, []).append(doc)
-            for spec_id, scoped_docs in participants.items():
-                if any(doc["meta"]["status"] != "approved" for doc in scoped_docs):
-                    continue  # A draft is not a claim of complete coverage.
-                expected = {req for req in required if req.startswith(f"{spec_id}#")}
-                covered = {
-                    req for doc in scoped_docs for req in doc["meta"]["requirements"]
-                }
-                for req in sorted(expected - covered):
-                    errors.append(
-                        f"{feature / next(k for k, v in LEVELS.items() if v[2] == level)}: "
-                        f"no approved document covers {req}"
-                    )
+        for level in (3, 4, 5):
+            for spec_id, reqs in specs.items():
+                participants = [d for d in by_level[level]
+                                if spec_id in d["meta"]["parents"]
+                                or any(r.startswith(spec_id + "#") for r in d["meta"]["requirements"])]
+                if participants:
+                    covered = {r for d in participants for r in d["meta"]["requirements"]}
+                    for req in sorted(reqs):
+                        if f"{spec_id}#{req}" not in covered:
+                            errors.append(f"{feature}: no document covers {spec_id}#{req} at level {level}")
     return errors
-
-
-
-def describe_parent_hashes(path: Path) -> list[str]:
-    """Print a valid fingerprint list to copy into an approved child document."""
-    metadata, _ = parse_document(path)
-    feature = path.parent.parent
-    known: dict[str, Path] = {}
-    for folder in LEVELS:
-        for candidate in (feature / folder).glob("*.md"):
-            child_meta, _ = parse_document(candidate)
-            known[child_meta["id"]] = candidate
-    result: list[str] = []
-    for parent_id in metadata.get("parents", []):
-        if parent_id not in known:
-            raise ValueError(f"unknown parent {parent_id} in {feature}")
-        result.append(f"{parent_id}@{git_blob_sha(known[parent_id])}")
-    return result
-
 
 def validate_features(features_root: Path, check_coverage: bool = False) -> list[str]:
     if not features_root.exists():
-        return []  # A new brain need not have a features directory yet.
+        return []
     if not features_root.is_dir():
-        return [f"{features_root}: expected directory, found non-directory"]
-    errors: list[str] = []
-    for feature in sorted(p for p in features_root.iterdir() if p.is_dir()):
+        return [f"{features_root}: expected directory"]
+    errors = []
+    for feature in sorted(f for f in features_root.iterdir() if f.is_dir()):
         errors.extend(validate_feature(feature, check_coverage))
     return errors
 
-
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("features_root", type=Path, nargs="?", help="path to .brain/features")
-    parser.add_argument("--show-parent-hashes", type=Path, metavar="DOCUMENT",
-                        help="print hashes for a child's current parents, without editing files")
-    parser.add_argument("--check-coverage", action="store_true",
-                        help="require each populated downstream stage to cover approved requirements")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("features_root", type=Path, nargs="?")
+    parser.add_argument("--check-coverage", action="store_true")
+    parser.add_argument("--show-parent-hashes", type=Path)
     args = parser.parse_args()
-    if args.show_parent_hashes is not None:
-        try:
-            values = describe_parent_hashes(args.show_parent_hashes)
-        except (OSError, ValueError) as exc:
-            parser.exit(1, f"{exc}\n")
-        print("parent_hashes: [" + ", ".join(values) + "]")
+    if args.show_parent_hashes:
+        print("parent_hashes: [" + ", ".join(describe_parent_hashes(args.show_parent_hashes)) + "]")
         return 0
-    if args.features_root is None:
-        parser.error("features_root is required unless --show-parent-hashes is supplied")
+    if not args.features_root:
+        parser.error("features_root required")
     errors = validate_features(args.features_root, args.check_coverage)
+    for e in errors:
+        print("INVALID " + e)
     if errors:
-        for error in errors:
-            print(error)
-        print(f"{len(errors)} feature-document error(s)")
         return 1
-    print(f"Feature documents valid: {args.features_root}")
+    print("VALID feature documents")
     return 0
-
-
 if __name__ == "__main__":
-    raise SystemExit(main())
+    sys.exit(main())

@@ -234,11 +234,9 @@ def template(kind: str, doc_id: str, parents: list[str], feature: str) -> str:
     body = match.group(1)
     replacements = {
         "id": doc_id,
-        "status": "draft",
         "parents": "[" + ", ".join(parents) + "]",
         "requirements": "[]",
         "depends_on": "[]",
-        "parent_hashes": "[]",
     }
     for key, value in replacements.items():
         body = re.sub(rf"(?m)^{key}:.*$", lambda _: f"{key}: {value}", body, count=1)
@@ -309,8 +307,6 @@ def doc(options: dict) -> None:
         raise Problem("duplicate parent ID")
     if kind == "brief" and parents:
         raise Problem("brief cannot have parents")
-    if kind not in ("brief", "specification") and not parents:
-        raise Problem("this document needs at least one governing --parent")
     for parent in parents:
         if parent not in by_id or by_id[parent] >= int(level):
             raise Problem(f"unknown or invalid earlier-level parent: {parent}")

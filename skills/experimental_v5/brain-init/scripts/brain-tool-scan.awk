@@ -1,6 +1,6 @@
 # Normalize one feature document into TSV for the POSIX awk graph validator.
 # Parameters: -v file=... -v feature=... -v hash=...
-BEGIN {inside=0;header=0;errored=0;id="";kind="";status="";parents="";requirements="";depends_on="";parent_hashes="";field="";keys=0}
+BEGIN {inside=0;header=0;errored=0;id="";kind="";status="";parents="";requirements="";depends_on="";parent_hashes="";amends="";supersedes="";field="";keys=0}
 FNR==1 && $0!="---" {print "ERROR\t"file": missing opening frontmatter";errored=1}
 errored {next}
 !header && $0=="---" {header=1;next}
@@ -14,7 +14,7 @@ header {
     gsub(/^[ \t]+|[ \t]+$/,"",value)
     if(value=="[]")value=""
     else if(value ~ /^\[/ && value ~ /\]$/){value=substr(value,2,length(value)-2);gsub(/, */ ,",",value)}
-    else if(field=="parents"||field=="requirements"||field=="depends_on"||field=="parent_hashes"){
+    else if(field=="parents"||field=="requirements"||field=="depends_on"||field=="parent_hashes"||field=="amends"||field=="supersedes"){
       if(value!=""){print "ERROR\t"file": unsupported list syntax";errored=1}
     }
     if(field=="id")id=value
@@ -24,6 +24,8 @@ header {
     if(field=="requirements")requirements=value
     if(field=="depends_on")depends_on=value
     if(field=="parent_hashes")parent_hashes=value
+    if(field=="amends")amends=value
+    if(field=="supersedes")supersedes=value
     next
   }
   if($0 ~ /^  - /){
@@ -32,6 +34,8 @@ header {
     else if(field=="requirements")requirements=requirements (requirements!=""?",":"") v
     else if(field=="depends_on")depends_on=depends_on (depends_on!=""?",":"") v
     else if(field=="parent_hashes")parent_hashes=parent_hashes (parent_hashes!=""?",":"") v
+    else if(field=="amends")amends=amends (amends!=""?",":"") v
+    else if(field=="supersedes")supersedes=supersedes (supersedes!=""?",":"") v
     else {print "ERROR\t"file": unsupported list";errored=1}
     next
   }
@@ -43,6 +47,6 @@ inside && kind=="specification" && $0 ~ /^[-*] REQ-[0-9][0-9][0-9]:/ {
 }
 END {
  if(errored)exit
- if(!inside||id==""||kind==""||status==""||!seen["parents"]||!seen["requirements"]||!seen["depends_on"]||!seen["parent_hashes"]){print "ERROR\t"file": missing required frontmatter";exit}
+ if(!inside||id==""||kind==""||!seen["parents"]||!seen["requirements"]||!seen["depends_on"]){print "ERROR\t"file": missing required frontmatter";exit}
  print "DOC\t"feature"\t"id"\t"kind"\t"status"\t"parents"\t"requirements"\t"depends_on"\t"parent_hashes"\t"hash"\t"file
 }

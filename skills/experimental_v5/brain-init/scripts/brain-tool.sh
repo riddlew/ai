@@ -251,7 +251,7 @@ doc)
     *) die "unknown kind: $KIND";;
   esac
   [ "$KIND" != brief ] || [ -z "$PARENTS" ] || die 'brief cannot have parents'
-  case "$KIND" in brief|specification) :;; *) [ -n "$PARENTS" ] || die 'missing parent';; esac
+  
   tmp=$(mktemp -d);trap 'rm -rf "$tmp"' 0 HUP INT TERM
   area=$BRAIN/features/$FEATURE
   : > "$tmp/ids"
