@@ -32,5 +32,7 @@ jobs:
         run: python -m compileall -q skills/experimental_v5/brain-init/scripts skills/experimental_v5/tests
       - name: Validate v5 contracts and all three tool runtimes
         run: python -m unittest discover -s skills/experimental_v5/tests -p 'test_v5_*.py' -v
+      - name: Run inherited contract tests against v5
+        run: python -m unittest discover -s skills/experimental_v5/tests -p 'test_*_contract.py' -v
       - name: Confirm v4 fixture compatibility
         run: python skills/experimental_v5/brain-init/scripts/validate_feature_docs.py skills/experimental_v5/tests/fixture/hierarchical-brain/.brain/features --check-coverage
