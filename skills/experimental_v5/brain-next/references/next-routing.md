@@ -1,7 +1,7 @@
-# Next-step guidance (v5)
+# Next routing (v5)
 
-Recommend **one** next action justified by actual feature context, current code/Git and blockers. When work is clear, `/brain-implement` is valid immediately, even without brainstorming, specs, plans, tasks or `brain-update`. Unresolved material behavior → `/brain-brainstorm`. Optional spec/design/decomposition/task records are recommended only when materially useful for risk or multi-session continuity.
+Use `/brain-implement` for a clear authorized change, even without a previous brainstorm, spec, plan, task or update. Use `/brain-brainstorm` for unresolved consequential requirements. Recommend `/brain-write-spec`, `/brain-design-implementation`, decomposition, or tasks only when complexity or later resumption materially benefits.
 
-Do not gate on document approval, revision statuses, parent hashes or per-increment review. When docs contradict, consult actual explicit amendment supersession or ask user rather than pretending the latest doc always wins.
+When work is underway, inspect actual Git/test state and any optional `execution.md`; do not treat a checkbox as verified completion. Existing explicit focused amendments override only the identified anchors, and contradictory amendments require user reconciliation. In an explicit documentation reconciliation request, point to the narrow affected change; do not require approval-state transitions, reapproval, or automatic `brain-update`.
 
-For an explicit narrow documentation reconciliation, the relevant skill may directly update the affected paragraphs. Large changes may use a focused amendment. `brain-next` itself is read-only, does not automatically invoke other skills and cannot authorize implementation.
+Return one concise next action. A recommendation is not authorization to invoke another skill or edit code.

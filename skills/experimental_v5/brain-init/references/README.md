@@ -8,7 +8,7 @@ Brain v5 is opt-in and independent of `experimental_v4`. The selected project's 
 
 Inline execution is default; subagents are opt-in. Preserve AI-led, developer-led and Learning Mode pair programming. Use risk-based verification and stop at requested scope. Only the user decides consequential unresolved behavior and architecture.
 
-## Skills (23 Brain skills and write-human)
+## Skills (22 Brain skills and write-human)
 
 | Purpose | Skills |
 |---|---|
