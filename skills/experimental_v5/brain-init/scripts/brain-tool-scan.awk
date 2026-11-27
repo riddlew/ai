@@ -48,5 +48,5 @@ inside && kind=="specification" && $0 ~ /^[-*] REQ-[0-9][0-9][0-9]:/ {
 END {
  if(errored)exit
  if(!inside||id==""||kind==""||!seen["parents"]||!seen["requirements"]||!seen["depends_on"]){print "ERROR\t"file": missing required frontmatter";exit}
- print "DOC\t"feature"\t"id"\t"kind"\t"status"\t"parents"\t"requirements"\t"depends_on"\t"parent_hashes"\t"hash"\t"file
+ print "DOC\t"feature"\t"id"\t"kind"\t"status"\t"parents"\t"requirements"\t"depends_on"\t"parent_hashes"\t"hash"\t"file"\t"amends"\t"supersedes
 }

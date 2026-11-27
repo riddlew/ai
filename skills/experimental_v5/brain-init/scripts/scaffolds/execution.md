@@ -1,27 +1,19 @@
-# {{TITLE}} — Execution
+# Feature execution (optional)
 
-Governing plans: (record actual approved plan paths)
-Tasks: (record applicable task paths)
-Review base: (record verified full commit before first code change)
-Branch: (verify current branch)
-Collaboration mode: collaborative
-Workspace: (verify authorized workspace)
-Execution mode: inline
+Current focus:
+- <next relevant behavior>
 
-## Work Items
+Completed:
+- <verified outcome>
 
-## Current Focus
+Remaining:
+- <remaining scope>
 
-## Blockers and Open Decisions
+Active amendments:
+- None
 
-## Design Deviations
+Blockers:
+- None
 
-## Rulings
-
-## Deferred
-
-## Review Focus
-
-## Verification
-
-## Checkpoints
+Verification:
+- <actual command/result>
