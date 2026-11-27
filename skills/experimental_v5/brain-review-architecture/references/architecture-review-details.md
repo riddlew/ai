@@ -68,10 +68,10 @@ Format findings per `${CLAUDE_SKILL_DIR}/../brain-review-code/references/finding
 If the area is sound, say so explicitly rather than proposing change for its own sake. Finish with:
 
 - **Decisions Safe to Preserve** — existing choices supported by evidence, including "no change needed".
-- **Decisions Requiring Approval** — consequential alternatives, your provisional recommendation, and a specific question; "None" if applicable.
+- **Consequential Decisions for User** — consequential alternatives, your provisional recommendation, and a specific question; "None" if applicable.
 - **Validation Before Adoption** — tests or experiments needed before a pattern is propagated.
 
-Do not implement, adopt, or document a proposed architecture as settled until the user chooses. Record an approved durable decision through `brain-update`.
+Do not implement, adopt, or document a proposed architecture as settled until the user chooses. Record established decisions in their authoritative home; `brain-update` is separately invoked by the user when needed.
 
 ## Output
 

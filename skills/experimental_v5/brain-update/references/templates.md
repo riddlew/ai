@@ -24,12 +24,12 @@ Main branch: main
 |---|---|---|
 | `USAGE.md` | Brain Skills workflow examples and selection guide | reference |
 | `README.md` | Brain Skills catalog and installation reference | reference |
-| `features/<slug>/01-brief/brief.md` | Desired outcome and success criteria | draft / approved / needs-revision |
-| `features/<slug>/02-specifications/<name>.md` | Normative behavior and examples | draft / approved / needs-revision |
-| `features/<slug>/03-components/<name>.md` | Functional decomposition and coverage | draft / approved / needs-revision |
+| `features/<slug>/01-brief/brief.md` | Desired outcome and success criteria | optional / no approval state |
+| `features/<slug>/02-specifications/<name>.md` | Normative behavior and examples | optional / no approval state |
+| `features/<slug>/03-components/<name>.md` | Functional decomposition and coverage | optional / no approval state |
 | `adrs/0001-<slug>.md` | <one line> | accepted / superseded |
-| `features/<slug>/04-implementation-plans/<name>.md` | Codebase-aware technical design | draft / approved / needs-revision |
-| `features/<slug>/05-tasks/<name>.md` | Executable implementation task | draft / approved / needs-revision |
+| `features/<slug>/04-implementation-plans/<name>.md` | Codebase-aware technical design | optional / no approval state |
+| `features/<slug>/05-tasks/<name>.md` | Executable implementation task | optional / no approval state |
 | `features/<slug>/execution.md` | Observed progress and verification | in progress / blocked / done |
 | `planning/<feature>/` | <one line> | active / done |
 | `diagnoses/01-<slug>.md` | <one line> | recorded |
@@ -151,7 +151,7 @@ Keep documents topic-specific. Include only applicable sections; use precise ref
 <Missing evidence, disagreements with code, checks needed against the original.>
 ```
 
-The original source remains authoritative. Do not copy entire documents, invent details for uninspected sections, or record source requirements as user-approved decisions.
+The original source remains authoritative. Do not copy entire documents, invent details for uninspected sections, or record source requirements as user-established decisions.
 
 ## Compact entry rule
 
@@ -198,7 +198,7 @@ When the project has several domains, use one section and table per domain.
 ## ADR
 
 ```markdown
-# <Approved Decision>
+# <Established Decision>
 
 ## Context
 The actual constraints and situation.

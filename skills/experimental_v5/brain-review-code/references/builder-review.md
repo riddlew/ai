@@ -4,7 +4,7 @@ A fresh reviewer reads a specification, component set, implementation plan, exec
 
 ## For the author
 
-**Confirm execution mode:** Inherit the user's confirmed inline/subagent choice from the invoking workflow, per `CLAUDE.local.md` §Execution mode selection. If none exists, the invoking skill must ask and wait. **Inline is recommended: read the artifact in the current session; never dispatch a subagent unless the user explicitly chose subagents.** In subagent mode, send one fresh standard-tier read-only reviewer. Fill every slot. Every path in any slot is absolute. `{artifact}` is the artifact's absolute file path when the file exists; for a draft not yet written, the full draft text. `{glossary_path}` is `glossary.md` in the `.brain/` you are using. `{sources}` holds paths to source files, or text when there is no file. Never pass the conversation or the rest of `.brain`.
+**Execution mode:** Inline by default; subagents only on explicit request.
 
 **Inline mode:** Read the artifact yourself as the builder would, then report the `self-read` line below. **Subagents unavailable:** ask before switching modes; never claim a fresh independent reviewer when none ran.
 
@@ -59,7 +59,7 @@ For a `component set`, also check:
 
 For a `task set`, also check:
 
-- tasks derive from approved technical plans and governing requirements, not speculative architecture;
+- tasks derive from applicable technical plans and governing requirements, not speculative architecture;
 - every planned increment and applicable Example maps to independently verifiable work;
 - dependencies are genuine and acyclic, with blocking choices clearly identified.
 
@@ -68,7 +68,7 @@ For an `execution work-item set`, also check:
 - work items cover each approved task and governing Example/criterion;
 - each item is a coherent testable increment respecting real dependencies;
 - `Review Focus` covers uncovered failures and blocked decisions;
-- mutable progress is separate from approved implementation plans.
+- mutable progress is separate from implementation plans.
 
 ## Rules
 
