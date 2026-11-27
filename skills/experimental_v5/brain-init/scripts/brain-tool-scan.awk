@@ -45,6 +45,12 @@ header {
 inside && kind=="specification" && $0 ~ /^[-*] REQ-[0-9][0-9][0-9]:/ {
   value=$2;sub(/:$/,"",value);print "REQ\t"feature"\t"id"\t"value
 }
+inside && $0 ~ /^[ \t]*[-*] [A-Za-z][A-Za-z0-9_-]*:/ {
+ value=$2;sub(/:$/,"",value);print "ANCHOR\t"feature"\t"id"\t"value
+}
+inside && $0 ~ /^#+[ \t]+/ {
+ value=$0;sub(/^#+[ \t]+/,"",value);gsub(/[ \t]+/,"-",value);print "ANCHOR\t"feature"\t"id"\t"tolower(value)
+}
 END {
  if(errored)exit
  if(!inside||id==""||kind==""||!seen["parents"]||!seen["requirements"]||!seen["depends_on"]){print "ERROR\t"file": missing required frontmatter";exit}

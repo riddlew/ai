@@ -129,6 +129,20 @@ class V5RuntimeContract(unittest.TestCase):
                 p = run("sh", TOOL, "validate", "--brain", brain, env=env)
                 self.assertIn("VALID feature documents", p.stdout)
 
+    def test_cross_runtime_missing_supersession_anchor(self):
+        for runtime in ("python", "node", "sh"):
+            with self.subTest(runtime=runtime), tempfile.TemporaryDirectory() as temp:
+                brain = Path(temp) / ".brain"
+                feature = brain / "features/demo"
+                doc(feature, "04-implementation-plans", "one.md", "PLAN-001", "implementation-plan",
+                    body="- existing-strategy: original\\n")
+                doc(feature, "04-implementation-plans", "two.md", "PLAN-002", "implementation-plan",
+                    amends=["PLAN-001"], supersedes=["PLAN-001#missing-strategy"])
+                p = run("sh", TOOL, "validate", "--brain", brain,
+                        env={"BRAIN_RUNTIME": runtime}, check=False)
+                self.assertNotEqual(p.returncode, 0, p.stdout + p.stderr)
+                self.assertIn("anchor not found", p.stdout + p.stderr)
+
     def test_cross_runtime_amendment_conflict(self):
         for runtime in ("python", "node", "sh"):
             with self.subTest(runtime=runtime), tempfile.TemporaryDirectory() as temp:

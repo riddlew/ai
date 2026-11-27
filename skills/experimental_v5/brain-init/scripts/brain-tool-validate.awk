@@ -10,6 +10,7 @@ $1=="DOC" {
  next
 }
 $1=="REQ" {k=$2 SUBSEP $3 SUBSEP $4;if(k in declared)err("duplicate requirement " $3 "#" $4);declared[k]=1;next}
+$1=="ANCHOR" {anchors[$2 SUBSEP $3 SUBSEP $4]=1;next}
 $1=="ERROR" {err($2);next}
 function err(s){print "INVALID "s;bad=1}
 function entries(s,a,n,j){if(s=="")return 0;n=split(s,a,",");for(j=1;j<=n;j++)gsub(/^[ \t]+|[ \t]+$/,"",a[j]);return n}
@@ -28,6 +29,7 @@ END{
   n=entries(supersedes[i],a);for(j=1;j<=n;j++){
    split(a[j],r,"#");allowed=0;m=entries(amends[i],b);for(q=1;q<=m;q++)if(b[q]==r[1])allowed=1
    if(!allowed||r[2]=="")err(filename[i]": invalid supersession "a[j])
+   else if(!((feature[i] SUBSEP r[1] SUBSEP r[2]) in anchors))err(filename[i]": superseded anchor not found "a[j])
    claim=feature[i] SUBSEP a[j];if(claim in claims)err(filename[i]": conflicting supersession "a[j]);claims[claim]=id[i]
   }
  }
