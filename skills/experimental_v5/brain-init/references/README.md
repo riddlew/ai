@@ -8,6 +8,14 @@ Brain v5 is opt-in and independent of `experimental_v4`. The selected project's 
 
 Inline execution is default; subagents are opt-in. Preserve AI-led, developer-led and Learning Mode pair programming. Use risk-based verification and stop at requested scope. Only the user decides consequential unresolved behavior and architecture.
 
+## Model recommendations
+
+- **Opus:** Complex brainstorming and consequential cross-system architecture or design decisions.
+- **Sonnet:** Default for implementation, routine specifications, bounded code review, manual knowledge updates, and optional compaction.
+- **Escalate from Sonnet to Opus** when difficult ambiguity, security-critical reasoning, concurrency or conflicting authoritative sources justify the added model cost.
+
+A fresh Sonnet session can resume from concise authoritative decisions and an optional `handoff.md`; do not load the original planning conversation merely because the model changed. These are model-selection guidelines, not mandatory stages or mode prompts.
+
 ## Skills (22 Brain skills and write-human)
 
 | Purpose | Skills |
