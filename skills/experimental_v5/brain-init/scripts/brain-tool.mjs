@@ -117,16 +117,16 @@ function validate(o){
    if(m.kind!==info[3]||!new RegExp('^'+info[2]+'-\\d{3}$').test(m.id||''))errors.push(d.file+': invalid kind or id');
    for(let k of ['parents','requirements','depends_on','amends','supersedes']){if(!Array.isArray(m[k])){if(k==='amends'||k==='supersedes')m[k]=[];else errors.push(d.file+': missing '+k)}if(new Set(m[k]||[]).size!==(m[k]||[]).length)errors.push(d.file+': duplicate '+k)}
   }
-  for(let d of arr.filter(x=>x.kind==='specification')){let r=[...d.body.matchAll(/^\\s*[-*]\\s*(REQ-\\d{3}):/gm)].map(x=>x[1]);if(new Set(r).size!==r.length)errors.push(d.file+': duplicate requirement ID');reqs.set(d.meta.id,new Set(r))}
+  for(let d of arr.filter(x=>x.kind==='specification')){let r=[...d.body.matchAll(/^\s*[-*]\s*(REQ-\d{3}):/gm)].map(x=>x[1]);if(new Set(r).size!==r.length)errors.push(d.file+': duplicate requirement ID');reqs.set(d.meta.id,new Set(r))}
   for(let d of arr){
    let m=d.meta;
    if(d.level===1&&(m.parents||[]).length)errors.push(d.file+': brief cannot have parents');
    for(let id of m.parents||[]){let p=ids.get(id);if(!p)errors.push(d.file+': unknown parent '+id);else if(p.level>=d.level)errors.push(d.file+': parent not earlier '+id)}
    for(let id of m.depends_on||[]){let p=ids.get(id);if(!p||p.level!==d.level||id===m.id)errors.push(d.file+': invalid dependency '+id)}
-   for(let r of m.requirements||[]){let x=r.match(/^(SPEC-\\d{3})#(REQ-\\d{3})$/);if(!x||!reqs.get(x[1])?.has(x[2]))errors.push(d.file+': unknown requirement '+r)}
+   for(let r of m.requirements||[]){let x=r.match(/^(SPEC-\d{3})#(REQ-\d{3})$/);if(!x||!reqs.get(x[1])?.has(x[2]))errors.push(d.file+': unknown requirement '+r)}
    if(Boolean(m.amends?.length)!==Boolean(m.supersedes?.length))errors.push(d.file+': amendments require amends and supersedes');
    for(let id of m.amends||[]){let p=ids.get(id);if(!p||p.level!==d.level||id===m.id)errors.push(d.file+': invalid amendment target '+id)}
-   for(let ref of m.supersedes||[]){let z=ref.match(/^((?:BRF|SPEC|CMP|PLAN|TASK)-\\d{3})#([A-Za-z][A-Za-z0-9_-]*)$/);if(!z||!(m.amends||[]).includes(z[1]))errors.push(d.file+': invalid supersession '+ref);else{let p=ids.get(z[1]);if(p&&!p.body.split('\n').some(line=>{let bullet=line.match(/^\s*[-*]\s+([A-Za-z][A-Za-z0-9_-]*):/);let h=line.match(/^#{1,6}\s+(.+)$/);return bullet?.[1]===z[2]||h?.[1].trim().toLowerCase().replace(/\s+/g,'-')===z[2].toLowerCase()}))errors.push(d.file+': superseded anchor not found '+ref)}if(claims.has(ref))errors.push(d.file+': conflicting supersession '+ref);else claims.set(ref,m.id)}
+   for(let ref of m.supersedes||[]){let z=ref.match(/^((?:BRF|SPEC|CMP|PLAN|TASK)-\d{3})#([A-Za-z][A-Za-z0-9_-]*)$/);if(!z||!(m.amends||[]).includes(z[1]))errors.push(d.file+': invalid supersession '+ref);else{let p=ids.get(z[1]);if(p&&!p.body.split('\n').some(line=>{let bullet=line.match(/^\s*[-*]\s+([A-Za-z][A-Za-z0-9_-]*):/);let h=line.match(/^#{1,6}\s+(.+)$/);return bullet?.[1]===z[2]||h?.[1].trim().toLowerCase().replace(/\s+/g,'-')===z[2].toLowerCase()}))errors.push(d.file+': superseded anchor not found '+ref)}if(claims.has(ref))errors.push(d.file+': conflicting supersession '+ref);else claims.set(ref,m.id)}
   }
   for(let key of ['depends_on','amends']){let visiting=new Set(),done=new Set();function dfs(id){if(visiting.has(id)){errors.push('dependency/amendment cycle '+id);return}if(done.has(id))return;visiting.add(id);for(let p of ids.get(id)?.meta[key]||[])if(ids.has(p))dfs(p);visiting.delete(id);done.add(id)}for(let id of ids.keys())dfs(id)}
   if(o['check-coverage'])for(let [spec,reqsSet] of reqs)for(let level of [3,4,5]){let participants=arr.filter(d=>d.level===level&&((d.meta.parents||[]).includes(spec)||(d.meta.requirements||[]).some(r=>r.startsWith(spec+'#'))));if(!participants.length)continue;let covered=new Set(participants.flatMap(d=>d.meta.requirements||[]));for(let req of reqsSet)if(!covered.has(spec+'#'+req))errors.push('no document covers '+spec+'#'+req)}
