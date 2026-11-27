@@ -3,7 +3,7 @@
 **Branch:** `feat/experimental-v5-simplified-brain`
 **Base:** `9c373e362c4876a136cd2eb686e6b1ac7696d2c5`
 **PR:** https://github.com/riddlew/ai/pull/25
-**State:** In progress
+**State:** Implementation and review complete; PR awaiting human review
 **Rules:** Check a task only when its implementation is committed and evidenced. Never infer CI pass or benchmark savings.
 
 - [x] T1 — Commit v5 plan/tracker on isolated branch and open PR. (Initial commit; PR created after commit)
@@ -15,8 +15,8 @@
 - [x] T7 — Focused amendments, conflict resolution and session handoffs.
 - [x] T8 — Context, verification, debugging, concise output and stop rules.
 - [x] T9 — V5 README, USAGE, counts, examples and model guidance.
-- [ ] T10 — Tests, cross-runtime verification and CI evidence.
-- [ ] T11 — Full plan compliance review and final PR readiness.
+- [x] T10 — Tests, cross-runtime verification and CI evidence.
+- [x] T11 — Full plan compliance review and final PR readiness.
 
 ## Implementation evidence
 
@@ -29,10 +29,35 @@
 - T7: Explicit narrow `amends`/`supersedes` contract, validator conflict checks, optional `handoff.md` and compact `execution.md` scaffold (`70e9f00`, `6163fc3`, `d3ddd11`).
 - T8: Targeted context, risk-based tests/reviews, evidence-driven retries, concise outputs and stopping rules in policy and implementation references (`0acd2e5`, `6092808`, `3933d0e`).
 - T9: V5 README/USAGE, ZPL and direct-workflow examples, corrected 22 Brain skills plus write-human count, model guidance (`6163fc3`, `3933d0e` and this commit).
-- T10: V5 regression suite and GitHub Actions added (`50f5404`); inherited v4-only assertions explicitly skipped with explanation while unaffected historical tests continue (`dd6b65e`). Latest Actions verification pending.
-- T11: Final compliance review pending.
+- T10: Added 16 purpose-built v5 tests including cross-runtime amendment conflicts and missing supersession anchors; CI executes on Ubuntu and macOS with Python/Node/POSIX validation, 116 inherited tests (56 explicitly skipped because they enforce superseded v4 behavior), and the v4 hierarchical fixture. Latest successful CI for `650028a` is [run 46075340889](https://github.com/riddlew/ai/actions/runs/46075340889) on both platforms. Python/Node regex regression fixed in `650028a`.
+- T11: Reviewed the plan against v5 policy, skills, tooling, references, tests and the [comparison with main](https://github.com/riddlew/ai/compare/main...feat/experimental-v5-simplified-brain). All 197 changed files are new v5 files (196) or its dedicated CI workflow (1); v4 and existing workflows are untouched. Acceptance traceability is below.
 
 ## Verification and risks
 
-- GitHub Actions: Ubuntu/macOS v5 checks passed for commit `dd6b65e`; latest amendment-anchor changes still under CI verification. Active tests include 15 original v5 cases plus a new runtime anchor case. Legacy v4-only assertions have documented skips; unaffected inherited tests still run.
+- GitHub Actions: **passed** on Ubuntu and macOS for `650028a` — 16 purpose-built v5 tests, 116 inherited contract tests (56 skipped with explicit legacy rationale), and v4 fixture validation.
 - Token-cost benchmark: not measured; no simulated measurement to be presented as real API savings.
+
+## Final plan-to-implementation review
+
+| Plan requirements | Evidence and review result |
+|---|---|
+| PR created before work, isolated branch, initial plan and tracker, incremental commits | Initial `7cd04f7`, PR #25; complete |
+| V4 unchanged; V5 independent and explicitly versioned | All 193 v4 files copied to v5; version marker in `brain-init/references/CLAUDE.local.md`; compare shows no changed v4 paths; complete |
+| Preserve brainstorming, direct brainstorm → implement and direct request → implement | Core `brain-brainstorm/SKILL.md`, `brain-implement/SKILL.md`, USAGE and targeted tests; complete |
+| Optional specs, plans, tasks, no approval status/reapproval and no automatic update | Shared feature contract, templates, Python/Node/shell scaffolds, updated owning and supporting skills; complete |
+| Narrow cross-document edits, authoritative decisions and material user control | Shared project policy and feature contract; explicit authorship/decision boundaries; complete |
+| Scoped focused amendments with explicit authority/precedence and conflict detection | Python, Node and POSIX validation of `amends`/`supersedes`, anchor existence, conflict/cycles; cross-runtime tests passed; complete |
+| Manual `brain-update`, safe branching/source provenance and no private notes access | `brain-update/SKILL.md`, update details and shared policy; complete |
+| Default inline and opt-in subagents; three pair modes | Shared policy, pair and implement skills/references; complete |
+| Concise handoffs, optional execution history and stable cross-session references | Contract, optional `execution.md` scaffold, handoff examples and README; complete |
+| Targeted context, selective docs, risk-based review and test, stop condition and evidence-based debugging | Shared policy and specialized implementation/review/context references; complete |
+| Optional manual preview-first `brain-compact`; other skills remain available | `brain-compact/SKILL.md`, details and skills index; complete |
+| Updated README, USAGE, examples, model guidance and counts | V5 `brain-init/references/README.md` and `USAGE.md`; 22 Brain skills plus `write-human`; complete |
+| Regression tests, cross-runtime parity, macOS/Ubuntu CI and v4 fixture compatibility | GitHub Actions run `46075340889`; passed; complete |
+
+## Disclosed limits
+
+- **Real API token-cost reduction is unmeasured.** No production Claude Code transcript, token billing, or end-to-end model-run benchmark was available; aspirational 30% input-token and 40% administrative-turn goals are not presented as attained.
+- **Behavioral agent simulation was not run.** Static and deterministic contract tests, source review and cross-runtime execution passed; actual interactive Claude behavior still merits a pilot.
+- **Inherited v4-specific assertions:** 56 of 116 old contract tests are explicitly skipped because they demand approval gates/status, old prompts or other v4-only contracts. These are preserved but no longer considered v5 acceptance tests; the 16 purpose-built v5 tests verify the replacement workflow and tooling behavior.
+- **Human evaluation** remains necessary before merging. This PR must not be merged automatically.
