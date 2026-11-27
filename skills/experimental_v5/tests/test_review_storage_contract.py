@@ -14,6 +14,7 @@ KINDS = {
 
 
 class ReviewStorageContract(unittest.TestCase):
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
     def test_all_review_skills_use_nested_reports_and_shared_rules(self):
         for kind, skill in KINDS.items():
             with self.subTest(kind=kind):
@@ -21,6 +22,8 @@ class ReviewStorageContract(unittest.TestCase):
                 self.assertIn("references/report-storage.md", content)
                 self.assertIn(f".brain/reviews/{kind}/<NN>-<short-slug>/review.md", content)
                 self.assertNotRegex(content, rf"\.brain/reviews/{re.escape(kind)}/<NN>-<short-slug>\.md")
+
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
 
     def test_code_review_preserves_three_assessments_with_proportional_repo_fit(self):
         skill = (ROOT / "brain-review-code/SKILL.md").read_text(encoding="utf-8")
@@ -36,6 +39,8 @@ class ReviewStorageContract(unittest.TestCase):
         self.assertIn("one status row for each in-scope Example", skill)
         self.assertIn("Only if the user selected subagents", details)
 
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
+
     def test_code_review_uses_current_brain_document_paths(self):
         skill = (ROOT / "brain-review-code/SKILL.md").read_text(encoding="utf-8")
         details = (ROOT / "brain-review-code/references/code-review-details.md").read_text(encoding="utf-8")
@@ -46,10 +51,14 @@ class ReviewStorageContract(unittest.TestCase):
         self.assertNotIn(".brain/specs/", details)
         self.assertNotIn(".brain/impl_plans/", details)
 
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
+
     def test_shared_rules_cover_legacy_and_baseline(self):
         storage = (ROOT / "brain-review-code/references/report-storage.md").read_text()
         for phrase in ("legacy flat", "Never overwrite", "relevant previous", "brain-update"):
             self.assertIn(phrase, storage)
+
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
 
     def test_architecture_continuity_and_persistence(self):
         architecture = (ROOT / "brain-review-architecture/SKILL.md").read_text()

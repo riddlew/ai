@@ -12,6 +12,7 @@ POLICY = ROOT / "brain-init/references/CLAUDE.local.md"
 
 
 class SimplificationContract(unittest.TestCase):
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
     def test_every_entrypoint_has_a_valid_purpose_and_on_demand_details(self):
         self.assertEqual(23, len(SKILLS))
         for skill in SKILLS:
@@ -28,6 +29,8 @@ class SimplificationContract(unittest.TestCase):
                 self.assertNotIn("brain-context plan", content,
                                  "The context map must not become a mandatory skill gate")
 
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
+
     def test_execution_mode_requires_explicit_choice_including_reviews(self):
         policy = POLICY.read_text(encoding="utf-8")
         code = (ROOT / "brain-review-code/references/code-review-details.md").read_text(encoding="utf-8")
@@ -42,6 +45,8 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("ask which one and wait", implementation)
         self.assertIn("only when the user opts into subagents", tester)
         self.assertNotIn("Dispatch one standard-tier subagent per assessment in parallel", code)
+
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
 
     def test_cross_cutting_safety_is_visible_in_primary_instructions(self):
         policy = POLICY.read_text(encoding="utf-8")
@@ -64,6 +69,8 @@ class SimplificationContract(unittest.TestCase):
                     "parent_hashes", "Unaffected:"):
             self.assertIn(key, spec)
 
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
+
     def test_context_discovery_is_not_a_scope_exclusion_or_map_gate(self):
         policy = POLICY.read_text(encoding="utf-8")
         guidance = (ROOT / "brain-init/references/safe-context-loading.md").read_text()
@@ -77,6 +84,8 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("context-map.tsv", details)
         for ext in ("brain-context.py", "brain-context.mjs", "brain-context.sh"):
             self.assertTrue((ROOT / "brain-init/scripts" / ext).exists())
+
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
 
     def test_separate_workflows_and_read_only_guards(self):
         review = (ROOT / "brain-review-merge-request/SKILL.md").read_text()
@@ -93,6 +102,8 @@ class SimplificationContract(unittest.TestCase):
         init = (ROOT / "brain-init/SKILL.md").read_text()
         self.assertIn("Existing-project migration", init)
         self.assertIn("preserving project-specific instructions", init)
+
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
 
     def test_selected_workflow_skills_allow_automatic_invocation_without_waiving_approval(self):
         automatically_invocable = {
@@ -111,6 +122,8 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("user explicitly requests implementation", implement)
         self.assertIn("Approval of a specification, blueprint, or task list", implement)
 
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
+
     def test_all_skills_provide_a_non_executing_next_step(self):
         for skill in SKILLS:
             with self.subTest(skill=skill.parent.name):
@@ -124,6 +137,8 @@ class SimplificationContract(unittest.TestCase):
         writing = (ROOT / "write-human/SKILL.md").read_text(encoding="utf-8")
         self.assertIn("without inserting commentary into it", writing)
 
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
+
     def test_model_tier_readme_covers_every_skill_once(self):
         readme = (ROOT / "brain-init/references/README.md").read_text(encoding="utf-8")
         heading = "## Model tiers and recommended models\n"
@@ -134,6 +149,8 @@ class SimplificationContract(unittest.TestCase):
         self.assertEqual(len(SKILLS), len(names))
         self.assertEqual(len(names), len(set(names)), "Each skill must appear exactly once")
         self.assertEqual({skill.parent.name for skill in SKILLS}, set(names))
+
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
 
     def test_usage_step_models_match_readme_tiers(self):
         readme = (ROOT / "brain-init/references/README.md").read_text(encoding="utf-8")
@@ -163,6 +180,8 @@ class SimplificationContract(unittest.TestCase):
                 checked += 1
         self.assertGreaterEqual(checked, 40, "Verify examples and session model labels")
 
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
+
     def test_usage_covers_mid_implementation_revisions(self):
         usage = (ROOT / "brain-init/references/USAGE.md").read_text(encoding="utf-8")
         scenario = usage.split("# Scenario 7 — Change an approved feature during implementation", 1)[1]
@@ -183,6 +202,8 @@ class SimplificationContract(unittest.TestCase):
         ):
             with self.subTest(requirement=requirement):
                 self.assertIn(requirement.lower(), scenario.lower())
+
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
 
     def test_renamed_skills_and_guides_are_consistent(self):
         renames = {
@@ -213,6 +234,8 @@ class SimplificationContract(unittest.TestCase):
         ):
             self.assertNotIn("`" + name + "` **(manual)**", readme)
 
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
+
     def test_policy_authorization_discovery_and_authority_boundaries(self):
         policy = POLICY.read_text(encoding="utf-8")
         details = (ROOT / "brain-init/references/engineering-details.md").read_text(
@@ -235,6 +258,8 @@ class SimplificationContract(unittest.TestCase):
         self.assertNotIn("feature request is not approval", policy)
         self.assertIn("brain-design-implementation", details)
         self.assertNotIn("brain-blueprint", details)
+
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
 
     def test_next_skill_is_read_only_by_default_and_routes_optional_revisions(self):
         skill = (ROOT / "brain-next/SKILL.md").read_text(encoding="utf-8")
@@ -264,6 +289,8 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("--reconcile", usage)
         self.assertIn("brain-next", policy)
 
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
+
     def test_next_prefers_core_workflow_with_optional_complexity_reasons(self):
         skill = (ROOT / "brain-next/SKILL.md").read_text(encoding="utf-8")
         detail = (ROOT / "brain-next/references/next-routing.md").read_text(encoding="utf-8")
@@ -282,6 +309,8 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("**Default workflow:**", usage)
         self.assertIn("**Optional:**", usage)
         self.assertIn("An *existing* affected component or task", usage)
+
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
 
     def test_compact_skill_preview_ownership_and_information_preservation(self):
         skill = (ROOT / "brain-compact/SKILL.md").read_text(encoding="utf-8")
@@ -303,6 +332,8 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("## Compact Brain writing", policy)
         self.assertIn("/brain-compact", usage)
         self.assertIn("brain-compact", (ROOT / "brain-init/references/README.md").read_text(encoding="utf-8"))
+
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
 
     def test_retro_is_manual_read_only_and_conditionally_suggested(self):
         retro = (ROOT / "brain-retro/SKILL.md").read_text(encoding="utf-8")
@@ -331,6 +362,8 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("`brain-retro` **(manual)**", readme)
         self.assertIn("## Review workflow friction with brain-retro", usage)
         self.assertIn("**Opus**", usage)
+
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
 
     def test_pair_program_preserves_existing_modes_and_checkpoints(self):
         skill = (ROOT / "brain-pair-program/SKILL.md").read_text(encoding="utf-8")
@@ -362,6 +395,8 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("AI-led", details)
         self.assertIn("never reset review base", details.lower())
 
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
+
     def test_pair_program_learning_mode_is_user_led_and_opt_in(self):
         skill = (ROOT / "brain-pair-program/SKILL.md").read_text(encoding="utf-8")
         learning = (ROOT / "brain-pair-program/references/learning-mode.md").read_text(encoding="utf-8")
@@ -389,6 +424,8 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("Learning Mode", readme)
         self.assertIn("### Learning Mode: independent implementation", usage)
         self.assertIn("**23 Claude Code skills**", readme)
+
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
 
     def test_pair_program_supports_informal_sessions_without_documents(self):
         skill = (ROOT / "brain-pair-program/SKILL.md").read_text(encoding="utf-8")

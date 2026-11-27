@@ -124,6 +124,8 @@ class SafeContextContract(unittest.TestCase):
         self.assertEqual((mode, reason), ("full", "unmapped-code-path"))
         self.assertIn("pending/feature--payments.md", files)
 
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
+
     def test_policy_and_implement_skill_load_planned_context(self):
         policy = (ROOT / "brain-init/references/CLAUDE.local.md").read_text()
         implement = (ROOT / "brain-implement/SKILL.md").read_text()

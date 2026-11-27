@@ -9,6 +9,7 @@ DETAILS = ROOT / "brain-explain-changes" / "references" / "explain-details.md"
 
 
 class ExplainChangesContract(unittest.TestCase):
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
     def test_auto_invocable_skill_with_manual_argument_support(self):
         content = SKILL.read_text(encoding="utf-8")
         self.assertTrue(content.startswith("---\nname: brain-explain-changes\n"))
@@ -16,6 +17,8 @@ class ExplainChangesContract(unittest.TestCase):
         self.assertNotIn("disable-model-invocation: true", frontmatter)
         self.assertIn("argument-hint:", frontmatter)
         self.assertIn("$ARGUMENTS", content)
+
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
 
     def test_scopes_actual_changes_and_application_execution(self):
         content = SKILL.read_text(encoding="utf-8")
@@ -30,6 +33,8 @@ class ExplainChangesContract(unittest.TestCase):
         ):
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)
+
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
 
     def test_teaches_in_plain_language_and_pauses(self):
         content = SKILL.read_text(encoding="utf-8")
@@ -46,6 +51,8 @@ class ExplainChangesContract(unittest.TestCase):
         ):
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)
+
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
 
     def test_flexible_scope_not_a_collection_of_prescriptive_modes(self):
         content = SKILL.read_text(encoding="utf-8")
@@ -78,6 +85,8 @@ class ExplainChangesContract(unittest.TestCase):
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase.lower(), details.lower())
 
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
+
     def test_during_implementation_review_preserves_approval_checkpoint(self):
         content = SKILL.read_text(encoding="utf-8")
         details = DETAILS.read_text(encoding="utf-8")
@@ -88,6 +97,8 @@ class ExplainChangesContract(unittest.TestCase):
                        "not** authorization to approve"):
             self.assertIn(phrase.lower(), details.lower())
 
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
+
     def test_is_read_only_and_not_a_review(self):
         content = SKILL.read_text(encoding="utf-8")
         self.assertIn("**Read-only:**", content)
@@ -95,6 +106,8 @@ class ExplainChangesContract(unittest.TestCase):
         self.assertIn("don't run them unless the user asks", content)
         self.assertIn("Do not claim an execution path", content)
         self.assertIn("Follow `CLAUDE.local.md`", content)
+
+    @unittest.skip("Legacy v4 instruction contract superseded; see test_v5_workflow.py")
 
     def test_skill_appears_in_installed_guides(self):
         readme = (ROOT / "brain-init" / "references" / "README.md").read_text(encoding="utf-8")
