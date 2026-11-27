@@ -65,7 +65,7 @@ For a complete traceability example including ADR references, negative-path requ
 
 **Model (main session):** **Sonnet** (`brain-pair-program`); **Opus** when significant concurrency, cross-system contracts or design revisions require deeper reasoning.
 
-Use `/brain-pair-program order-cancellation` in place of `/brain-implement` after approved specifications and binding design. Claude asks for **pair mode** (**AI-led recommended**, **developer-led**, or **Learning Mode** if unspecified), and separately for **execution mode** (inline recommended or subagents), without assuming either. In all three pair modes, implementation proceeds through **adaptive, logically coherent, dependency-safe increments** with explanations focused on important decisions rather than every line. Mandatory review and approval follows **each** increment.
+Use `/brain-pair-program order-cancellation` in place of `/brain-implement` after approved specifications and binding design, **or directly without a spec or implementation plan** for informal coding, design feedback and review. Claude asks for **pair mode** (**AI-led recommended**, **developer-led**, or **Learning Mode** if unspecified), and separately for **execution mode** (inline recommended or subagents), without assuming either. In all three pair modes, implementation proceeds through **adaptive, logically coherent, dependency-safe increments** with explanations focused on important decisions rather than every line. Mandatory review and approval follows **each** increment.
 
 **Illustrative Spring Boot dialogue:**
 
@@ -87,7 +87,17 @@ Choose **Learning Mode** when you want to practice solving the next approved inc
 - **You:** "My concurrency test fails." Claude initially suggests how to investigate competing writes, versions and transactions; if you request the direct cause or fix, it answers directly.
 - **Claude:** Reviews the actual diff, distinguishes confirmed defects from potential risks, meaningful design concerns and optional style improvements, and helps choose tests. After an important concept, it may briefly invite you to explain a tradeoff, but never forces a quiz.
 
-This is peer-style collaboration, not a mandatory teaching script. User questions control guidance depth; the existing plan, `execution.md`, design approvals and per-increment review checkpoints remain unchanged.
+This is peer-style collaboration, not a mandatory teaching script. User questions control guidance depth; existing plans, `execution.md`, design approvals and implementation checkpoints remain authoritative **when present**. Informal review needs no feature record.
+
+### Example: informal Spring Boot coding without a spec
+
+```text
+/brain-pair-program Learning Mode
+I'm writing a Spring Boot service myself. I don't have a spec or
+implementation plan. Review my approach and help me debug as I code.
+```
+
+Claude inspects the service, repository, callers, tests and relevant architectural conventions without demanding a plan or generating tasks. In Learning Mode, you propose and implement while Claude mentors and reviews real code. In developer-led mode, Claude can propose code for you to write. AI-led mode writes code **only after explicit implementation authorization**, never just because you requested suggestions. Review-only questions are answered directly without a fabricated implementation sequence. Existing governing approvals are still respected; consequential design-sensitive implementation may need an approved plan before editing.
 
 ## Understand changes after implementation
 
@@ -1598,6 +1608,7 @@ After repeated failed fixes, confusing workflow directions or redundant context 
 | Improve recurring workflow problems | Optional `/brain-retro <feature>` (manual, read-only) | Review evidence and explicitly approve any later changes. |
 | Small, settled feature | `brain-implement` | Review the focused change and verification. |
 | Design-sensitive hands-on implementation | `/brain-pair-program <feature>` after the agreed design | Choose AI-led, developer-led or Learning Mode; approve each dependency-safe increment. |
+| Informal coding, review or debugging without a plan | `/brain-pair-program` with a selected mode | Work from actual code and goals; no invented spec, task ID or progress file. |
 | Understand AI-written code or an entire feature branch | `/brain-explain-changes [file, symbol, topic or branch]` | Ask questions and steer the read-only walkthrough before approving code separately. |
 | Isolated protocol bug | `brain-diagnose` → focused fix → optional `brain-review-code` | Review the diagnosis and correction. |
 | Architecture cleanup | `brain-review-architecture` → `brain-brainstorm` → `brain-write-spec` → `brain-design-implementation` → `brain-implement` → `brain-review-code` | Choose improvements and shape the exact design. |

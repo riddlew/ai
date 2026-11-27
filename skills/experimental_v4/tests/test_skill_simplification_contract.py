@@ -390,6 +390,34 @@ class SimplificationContract(unittest.TestCase):
         self.assertIn("### Learning Mode: independent implementation", usage)
         self.assertIn("**23 Claude Code skills**", readme)
 
+    def test_pair_program_supports_informal_sessions_without_documents(self):
+        skill = (ROOT / "brain-pair-program/SKILL.md").read_text(encoding="utf-8")
+        details = (ROOT / "brain-pair-program/references/pair-program-details.md").read_text(encoding="utf-8")
+        learning = (ROOT / "brain-pair-program/references/learning-mode.md").read_text(encoding="utf-8")
+        template = (ROOT / "brain-implement/references/todo-template.md").read_text(encoding="utf-8")
+        readme = (ROOT / "brain-init/references/README.md").read_text(encoding="utf-8")
+        usage = (ROOT / "brain-init/references/USAGE.md").read_text(encoding="utf-8")
+        for phrase in ("spec or implementation plan is not required", "informal coding",
+                       "Review-only", "does not authorize AI-led code edits",
+                       "do not invent plans or task IDs", "no `execution.md` is required",
+                       "approved requirements", "brain-design-implementation",
+                       "Stage/commit only", "Wait in all three modes"):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase.lower(), skill.lower())
+        for phrase in ("without a plan", "AI-led", "Developer-led",
+                       "Learning Mode", "review requests alone are read-only",
+                       "No execution record is required", "approved", "Review-only"):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase.lower(), details.lower())
+        self.assertIn("No spec or plan is required", learning)
+        self.assertIn("user-chosen coding objective", learning)
+        self.assertIn("informal session without a feature record", learning)
+        self.assertIn("only if one exists", template)
+        self.assertIn("Informal coding/review conversations", template)
+        self.assertIn("directly without a spec/plan", readme)
+        self.assertIn("informal Spring Boot coding without a spec", usage)
+        self.assertIn("Informal review needs no feature record", usage)
+
     def test_detailed_workflows_still_exist(self):
         pairs = {
             "brain-init": "init-details.md",
