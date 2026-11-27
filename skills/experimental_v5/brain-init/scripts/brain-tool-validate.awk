@@ -13,7 +13,7 @@ $1=="REQ" {k=$2 SUBSEP $3 SUBSEP $4;if(k in declared)err("duplicate requirement 
 $1=="ERROR" {err($2);next}
 function err(s){print "INVALID "s;bad=1}
 function entries(s,a,n,j){if(s=="")return 0;n=split(s,a,",");for(j=1;j<=n;j++)gsub(/^[ \t]+|[ \t]+$/,"",a[j]);return n}
-function dupe(s,file,label, a,n,j,k){n=entries(s,a);delete seen;for(j=1;j<=n;j++)if(seen[a[j]]++)err(file": duplicate "label" "a[j])}
+function dupe(s,file,label, a,n,j,k,scope){n=entries(s,a);scope=++dupe_epoch;for(j=1;j<=n;j++)if(seen[scope SUBSEP a[j]]++)err(file": duplicate "label" "a[j])}
 function walk(k,field, i,n,a,j,dep,key){if(active[field SUBSEP k]){err(field" cycle at "k);return}if(done[field SUBSEP k])return;active[field SUBSEP k]=1;i=lookup[k];n=entries(field=="amends"?amends[i]:deps[i],a);for(j=1;j<=n;j++){key=feature[i] SUBSEP a[j];if(key in lookup)walk(key,field)}active[field SUBSEP k]=0;done[field SUBSEP k]=1}
 function reaches(k,target, i,n,a,j,dep){if(k==target)return 1;if(trail[k]==epoch)return 0;trail[k]=epoch;i=lookup[k];if(!i)return 0;n=entries(parents[i],a);for(j=1;j<=n;j++)if(reaches(feature[i] SUBSEP a[j],target))return 1;n=entries(deps[i],a);for(j=1;j<=n;j++)if(reaches(feature[i] SUBSEP a[j],target))return 1;n=entries(amends[i],a);for(j=1;j<=n;j++)if(reaches(feature[i] SUBSEP a[j],target))return 1;return 0}
 END{
