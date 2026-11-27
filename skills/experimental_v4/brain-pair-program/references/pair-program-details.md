@@ -9,6 +9,17 @@ Use this when implementation modes or checkpoint behavior need more detail. **Do
 
 Ask for any missing choice at the beginning (both can be asked in one message), wait, and record the selection. In developer-led Claude may read code, propose snippets, inspect actual diffs, and perform authorized non-editing checks; it must not write application code, tests or database migrations. Updating the authorized `execution.md` record is permitted. In Learning Mode the user proposes and implements first; Claude mentors without automatically revealing code. Read `learning-mode.md` when selected. Explicitly confirm a switch before Claude takes over edits; subagents do not change authorship or waive review checkpoints.
 
+## Informal coding and review without a plan
+
+When asked to pair on an informal change, design question, debugging problem or work-in-progress review, start with the user's objective, actual files and repository conventions. **A spec, implementation plan, tasks or feature execution record is not required when none exists.** Do not create placeholder documents or IDs simply to use the skill. Read and honor existing approved requirements and design decisions if present; new consequential design changes still require appropriate approval, and substantial/design-sensitive implementation may need an approved blueprint before edits.
+
+- **AI-led:** Only an explicit implementation request authorizes Claude to edit. Feedback or review requests alone are read-only. For authorized edits, keep the existing bounded changes, diff/test evidence and user checkpoints.
+- **Developer-led:** Claude suggests code, while the user writes it. Review the user's real work and preserve the usual implementation checkpoints.
+- **Learning Mode:** The user proposes, implements and debugs first. Claude mentors and reviews, without automatically revealing solution code or editing files.
+- **Review-only:** Answer a question about the user's current code, or provide evidence-backed suggestions, without forcing an implementation outline, task sequence, or artificial approval. Distinguish advice from an authorization to edit.
+
+If an existing feature `execution.md` is present, preserve its original review base and any pending approvals. **No execution record is required** for an informal conversation; keep working context in the session. For genuine multi-session feature work needing tracking, reuse the standard `execution.md` without inventing governing plans or tasks.
+
 ## Dependency-aware Spring Boot example
 
 Assume `Order`, `OrderStatus`, `OrderRepository`, `OrderService` and `OrderController` already exist. **Inspect those first**, along with approved order-cancellation behavior, concurrency expectations and existing exception handling. An illustration is **not** permission to invent cancellation eligibility, HTTP status or lock strategy.
@@ -37,7 +48,7 @@ A test-first red stage is normal **during** an increment; finish with a buildabl
 
 ## Reuse existing execution history
 
-Use `.brain/features/<feature-slug>/execution.md` and `brain-implement/references/todo-template.md`, not `pair-progress.md` or another checklist. Retain original `Review base`, branch/workspace, collaboration and execution modes, approvals, verification and decisions. For a feature record, optional fields can distinguish the implementation workflow without changing the template contract:
+For feature work with an existing record, use `.brain/features/<feature-slug>/execution.md` and `brain-implement/references/todo-template.md`, not `pair-progress.md` or another checklist. Do not require a record for an informal review. Retain original `Review base`, branch/workspace, collaboration and execution modes, approvals, verification and decisions. For a feature record, optional fields can distinguish the implementation workflow without changing the template contract:
 
 ```markdown
 Implementation workflow: brain-pair-program
