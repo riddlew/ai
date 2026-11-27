@@ -1,25 +1,12 @@
 ---
 name: brain-write-spec
-description: Synthesize established decisions and repository evidence into a feature specification with concrete examples, without inventing or reopening requirements.
+description: Write optional testable behavioral specifications from settled decisions and source evidence, without approval gates.
 ---
 
-# Write Spec
+# Write specification
 
-Specify **what observable behavior and invariants must hold**, grounded in the user-confirmed direction and authoritative sources. Do not invent requirements or approve your own draft.
+Use only when a specification will materially help. Inspect active decisions, authoritative contracts, relevant source and existing feature documents. Define observable scope, `REQ-###` requirements, concrete `E#` examples (normal, edge, failure, unchanged behavior), exclusions and proportionate verification; do not invent requirements. Write a concise specification in `.brain/features/<feature>/02-specifications/` using `brain-tool doc new --kind specification` if new, or modify an existing specification without renumbering requirements.
 
-## Workflow
+No `status: draft/approved/needs-revision`, user approval, parent fingerprint or descendant reapproval cycle. For material changes after implementation begins, prefer a focused new specification amendment explicitly identifying `amends` and `supersedes`, leaving unaffected original decisions in force. Do not create documentation merely because a stage exists. Record unresolved consequential choices instead of silently deciding.
 
-1. Inspect approved decisions, relevant source, existing code/tests, and active feature documents. Resolve consequential behavior questions with the user before treating them as settled.
-2. Declare uniquely numbered requirements (`REQ-001`, etc.) and concrete examples (`E1`, etc.): normal, edge, failure, compatibility and unchanged behavior. Make observable expected results and exclusions testable, independent of the implementation.
-3. Specify verification at stable boundaries, including required tests/evidence, known limitations and links to authoritative technical contracts. Preserve confirmed user-directed code constraints as binding requirements where applicable.
-4. Write or revise a document in `.brain/features/<feature-slug>/02-specifications/` via `brain-tool doc new --kind specification` for new drafts only. Use `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md`, its templates, and the deterministic validator for metadata, parent IDs, traceability and coverage. Existing IDs survive revisions.
-5. Ask for explicit approval when required; record only observed approval. Report open decisions, exclusions, coverage and the next applicable stage; invoke `brain-update` after recording a change.
-
-**Revising an approved spec.** On material behavior changes, set `status: needs-revision` in the same edit; never renumber stable IDs and a request to revise is not approval of the written revision. The producing skills `brain-decompose-feature`, `brain-design-implementation`, `brain-write-tasks` must review affected descendants; do not change their status or `parent_hashes` yourself. **Unaffected:** leave independent descendants and approvals intact. Editorial changes without material meaning need no blanket invalidation.
-
-**Read on demand:** `${CLAUDE_SKILL_DIR}/references/spec-details.md` for full example template, technical decisions, verification strategy and nuanced revision handling. For safe CLI invocation see `${CLAUDE_SKILL_DIR}/../brain-init/references/deterministic-tooling.md`.
-
-
-**Writing:** Follow `${CLAUDE_SKILL_DIR}/../brain-init/references/compact-writing.md` when recording Brain facts: concise, evidence-complete entries without duplicated narrative. Do not reformat unrelated existing files solely for style.
-
-**Recommended next step:** End the final user-facing reply with one concise, evidence-based next action, naming the appropriate skill or command when useful. If blocked, identify the missing information, prerequisite, or approval instead of advancing; if complete, say no further action is needed. A recommendation is not authorization to execute another step. Keep it outside copy-ready deliverables.
+Never invoke `brain-update` automatically. See `../brain-init/references/feature-document-contract.md`; consult `references/spec-details.md` only for complex examples or legacy-document conversion. Default inline; concise final summary.

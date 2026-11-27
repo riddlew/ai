@@ -1,45 +1,17 @@
 ---
 name: brain-implement
-description: Implement approved requirements and code-level design in verified, test-first increments, using collaborative review checkpoints by default and resumable per-feature progress when needed.
+description: Implement requested changes with or without a Brain spec, plan, tasks or prior brainstorming; verify proportionately without routine approvals.
 ---
 
 # Implement
 
-Implement approved requirements within the agreed architecture. Small settled changes can proceed directly; substantial or design-sensitive work needs an approved blueprint. Honor `CLAUDE.local.md` for decisions, context loading and write scope.
+**A direct explicit user request is sufficient authorization to implement within its established scope.** No spec, plan, task list, approved blueprint, previous brainstorm, `brain-update` or execution record is required. Use the ongoing brainstorming conversation, a concise decision record, optional handoff, or existing feature docs when available.
 
-## Collaboration and design boundary
+1. Locate the task and relevant Brain index/decisions/amendments (if present). Inspect current Git state, actual code owners, callers, tests and applicable source contracts. Use targeted context, expanding when dependencies or contradictions emerge; never treat a handoff as proof of current source.
+2. Resolve consequential undecided behavior or architecture with the user. For routine reversible details, choose an appropriate implementation and proceed. Plans and specs are optional aids, not gates. Do not ask for mode: **inline is default; subagents require explicit request**.
+3. Implement small coherent increments, respecting existing worktrees and user edits. Use test-first when useful, run risk-proportionate focused checks, inspect actual diffs; do not require approval between increments, a separate code-review invocation or a user confirmation to proceed. High-risk security, persistence, protocol, concurrency and compatibility changes merit deeper checks.
+4. A material newly established change to a documented design may be recorded as a focused amendment with explicit `amends`/`supersedes`; do not rewrite whole original specs or require a document for minor adjustments. Conflicting authoritative decisions require consultation; no latest-document-wins shortcut.
+5. Diagnose a failure before changing code again; use new evidence and different diagnostic approaches, not repeated equivalent retries. Protect modified/untracked files and explicit write boundaries. Create a compact optional `execution.md` for multi-session work; `handoff.md` only when useful. No redundant approvals or copied normative decisions.
+6. Stop when requested behavior is implemented, relevant verification completed or limitations disclosed, and no material blocker remains. Do not continue with unrequested refactors, tests, docs or reviews. Only stage/commit if explicitly instructed.
 
-**Automatic skill invocation is not authorization to modify code.** Begin implementation only when the user explicitly requests implementation. Approval of a specification, blueprint, or task list does not independently authorize implementation. Preserve all existing design-approval and collaborative review checkpoints.
-
-**Collaborative approval checkpoints are the default**, with execution mode selected explicitly. If no mode is confirmed, ask inline (recommended) or subagents and wait. For substantial work, obtain explicit approval of the binding `brain-design-implementation` before editing; after **each verified, coherent increment**, show the diff and verification and **wait for user approval**. **Guided** reviews larger increments; **autonomous** skips routine checkpoints only when the user opts in. No mode waives approval for an unresolved consequential change. Subagent-driven is a separate opt-in execution mode; use `${CLAUDE_SKILL_DIR}/references/subagent-driven.md` and keep the main coordinator out of production edits.
-
-## 1. Establish the boundary
-
-1. Read the project core, active feature's specifications, approved implementation plans, tasks, ADRs and technical source knowledge; inspect all relevant code owners, callers, tests and current Git changes. `brain-context` is optional, not a substitute for discovery: when uncertain, **read more**. If no Brain exists, proceed from the request and mention `/brain-init` once.
-2. Recheck binding plan assumptions against current source and `Design inspected at:`. If a binding design is stale, stop affected work and return to `brain-design-implementation` for revision/approval; independent authorized work may proceed.
-3. Note `git status`; preserve unrelated edits. Record the **true review base before the first code change** and preserve it on resume (do not substitute the design SHA or latest HEAD). Reconcile any recorded base that no longer represents the actual work.
-4. Resolve the previously chosen workspace and collaboration/execution modes without re-asking. Worktrees use a shared Brain: **do not copy brain documents into it**. Verify new worktrees against committed/uncommitted work and user authorization; never silently discard uncommitted or untracked dependencies, auto-merge, or remove worktrees.
-
-## 2. Track execution progress separately from design
-
-For feature tasks or multi-session work, use `.brain/features/<feature-slug>/execution.md`, **not** `04-implementation-plans/`, for checkpoints, review base, verification, blockers, rulings and deviations. Read existing history and preserve approvals. Scaffold a missing record with `brain-tool doc new --kind execution` and append verified events with `record`; preview writes and pass the real authorized scope. Do not mark a task complete from a checkbox or successful scaffold.
-
-If that write is denied or outside the session's authorized boundaries, follow `CLAUDE.local.md` §Worktrees and brain writes. Never route around a restriction. For new/changed tracked work items, review task/plan coverage using `${CLAUDE_SKILL_DIR}/references/impl-plan-review.md`. On resume, inspect the actual diff and any user changes **since the last reviewed checkpoint** before editing.
-
-## 3. Implement and verify
-
-1. Choose the next unblocked requirement/example and smallest coherent behavior slice; do not introduce speculative owners, layers or dependencies.
-2. When observable testing is feasible: write a spec-derived test, verify a meaningful **red** result, make the smallest change, verify **green**, and rerun affected checks. If it already passes, investigate; don't manufacture failure. When tests are impractical, use proportionate observable evidence and disclose limits.
-3. Review the actual diff, requirements and approved binding design; inspect command results. Technically verified is **not** the same as approved or done. Maintain verification evidence in execution records.
-4. In collaborative/guided mode, present the relevant diff, covered acceptance cases and actual test results, request approval and **wait**; a `continue` response approves only the previously reviewed increment. If the user edited files, preserve/reverify them before proceeding.
-5. For consequential design deviations, stop the affected scope and consult/return to `brain-design-implementation`. Minor reversible illustrative adjustments may proceed and be reported.
-
-Commit only upon explicit user instruction; stage only authorized files. For subagent task review and detailed test/review modes, read `${CLAUDE_SKILL_DIR}/references/implement-details.md` **when that mode or situation arises**.
-
-## 4. Finish
-
-Run proportionate checks and inspect the full diff. Substantial or consequential work, or requested review, gets `brain-review-code` including in-scope uncommitted files and recorded Review Focus; small changes get a disclosed self-review. Address findings and user checkpoints. Record evidence; use `brain-update` if knowledge changed. Report changes, verification, approvals and blockers; never claim completion with critical failures. For evidenced repeated process friction only, optionally suggest `/brain-retro <feature>` with a reason. **Never invoke it** for routine work.
-
-**Detailed exceptions:** `${CLAUDE_SKILL_DIR}/references/implement-details.md` covers worktree creation, paused/resumed runs, subagent review packets, failed-test diagnosis, final independent review and fix-pass mechanics. The CLI contract is `${CLAUDE_SKILL_DIR}/../brain-init/references/deterministic-tooling.md`.
-
-**Recommended next step:** End the final user-facing reply with one concise, evidence-based next action, naming the appropriate skill or command when useful. If blocked, identify the missing information, prerequisite, or approval instead of advancing; if complete, say no further action is needed. A recommendation is not authorization to execute another step. Keep it outside copy-ready deliverables.
+Never call `brain-update` automatically. Final answer: changed files, executed verification and unresolved issues. Read `references/implement-details.md` only for specialized tests, delegated implementation or complex resume.

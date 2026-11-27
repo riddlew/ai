@@ -1,23 +1,10 @@
 ---
 name: brain-write-tasks
-description: Decompose approved technical implementation plans into small, verifiable executable tasks with grounded dependencies, requirement coverage, and user-approved task boundaries.
+description: Optionally break complex work into verifiable tasks when coordination benefits outweigh document costs.
 ---
 
-# Write Tasks
+# Write tasks
 
-Translate approved requirements and binding implementation plans into the **smallest independently verifiable behavioral increments**. Do not invent a new architecture or require tasks for trivial direct changes.
+Use only when complex dependencies or multi-session coordination justify persistent tasks. Based on actual requirements, applicable plans/amendments, code and tests, write small coherent tasks with real dependencies, outcomes and checks. No spec/plan is required; tasks may be independent if no governing document exists. Use `brain-tool doc new --kind task` only for requested/useful new docs; preserve IDs and validate real references.
 
-## Workflow
-
-1. Read approved specs/examples, applicable components/plans, explicit exclusions and dependencies. Stop affected tasks if a governing design is `draft` or `needs-revision`.
-2. Divide work by observable behavior and real prerequisites, not arbitrary code layers or one-line edits. Each task cites relevant `SPEC-...#REQ-...` requirements, examples and approved plan parents.
-3. Write clear actions, acceptance evidence, expected tests and negative constraints. Use `brain-tool doc new --kind task` for new drafts in `.brain/features/<feature-slug>/05-tasks/`; preserve stable task IDs on revision.
-4. Validate dependency ordering, cycles, parent fingerprints and requirement coverage; check semantic completeness too. Get explicit approval where required and leave unresolved design choices blocked.
-5. Report the executable task order, skipped levels and handoff to `brain-implement`. Invoke `brain-update` when records change.
-
-Use `${CLAUDE_SKILL_DIR}/../brain-init/references/feature-document-contract.md`. **Read on demand:** `${CLAUDE_SKILL_DIR}/references/task-details.md` for nuanced decomposition/approval and full task examples, or `../brain-init/references/deterministic-tooling.md` for CLI.
-
-
-**Writing:** Follow `${CLAUDE_SKILL_DIR}/../brain-init/references/compact-writing.md` when recording Brain facts: concise, evidence-complete entries without duplicated narrative. Do not reformat unrelated existing files solely for style.
-
-**Recommended next step:** End the final user-facing reply with one concise, evidence-based next action, naming the appropriate skill or command when useful. If blocked, identify the missing information, prerequisite, or approval instead of advancing; if complete, say no further action is needed. A recommendation is not authorization to execute another step. Keep it outside copy-ready deliverables.
+Do not ask to approve task documents or change `status` and parent hashes. No automatic `brain-update`. Default inline. If work is sufficiently clear, recommend direct `brain-implement` instead.
