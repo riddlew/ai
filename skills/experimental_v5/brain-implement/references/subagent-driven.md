@@ -1,0 +1,35 @@
+# Subagent-driven mode
+
+For the coordinator (the main session). When filling any template, fill every slot. Path slots are absolute paths: `{review_feedback_path}` is `${CLAUDE_SKILL_DIR}/references/review-feedback.md`, and `{findings_path}` is `${CLAUDE_SKILL_DIR}/../brain-review-code/references/findings.md`.
+
+Per task, in order:
+
+1. **Base.** Run `git rev-parse HEAD` and `git status --short`, then capture the **contents or patch** of pre-existing staged/unstaged modifications and any relevant untracked files before dispatch (outside the task's files or in the coordinator's context). Record the sha, pre-existing paths, and where baseline evidence is held in the feature's `execution.md` work item. Path lists alone cannot distinguish a task's later edits to those same files. Shell variables do not persist. If the previous task was not committed, keep its base and pre-existing changes, and give the reviewer both tasks' briefs, Examples, and criteria.
+2. **Implementer.** Dispatch on the standard tier with `${CLAUDE_SKILL_DIR}/references/implementer-prompt.md`. Fill only the task text, Examples and criteria, **approved binding implementation-plan constraints plus task-relevant illustrative guidance**, relevant brain excerpts and code locations. Never send the whole `.brain`. Keep its agent id for rounds 1-3. Handle its status:
+   - `NEEDS_CONTEXT`: answer and resume it.
+   - `BLOCKED`: resolve it. If the choice is consequential under `CLAUDE.local.md`, or the implementer reports three failed fixes, consult the user.
+3. **Task reviewer.** Dispatch on the standard tier, read-only, with `${CLAUDE_SKILL_DIR}/references/task-reviewer-prompt.md`: the base sha, the pre-existing baseline (`{preexisting}` including patch/content evidence), the brief, and the implementer's report.
+4. **Fix loop.** Before any fix round, drop findings demonstrated to concern **only** the pre-existing content; compare with captured baseline evidence, not just the file path. A new defect in a previously modified file is still in scope. Never ask an implementer to delete, revert, or overwrite the user's pre-existing work. Run the loop when an Example or criterion is unmet or unclear, or any remaining finding is Critical, High or Medium. Low findings go to `execution.md`'s `## Deferred` list and never to a fix round. Each round is one fix plus one scoped re-review (standard tier, re-review variant). Nothing is committed between rounds, so the re-review input is the cumulative `git diff <base>` plus untracked files, the pre-existing changes, the open findings, and the implementer's fix-round report.
+   - Rounds 1-3: resume the same implementer (in Claude Code, `SendMessage` to its agent id) with the open findings in findings format and "apply the Fix round section".
+   - Rounds 4-5: dispatch a fresh implementer on the strongest tier. Fill the template, including `{open_findings}` and `{prior_report}`.
+   - The implementer may push back with evidence under `review-feedback.md`. The next re-reviewer judges the pushback. A disputed finding still uses up a round.
+   - The loop ends when a review or re-review has no unmet or unclear row and no remaining Critical, High or Medium finding.
+5. **After round 5.** Rule on each open finding, applying `review-feedback.md`:
+   - Reviewer wrong or point contestable: park it with the reason.
+   - Real but not blocking: defer it.
+   - Unmet Example or criterion, or anything consequential: take it to the user. The task is not done.
+
+   Record each ruling under `## Rulings` as `Ruling: <decision> — <why> — <cost if wrong>`. Parked and deferred findings do not block done.
+6. **Proof before done.** Apply SKILL.md §5 step 6: (a) rerun the task's targeted tests or meaningful alternative verification when tests are inapplicable, and read the evidence; (b) verify each Example or criterion against observed output where feasible, not coverage-table claims alone; (c) use the task review plus `git diff --stat <base>`, `git diff --cached --stat`, and untracked-file checks to inspect scope; (d) record commands, results, and limits in the impl plan. Leave the task open if essential behavior is unverified. §7 step 1 decides whether the full suite runs.
+7. **Collaboration checkpoint.** Apply SKILL.md §5's User review and optional commit: in collaborative or guided mode, show the verified task diff, tests, and design deviations **and wait for user approval before dispatching the next task**. Mark `verified, awaiting user review` until approval. In autonomous mode, continue after proof with no routine user pause. If the user explicitly requests a commit, check HEAD moved and inspect `git status --short` for remaining task edits; don't silently stage or commit user changes. If the user continues uncommitted, preserve the baseline evidence for cumulative review.
+
+## Final review
+
+§7 step 3 decides whether a full review runs; per-task reviews and the execution mode do not make a change substantial. When it does run, it uses the impl plan header's `Review base`, not the per-task bases; its fix pass is one fresh strongest-tier implementer, using the implementer prompt's Fix round section with the final findings. Then run appropriate full/affected verification and the collaboration checkpoint when the mode requires it. Inline mode: the main session fixes, as §7 says.
+
+## Rules
+
+- Never edit code in this mode, including fixes. Fixes go through implementers.
+- Pause for **increment reviews** in collaborative/guided mode, unresolved consequential decisions, and blockers you cannot resolve. Commit only on explicit instruction; do not add commit pauses in autonomous mode.
+- Never dispatch two implementers at once.
+- If no subagent tool is available, say so once and switch to inline for the rest of the run. Record `Execution mode: inline (no subagent tool)` in the impl plan header.

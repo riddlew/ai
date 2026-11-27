@@ -1,0 +1,9 @@
+[project]
+name = "crate"
+version = "0.1.0"
+description = "A command-line tool for DJs to organize tracks into crates"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
