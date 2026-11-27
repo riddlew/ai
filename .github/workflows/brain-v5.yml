@@ -1,0 +1,38 @@
+name: Brain v5 integration contracts
+on:
+  pull_request:
+    paths:
+      - "skills/experimental_v5/**"
+      - ".github/workflows/brain-v5.yml"
+  push:
+    branches: [feat/experimental-v5-simplified-brain]
+    paths:
+      - "skills/experimental_v5/**"
+      - ".github/workflows/brain-v5.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  v5:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Compile v5 Python
+        run: python -m compileall -q skills/experimental_v5/brain-init/scripts skills/experimental_v5/tests
+      - name: Validate v5 contracts and all three tool runtimes
+        run: python -m unittest discover -s skills/experimental_v5/tests -p 'test_v5_*.py' -v
+      - name: Run inherited contract tests against v5
+        run: python -m unittest discover -s skills/experimental_v5/tests -p 'test_*_contract.py' -v
+      - name: Confirm v4 fixture compatibility
+        run: python skills/experimental_v5/brain-init/scripts/validate_feature_docs.py skills/experimental_v5/tests/fixture/hierarchical-brain/.brain/features --check-coverage
