@@ -1,18 +1,8 @@
 ---
 name: brain-test-skill
-description: Test whether a skill changes what an agent does, by running it on scenarios in fresh agents. Use when asked to test whether a skill's rule holds, or before claiming that a new skill or a change to a skill's behavior works.
+description: Test skill behavior against observable scenarios and explicit criteria when agent runner available.
 ---
 
 # Test a skill
 
-A **skill test is a fresh agent acting in a throwaway fixture**, scored against explicit observable criteria. A reading is a review, not a test. Never claim a rule holds based on reading or one sample.
-
-1. Specify the behavior, pressure and expected failure. Use existing scenario formats/fixtures; for a changed skill compare a **RED baseline** with a **GREEN modified** arm using the same trigger, model, wrapper and checkable criteria.
-2. Write scenario pass criteria *before* any agent run. Isolate fixtures/agent outputs from criteria and other runs. A pressure scenario must cause the agent to act, not just answer what it would do.
-3. Follow `CLAUDE.local.md` §Execution mode selection: ask and wait if no mode is confirmed. Actual behavioral testing requires fresh agents. Dispatch one fresh agent per run with an explicitly selected tier **only when the user opts into subagents**. If inline was selected or no agent runner is available, report **No test run** and offer a labeled static review instead. Do not allow unrelated skills to satisfy the test.
-4. Grade actual replies, files and Git state; mark unseen behavior **unverified**. An agent that accessed hidden criteria is a void sample. One run is not a frequency estimate: require **three or more samples** before claiming a behavior generally holds/fails; narrow regression reruns may use one sample.
-5. If RED already passes, strengthen pressure once; if GREEN fails, revise the failure mechanism and rerun. Report model, samples, evidence, RED/GREEN outcomes, prior-scenario regressions and limitations. Never invent run results or commit unrequested edits.
-
-**Read when needed:** `${CLAUDE_SKILL_DIR}/references/scenario-format.md` and `${CLAUDE_SKILL_DIR}/references/skill-testing-details.md` for fixture setup, red-flag analysis, runner limits, grading and full report shape.
-
-**Recommended next step:** End the final user-facing reply with one concise, evidence-based next action, naming the appropriate skill or command when useful. If blocked, identify the missing information, prerequisite, or approval instead of advancing; if complete, say no further action is needed. A recommendation is not authorization to execute another step. Keep it outside copy-ready deliverables.
+Define actual observable criteria, then compare baseline and modified behavior in isolated disposable fixtures using the same model, wrapper and inputs. Default inline; never auto-dispatch subagents. Running fresh-agent behavioral tests requires an explicitly authorized subagent mode and available agent runner. When not available, report **No behavioral test run** and perform clearly labeled static contract review if useful. Grade actual files, replies and code evidence; never invent run results or claim general reliability from one sample. No automatic `brain-update`. See `references/skill-testing-details.md`.
